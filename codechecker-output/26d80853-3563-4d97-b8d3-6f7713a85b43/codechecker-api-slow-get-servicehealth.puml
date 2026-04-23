@@ -1,0 +1,43 @@
+@startuml codechecker_api_slow_get_servicehealth
+left to right direction
+skinparam defaultFontSize 11
+skinparam defaultFontName Arial
+skinparam titleFontSize 14
+skinparam titleFontStyle bold
+skinparam rectangle {
+  RoundCorner 8
+  BorderThickness 2
+}
+
+title A2 - SLOW API Analysis\nGET /servicehealth\np50: ~543ms | p95: ~1357ms | Rating: SLOW\n2026-04-02
+
+rectangle " ROOT CAUSE ANALYSIS\n A2-003: Synchronous REST call — HealthServiceResource.getServiceHealth()\n A2-005: No timeout on REST client — RESOLVED_AT_RUNTIME\n " as rootcause #FADBD8
+
+rectangle " HTTP Request\n GET /servicehealth\n ~10ms routing " as http #EBF5FB
+
+rectangle " HealthServiceResource.getServiceHealth()\n ~5ms binding " as ctrl #D6EAF8
+
+rectangle " MDC.put()\n line 65\n ~5ms " as svc0_0 #D5F5E3
+
+rectangle " request.getHeader()\n line 67\n ~5ms " as svc1_0 #D5F5E3
+
+rectangle " logger.info()\n line 69\n ~5ms " as svc2_0 #D5F5E3
+
+rectangle " HealthServiceResource.getServiceHealth()\n line 74\n When: null == response\n ~510ms " as svc3_0 #FADBD8
+
+cloud " REST: PUT RESOLVED_AT_RUNTIME\n NO TIMEOUT — thread could hang\n ~500ms " as svc3_0_ext0 #FADBD8
+svc3_0 --> svc3_0_ext0
+
+  rectangle " HealthService.getServiceHealth()\n line 23\n When: null == response\n ~5ms " as svc3_n0_1 #D5F5E3
+
+svc3_0 --> svc3_n0_1
+rectangle " TIMING BREAKDOWN\n Total p50: ~543ms\n Total p95: ~1357ms\n " as timebox #FADBD8
+
+http --> ctrl
+ctrl -[#E74C3C,thickness=2]-> svc0_0
+ctrl -[#E74C3C,thickness=2]-> svc1_0
+ctrl -[#E74C3C,thickness=2]-> svc2_0
+ctrl -[#E74C3C,thickness=2]-> svc3_0
+rootcause -[hidden]-> http
+timebox -[hidden]-> ctrl
+@enduml

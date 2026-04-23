@@ -1,0 +1,189 @@
+@startuml codechecker_api_get_authallucare
+left to right direction
+skinparam defaultFontSize 11
+skinparam defaultFontName Arial
+skinparam titleFontSize 14
+skinparam titleFontStyle bold
+skinparam rectangle {
+  RoundCorner 8
+  BorderThickness 2
+}
+skinparam database {
+  BorderColor #2C3E50
+  BorderThickness 2
+}
+skinparam cloud {
+  BorderColor #8E44AD
+  BorderThickness 2
+}
+
+title A1 - GET /authAllucare - AuthenticationResource.validateAllucareToken()\nRated: MODERATE - 2026-04-06
+
+rectangle " HTTP Client " as client #EBF5FB
+
+rectangle " HTTP Request\n GET /authAllucare\n Auth: NO AUTH\n @Valid: NO " as req #EBF5FB
+
+rectangle " AuthenticationResource\n validateAllucareToken() line 137\n Framework: SEEDSTACK_JAXRS\n Issues: NONE " as ctrl #D6EAF8
+
+rectangle " MDC\n put() line 147\n Est: ~5ms " as svc1 #D5F5E3
+
+rectangle " logger\n info() line 148\n Est: ~5ms " as svc2 #D5F5E3
+
+rectangle " AuthentiationTokenService\n validateSignedToken1() line 158\n Called when: null == response\n Est: ~5ms " as svc3 #D5F5E3
+
+rectangle " HubPayloadResponse\n getUserID() line 162\n Called when: res instanceof HubPayloadResponse\n Est: ~5ms " as svc4 #D5F5E3
+
+rectangle " HubPayloadResponse\n getVin() line 163\n Called when: res instanceof HubPayloadResponse\n Est: ~5ms " as svc5 #D5F5E3
+
+rectangle " logger\n info() line 164\n Called when: res instanceof HubPayloadResponse\n Est: ~5ms " as svc6 #D5F5E3
+
+rectangle " BrandcareRepository\n getProgramTitleByBrand() line 167\n Called when: check == null\n Est: ~5ms " as svc7 #D5F5E3
+
+rectangle " HubPayloadResponse\n getVinBrand() line 167\n Called when: check == null\n Est: ~5ms " as svc8 #D5F5E3
+
+rectangle " HubPayloadResponse\n getLocale() line 167\n Called when: check == null\n Est: ~5ms " as svc9 #D5F5E3
+
+rectangle " HubPayloadResponse\n setProgramTitle() line 168\n Called when: check == null\n Est: ~5ms " as svc10 #D5F5E3
+
+rectangle " Response\n ok() line 169\n Called when: check == null\n Est: ~5ms " as svc11 #D5F5E3
+
+rectangle " new Gson()\n toJson() line 169\n Called when: check == null\n Est: ~5ms " as svc12 #D5F5E3
+
+rectangle " builder\n build() line 170\n Called when: check == null\n Est: ~5ms " as svc13 #D5F5E3
+
+rectangle " logger\n info() line 172\n Called when: check == null\n Est: ~5ms " as svc14 #D5F5E3
+
+rectangle " PanierPayloadResponse\n getUserID() line 178\n Called when: res instanceof PanierPayloadResponse\n Est: ~5ms " as svc15 #D5F5E3
+
+rectangle " PanierPayloadResponse\n getVin() line 179\n Called when: res instanceof PanierPayloadResponse\n Est: ~5ms " as svc16 #D5F5E3
+
+rectangle " logger\n info() line 180\n Called when: res instanceof PanierPayloadResponse\n Est: ~5ms " as svc17 #D5F5E3
+
+rectangle " brandcareRepository\n getProgramTitleByBrand() line 183\n Called when: check == null\n Est: ~5ms " as svc18 #D5F5E3
+
+rectangle " PanierPayloadResponse\n getVinBrand() line 183\n Called when: check == null\n Est: ~5ms " as svc19 #D5F5E3
+
+rectangle " PanierPayloadResponse\n getLocale() line 183\n Called when: check == null\n Est: ~5ms " as svc20 #D5F5E3
+
+rectangle " PanierPayloadResponse\n setProgramTitle() line 184\n Called when: check == null\n Est: ~5ms " as svc21 #D5F5E3
+
+rectangle " Response\n ok() line 185\n Called when: check == null\n Est: ~5ms " as svc22 #D5F5E3
+
+rectangle " new Gson()\n toJson() line 185\n Called when: check == null\n Est: ~5ms " as svc23 #D5F5E3
+
+rectangle " builder\n build() line 186\n Called when: check == null\n Est: ~5ms " as svc24 #D5F5E3
+
+rectangle " logger\n info() line 188\n Called when: check == null\n Est: ~5ms " as svc25 #D5F5E3
+
+rectangle " logger\n error() line 193\n Called when: res instanceof PanierPayloadResponse\n Est: ~5ms " as svc26 #D5F5E3
+
+rectangle " ValidatorImpl\n dimboErrorResponse() line 194\n Called when: res instanceof PanierPayloadResponse\n Est: ~5ms " as svc27 #D5F5E3
+
+rectangle " ValidatorImpl\n returnErrorResponse() line 195\n Called when: res instanceof PanierPayloadResponse\n Est: ~5ms " as svc28 #D5F5E3
+
+rectangle " logger\n error() line 200\n Called when: res != null\n Est: ~5ms " as svc29 #D5F5E3
+
+rectangle " validator\n dimboErrorResponse() line 201\n Called when: res != null\n Est: ~5ms " as svc30 #D5F5E3
+
+rectangle " validator\n returnErrorResponse() line 202\n Called when: res != null\n Est: ~5ms " as svc31 #D5F5E3
+
+rectangle " logger\n error() line 206\n Called when: null == response\n Est: ~5ms " as svc32 #D5F5E3
+
+rectangle " e\n getMessage() line 206\n Called when: null == response\n Est: ~5ms " as svc33 #D5F5E3
+
+rectangle " validator\n dimboErrorResponse() line 208\n Called when: null == response\n Est: ~5ms " as svc34 #D5F5E3
+
+rectangle " validator\n returnErrorResponse() line 209\n Called when: null == response\n Est: ~5ms " as svc35 #D5F5E3
+
+rectangle " logger\n error() line 213\n Called when: null == response\n Est: ~5ms " as svc36 #D5F5E3
+
+rectangle " validator\n dimboErrorResponse() line 214\n Called when: null == response\n Est: ~5ms " as svc37 #D5F5E3
+
+rectangle " validator\n returnErrorResponse() line 215\n Called when: null == response\n Est: ~5ms " as svc38 #D5F5E3
+
+rectangle " logger\n error() line 219\n Called when: null == response\n Est: ~5ms " as svc39 #D5F5E3
+
+rectangle " validator\n dimboErrorResponse() line 221\n Called when: null == response\n Est: ~5ms " as svc40 #D5F5E3
+
+rectangle " validator\n returnErrorResponse() line 221\n Called when: null == response\n Est: ~5ms " as svc41 #D5F5E3
+
+rectangle " logger\n error() line 225\n Called when: null == response\n Est: ~5ms " as svc42 #D5F5E3
+
+rectangle " e\n getMessage() line 225\n Called when: null == response\n Est: ~5ms " as svc43 #D5F5E3
+
+rectangle " validator\n dimboErrorResponse() line 227\n Called when: null == response\n Est: ~5ms " as svc44 #D5F5E3
+
+rectangle " validator\n returnErrorResponse() line 228\n Called when: null == response\n Est: ~5ms " as svc45 #D5F5E3
+
+rectangle " logger\n error() line 232\n Called when: null == response\n Est: ~5ms " as svc46 #D5F5E3
+
+rectangle " validator\n dimboErrorResponse() line 233\n Called when: null == response\n Est: ~5ms " as svc47 #D5F5E3
+
+rectangle " validator\n returnErrorResponse() line 233\n Called when: null == response\n Est: ~5ms " as svc48 #D5F5E3
+
+rectangle " e\n getMessage() line 234\n Called when: null == response\n Est: ~5ms " as svc49 #D5F5E3
+
+rectangle " CorsPolicy\n makeCORSComplaint() line 238\n Est: ~5ms " as svc50 #D5F5E3
+
+database " Database " as db #D6EAF8
+
+rectangle " Response\n 200 OK " as resp #E8F8E8
+
+rectangle " Timing - GET /authAllucare\n p50 ESTIMATED: ~268ms\n p95 ESTIMATED: ~670ms\n Rating: MODERATE " as timing #FDEBD0
+
+client -[#2196F3,thickness=2]-> req
+req -[#2196F3,thickness=2]-> ctrl : GET /authAllucare
+ctrl -[#27AE60,thickness=2]-> svc1 : put()
+ctrl -[#27AE60,thickness=2]-> svc2 : info()
+ctrl -[#27AE60,thickness=2]-> svc3 : validateSignedToken1()
+ctrl -[#27AE60,thickness=2]-> svc4 : getUserID()
+ctrl -[#27AE60,thickness=2]-> svc5 : getVin()
+ctrl -[#27AE60,thickness=2]-> svc6 : info()
+ctrl -[#27AE60,thickness=2]-> svc7 : getProgramTitleByBrand()
+ctrl -[#27AE60,thickness=2]-> svc8 : getVinBrand()
+ctrl -[#27AE60,thickness=2]-> svc9 : getLocale()
+ctrl -[#27AE60,thickness=2]-> svc10 : setProgramTitle()
+ctrl -[#27AE60,thickness=2]-> svc11 : ok()
+ctrl -[#27AE60,thickness=2]-> svc12 : toJson()
+ctrl -[#27AE60,thickness=2]-> svc13 : build()
+ctrl -[#27AE60,thickness=2]-> svc14 : info()
+ctrl -[#27AE60,thickness=2]-> svc15 : getUserID()
+ctrl -[#27AE60,thickness=2]-> svc16 : getVin()
+ctrl -[#27AE60,thickness=2]-> svc17 : info()
+ctrl -[#27AE60,thickness=2]-> svc18 : getProgramTitleByBrand()
+ctrl -[#27AE60,thickness=2]-> svc19 : getVinBrand()
+ctrl -[#27AE60,thickness=2]-> svc20 : getLocale()
+ctrl -[#27AE60,thickness=2]-> svc21 : setProgramTitle()
+ctrl -[#27AE60,thickness=2]-> svc22 : ok()
+ctrl -[#27AE60,thickness=2]-> svc23 : toJson()
+ctrl -[#27AE60,thickness=2]-> svc24 : build()
+ctrl -[#27AE60,thickness=2]-> svc25 : info()
+ctrl -[#27AE60,thickness=2]-> svc26 : error()
+ctrl -[#27AE60,thickness=2]-> svc27 : dimboErrorResponse()
+ctrl -[#27AE60,thickness=2]-> svc28 : returnErrorResponse()
+ctrl -[#27AE60,thickness=2]-> svc29 : error()
+ctrl -[#27AE60,thickness=2]-> svc30 : dimboErrorResponse()
+ctrl -[#27AE60,thickness=2]-> svc31 : returnErrorResponse()
+ctrl -[#27AE60,thickness=2]-> svc32 : error()
+ctrl -[#27AE60,thickness=2]-> svc33 : getMessage()
+ctrl -[#27AE60,thickness=2]-> svc34 : dimboErrorResponse()
+ctrl -[#27AE60,thickness=2]-> svc35 : returnErrorResponse()
+ctrl -[#27AE60,thickness=2]-> svc36 : error()
+ctrl -[#27AE60,thickness=2]-> svc37 : dimboErrorResponse()
+ctrl -[#27AE60,thickness=2]-> svc38 : returnErrorResponse()
+ctrl -[#27AE60,thickness=2]-> svc39 : error()
+ctrl -[#27AE60,thickness=2]-> svc40 : dimboErrorResponse()
+ctrl -[#27AE60,thickness=2]-> svc41 : returnErrorResponse()
+ctrl -[#27AE60,thickness=2]-> svc42 : error()
+ctrl -[#27AE60,thickness=2]-> svc43 : getMessage()
+ctrl -[#27AE60,thickness=2]-> svc44 : dimboErrorResponse()
+ctrl -[#27AE60,thickness=2]-> svc45 : returnErrorResponse()
+ctrl -[#27AE60,thickness=2]-> svc46 : error()
+ctrl -[#27AE60,thickness=2]-> svc47 : dimboErrorResponse()
+ctrl -[#27AE60,thickness=2]-> svc48 : returnErrorResponse()
+ctrl -[#27AE60,thickness=2]-> svc49 : getMessage()
+ctrl -[#27AE60,thickness=2]-> svc50 : makeCORSComplaint()
+ctrl -[#27AE60,thickness=2]-> resp
+resp -[#2196F3,thickness=2]-> client
+timing --> resp
+@enduml

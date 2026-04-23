@@ -1,0 +1,549 @@
+@startuml codechecker_api_get_vins
+left to right direction
+skinparam defaultFontSize 11
+skinparam defaultFontName Arial
+skinparam titleFontSize 14
+skinparam titleFontStyle bold
+skinparam rectangle {
+  RoundCorner 8
+  BorderThickness 2
+}
+skinparam database {
+  BorderColor #2C3E50
+  BorderThickness 2
+}
+skinparam cloud {
+  BorderColor #8E44AD
+  BorderThickness 2
+}
+
+title A1 - GET /vins - VehicleIdentificationNumberResource.getVins()\nRated: SLOW - 2026-04-02
+
+rectangle " HTTP Client " as client #EBF5FB
+
+rectangle " HTTP Request\n GET /vins\n Auth: NO AUTH\n @Valid: NO " as req #EBF5FB
+
+rectangle " VehicleIdentificationNumberResource\n getVins() line 112\n Framework: SEEDSTACK_JAXRS\n Issues: NONE " as ctrl #D6EAF8
+
+rectangle " MDC\n put() line 128\n Est: ~5ms " as svc1 #D5F5E3
+
+rectangle " logger\n info() line 129\n Est: ~5ms " as svc2 #D5F5E3
+
+rectangle " parameter\n setForceRefresh() line 133\n Est: ~5ms " as svc3 #D5F5E3
+
+rectangle " parameter\n setDetails() line 134\n Est: ~5ms " as svc4 #D5F5E3
+
+rectangle " parameter\n setVehicleDescriptionFull() line 135\n Est: ~5ms " as svc5 #D5F5E3
+
+rectangle " parameter\n setContract() line 136\n Est: ~5ms " as svc6 #D5F5E3
+
+rectangle " parameter\n setWarranty() line 137\n Est: ~5ms " as svc7 #D5F5E3
+
+rectangle " parameter\n setAllWarranties() line 138\n Est: ~5ms " as svc8 #D5F5E3
+
+rectangle " parameter\n setWarrantyClaims() line 139\n Est: ~5ms " as svc9 #D5F5E3
+
+rectangle " parameter\n setServiceHistory() line 140\n Est: ~5ms " as svc10 #D5F5E3
+
+rectangle " parameter\n setRecallCampaigns() line 141\n Est: ~5ms " as svc11 #D5F5E3
+
+rectangle " parameter\n setLicencePlateNo() line 142\n Est: ~5ms " as svc12 #D5F5E3
+
+rectangle " ESAPI.encoder()\n encodeForHTML() line 142\n Est: ~5ms " as svc13 #D5F5E3
+
+rectangle " ESAPI\n encoder() line 142\n Est: ~5ms " as svc14 #D5F5E3
+
+rectangle " parameter\n setIdToCheck() line 143\n Est: ~5ms " as svc15 #D5F5E3
+
+rectangle " parameter\n setIsSagaiDeployed() line 145\n Est: ~5ms " as svc16 #D5F5E3
+
+rectangle " parameter\n setListLcdvOvip() line 146\n Est: ~5ms " as svc17 #D5F5E3
+
+rectangle " parameter\n setListElectronic() line 147\n Est: ~5ms " as svc18 #D5F5E3
+
+rectangle " StringUtils\n isNotBlank() line 148\n Called when: StringUtils.isNotBlank(brandName)\n Est: ~5ms " as svc19 #D5F5E3
+
+rectangle " parameter\n setBrandName() line 149\n Called when: StringUtils.isNotBlank(brandName)\n Est: ~5ms " as svc20 #D5F5E3
+
+rectangle " ESAPI.encoder()\n encodeForHTML() line 153\n Est: ~5ms " as svc21 #D5F5E3
+
+rectangle " ESAPI\n encoder() line 153\n Est: ~5ms " as svc22 #D5F5E3
+
+rectangle " CartellService\n getLanguage() line 156\n Est: ~5ms " as svc23 #D5F5E3
+
+rectangle " ESAPI.encoder()\n encodeForHTML() line 156\n Est: ~5ms " as svc24 #D5F5E3
+
+rectangle " ESAPI\n encoder() line 156\n Est: ~5ms " as svc25 #D5F5E3
+
+rectangle " request\n getHeader() line 156\n Est: ~5ms " as svc26 #D5F5E3
+
+rectangle " ESAPI.encoder()\n encodeForHTML() line 157\n Est: ~5ms " as svc27 #D5F5E3
+
+rectangle " ESAPI\n encoder() line 157\n Est: ~5ms " as svc28 #D5F5E3
+
+rectangle " request\n getHeader() line 157\n Est: ~5ms " as svc29 #D5F5E3
+
+rectangle " ESAPI.encoder()\n encodeForHTML() line 158\n Est: ~5ms " as svc30 #D5F5E3
+
+rectangle " ESAPI\n encoder() line 158\n Est: ~5ms " as svc31 #D5F5E3
+
+rectangle " request\n getHeader() line 158\n Est: ~5ms " as svc32 #D5F5E3
+
+rectangle " com.inetpsa.cin.vin.domain.shared.enums.Consumer\n getConsumerNameByKey() line 159\n Est: ~5ms " as svc33 #D5F5E3
+
+rectangle " parameter\n setConsumerName() line 160\n Est: ~5ms " as svc34 #D5F5E3
+
+rectangle " parameter\n setApiKey() line 161\n Est: ~5ms " as svc35 #D5F5E3
+
+rectangle " country\n isEmpty() line 162\n Called when: null != country && !country.isEmpty()\n Est: ~5ms " as svc36 #D5F5E3
+
+rectangle " parameter\n setCountry() line 163\n Called when: null != country && !country.isEmpty()\n Est: ~5ms " as svc37 #D5F5E3
+
+rectangle " country\n toLowerCase() line 163\n Called when: null != country && !country.isEmpty()\n Est: ~5ms " as svc38 #D5F5E3
+
+rectangle " parameter\n setVis() line 164\n Est: ~5ms " as svc39 #D5F5E3
+
+rectangle " parameter\n setIntent() line 165\n Est: ~5ms " as svc40 #D5F5E3
+
+rectangle " parameter\n setSource() line 166\n Est: ~5ms " as svc41 #D5F5E3
+
+rectangle " StringUtils\n isEmpty() line 168\n Called when: !StringUtils.isEmpty(lpnCountry) && util.isValidAlhaStr(lpnCountry.toLowerCase())\n Est: ~5ms " as svc42 #D5F5E3
+
+rectangle " util\n isValidAlhaStr() line 168\n Called when: !StringUtils.isEmpty(lpnCountry) && util.isValidAlhaStr(lpnCountry.toLowerCase())\n Est: ~5ms " as svc43 #D5F5E3
+
+rectangle " lpnCountry\n toLowerCase() line 168\n Called when: !StringUtils.isEmpty(lpnCountry) && util.isValidAlhaStr(lpnCountry.toLowerCase())\n Est: ~5ms " as svc44 #D5F5E3
+
+rectangle " parameter\n setLpnCountry() line 169\n Called when: !StringUtils.isEmpty(lpnCountry) && util.isValidAlhaStr(lpnCountry.toLowerCase())\n Est: ~5ms " as svc45 #D5F5E3
+
+rectangle " lpnCountry\n toLowerCase() line 169\n Called when: !StringUtils.isEmpty(lpnCountry) && util.isValidAlhaStr(lpnCountry.toLowerCase())\n Est: ~5ms " as svc46 #D5F5E3
+
+rectangle " parameter\n setLanguageCode() line 172\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc47 #D5F5E3
+
+rectangle " logger\n debug() line 175\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc48 #D5F5E3
+
+rectangle " parameter\n setVin() line 178\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc49 #D5F5E3
+
+rectangle " vinNumber\n toUpperCase() line 178\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc50 #D5F5E3
+
+rectangle " parameter.getVin()\n length() line 179\n Called when: parameter.getVin().length() != Constants.SEVENTEEN\n Est: ~5ms " as svc51 #D5F5E3
+
+rectangle " parameter\n getVin() line 179\n Called when: parameter.getVin().length() != Constants.SEVENTEEN\n Est: ~5ms " as svc52 #D5F5E3
+
+rectangle " CartellService\n getCountry() line 181\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc53 #D5F5E3
+
+rectangle " parameter\n setCountry() line 182\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc54 #D5F5E3
+
+rectangle " logger\n info() line 183\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc55 #D5F5E3
+
+rectangle " parameter\n getSource() line 186\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc56 #D5F5E3
+
+rectangle " parameter\n getDetails() line 186\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc57 #D5F5E3
+
+rectangle " parameter\n getIntent() line 186\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc58 #D5F5E3
+
+rectangle " parameter\n getVehicleDescriptionFull() line 186\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc59 #D5F5E3
+
+rectangle " parameter\n getContract() line 187\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc60 #D5F5E3
+
+rectangle " parameter\n getWarranty() line 187\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc61 #D5F5E3
+
+rectangle " parameter\n getAllWarranties() line 187\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc62 #D5F5E3
+
+rectangle " parameter\n getWarrantyClaims() line 187\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc63 #D5F5E3
+
+rectangle " parameter\n getServiceHistory() line 188\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc64 #D5F5E3
+
+rectangle " parameter\n getRecallCampaigns() line 188\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc65 #D5F5E3
+
+rectangle " parameter\n getForceRefresh() line 188\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc66 #D5F5E3
+
+rectangle " parameter\n getIsSagaiDeployed() line 188\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc67 #D5F5E3
+
+rectangle " parameter\n getBrandName() line 189\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc68 #D5F5E3
+
+rectangle " parameter\n getListLcdvOvip() line 189\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc69 #D5F5E3
+
+rectangle " parameter\n getListElectronic() line 189\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc70 #D5F5E3
+
+rectangle " parameter\n getCountry() line 189\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc71 #D5F5E3
+
+rectangle " CartellService\n processForCartellSource() line 192\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc72 #D5F5E3
+
+rectangle " logger\n debug() line 196\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc73 #D5F5E3
+
+rectangle " parameter\n setVin() line 197\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc74 #D5F5E3
+
+rectangle " vinNumber\n toUpperCase() line 197\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc75 #D5F5E3
+
+rectangle " parameter.getVin()\n length() line 198\n Called when: parameter.getVin().length() != Constants.SEVENTEEN\n Est: ~5ms " as svc76 #D5F5E3
+
+rectangle " parameter\n getVin() line 198\n Called when: parameter.getVin().length() != Constants.SEVENTEEN\n Est: ~5ms " as svc77 #D5F5E3
+
+rectangle " Arrays.asList(appConfig.getNonPcdVins().split(ACTION_SPLIT))\n contains() line 200\n Called when: Arrays.asList(appConfig.getNonPcdVins().split(ACTION_SPLIT)).contains(parameter.getVin().substring(Constants.SUBSTRING_ZERO, Constants.SUBSTRING_THREE))\n Est: ~5ms " as svc78 #D5F5E3
+
+rectangle " Arrays\n asList() line 200\n Called when: Arrays.asList(appConfig.getNonPcdVins().split(ACTION_SPLIT)).contains(parameter.getVin().substring(Constants.SUBSTRING_ZERO, Constants.SUBSTRING_THREE))\n Est: ~5ms " as svc79 #D5F5E3
+
+rectangle " appConfig.getNonPcdVins()\n split() line 200\n Called when: Arrays.asList(appConfig.getNonPcdVins().split(ACTION_SPLIT)).contains(parameter.getVin().substring(Constants.SUBSTRING_ZERO, Constants.SUBSTRING_THREE))\n Est: ~5ms " as svc80 #D5F5E3
+
+rectangle " appConfig\n getNonPcdVins() line 200\n Called when: Arrays.asList(appConfig.getNonPcdVins().split(ACTION_SPLIT)).contains(parameter.getVin().substring(Constants.SUBSTRING_ZERO, Constants.SUBSTRING_THREE))\n Est: ~5ms " as svc81 #D5F5E3
+
+rectangle " parameter.getVin()\n substring() line 201\n Called when: Arrays.asList(appConfig.getNonPcdVins().split(ACTION_SPLIT)).contains(parameter.getVin().substring(Constants.SUBSTRING_ZERO, Constants.SUBSTRING_THREE))\n Est: ~5ms " as svc82 #D5F5E3
+
+rectangle " parameter\n getVin() line 201\n Called when: Arrays.asList(appConfig.getNonPcdVins().split(ACTION_SPLIT)).contains(parameter.getVin().substring(Constants.SUBSTRING_ZERO, Constants.SUBSTRING_THREE))\n Est: ~5ms " as svc83 #D5F5E3
+
+rectangle " logger\n info() line 203\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc84 #D5F5E3
+
+rectangle " parameter\n getSource() line 206\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc85 #D5F5E3
+
+rectangle " parameter\n getDetails() line 206\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc86 #D5F5E3
+
+rectangle " parameter\n getIntent() line 206\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc87 #D5F5E3
+
+rectangle " parameter\n getVehicleDescriptionFull() line 206\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc88 #D5F5E3
+
+rectangle " parameter\n getContract() line 207\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc89 #D5F5E3
+
+rectangle " parameter\n getWarranty() line 207\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc90 #D5F5E3
+
+rectangle " parameter\n getAllWarranties() line 207\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc91 #D5F5E3
+
+rectangle " parameter\n getWarrantyClaims() line 207\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc92 #D5F5E3
+
+rectangle " parameter\n getServiceHistory() line 208\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc93 #D5F5E3
+
+rectangle " parameter\n getRecallCampaigns() line 208\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc94 #D5F5E3
+
+rectangle " parameter\n getForceRefresh() line 208\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc95 #D5F5E3
+
+rectangle " parameter\n getIsSagaiDeployed() line 208\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc96 #D5F5E3
+
+rectangle " parameter\n getBrandName() line 209\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc97 #D5F5E3
+
+rectangle " parameter\n getListLcdvOvip() line 209\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc98 #D5F5E3
+
+rectangle " parameter\n getListElectronic() line 209\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc99 #D5F5E3
+
+rectangle " parameter\n getCountry() line 209\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc100 #D5F5E3
+
+rectangle " RecoverDescriptionServiceImpl\n getVinResponse() line 215\n Called when: consumerNewFlow\n Est: ~25ms " as svc101 #D5F5E3
+
+rectangle " esaService\n getVinResponseFromEsa() line 217\n Called when: consumerNewFlow\n Est: ~5ms " as svc102 #D5F5E3
+
+rectangle " logger\n debug() line 221\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc103 #D5F5E3
+
+rectangle " logger\n info() line 224\n Called when: response == null && vinSource != null && null != vinNumber\n Est: ~5ms " as svc104 #D5F5E3
+
+rectangle " parameter\n setLanguageCode() line 227\n Called when: null == response && null != visNumber\n Est: ~5ms " as svc105 #D5F5E3
+
+rectangle " logger\n debug() line 228\n Called when: null == response && null != visNumber\n Est: ~5ms " as svc106 #D5F5E3
+
+rectangle " parameter\n setVis() line 229\n Called when: null == response && null != visNumber\n Est: ~5ms " as svc107 #D5F5E3
+
+rectangle " visNumber\n toUpperCase() line 229\n Called when: null == response && null != visNumber\n Est: ~5ms " as svc108 #D5F5E3
+
+rectangle " logger\n info() line 230\n Called when: null == response && null != visNumber\n Est: ~5ms " as svc109 #D5F5E3
+
+rectangle " parameter\n getSource() line 233\n Called when: null == response && null != visNumber\n Est: ~5ms " as svc110 #D5F5E3
+
+rectangle " parameter\n getDetails() line 233\n Called when: null == response && null != visNumber\n Est: ~5ms " as svc111 #D5F5E3
+
+rectangle " parameter\n getIntent() line 233\n Called when: null == response && null != visNumber\n Est: ~5ms " as svc112 #D5F5E3
+
+rectangle " parameter\n getVehicleDescriptionFull() line 233\n Called when: null == response && null != visNumber\n Est: ~5ms " as svc113 #D5F5E3
+
+rectangle " parameter\n getContract() line 234\n Called when: null == response && null != visNumber\n Est: ~5ms " as svc114 #D5F5E3
+
+rectangle " parameter\n getWarranty() line 234\n Called when: null == response && null != visNumber\n Est: ~5ms " as svc115 #D5F5E3
+
+rectangle " parameter\n getAllWarranties() line 234\n Called when: null == response && null != visNumber\n Est: ~5ms " as svc116 #D5F5E3
+
+rectangle " parameter\n getWarrantyClaims() line 234\n Called when: null == response && null != visNumber\n Est: ~5ms " as svc117 #D5F5E3
+
+rectangle " parameter\n getServiceHistory() line 235\n Called when: null == response && null != visNumber\n Est: ~5ms " as svc118 #D5F5E3
+
+rectangle " parameter\n getRecallCampaigns() line 235\n Called when: null == response && null != visNumber\n Est: ~5ms " as svc119 #D5F5E3
+
+rectangle " parameter\n getForceRefresh() line 235\n Called when: null == response && null != visNumber\n Est: ~5ms " as svc120 #D5F5E3
+
+rectangle " parameter\n getIsSagaiDeployed() line 235\n Called when: null == response && null != visNumber\n Est: ~5ms " as svc121 #D5F5E3
+
+rectangle " parameter\n getBrandName() line 236\n Called when: null == response && null != visNumber\n Est: ~5ms " as svc122 #D5F5E3
+
+rectangle " parameter\n getListLcdvOvip() line 236\n Called when: null == response && null != visNumber\n Est: ~5ms " as svc123 #D5F5E3
+
+rectangle " parameter\n getListElectronic() line 236\n Called when: null == response && null != visNumber\n Est: ~5ms " as svc124 #D5F5E3
+
+rectangle " parameter\n getCountry() line 236\n Called when: null == response && null != visNumber\n Est: ~5ms " as svc125 #D5F5E3
+
+rectangle " VISServiceImpl\n getVisResponseForNewFlow() line 242\n Called when: consumerNewFlow\n Est: ~10ms " as svc126 #D5F5E3
+
+rectangle " response\n getStatus() line 243\n Called when: response != null && response.getStatus() == 408\n Est: ~5ms " as svc127 #D5F5E3
+
+rectangle " VISServiceImpl\n getVisResponse() line 248\n Called when: consumerNewFlow\n Est: ~25ms " as svc128 #D5F5E3
+
+rectangle " parameter\n setLanguageCode() line 251\n Called when: null == response && null != licencePlateNo\n Est: ~5ms " as svc129 #D5F5E3
+
+rectangle " logger\n debug() line 252\n Called when: null == response && null != licencePlateNo\n Est: ~5ms " as svc130 #D5F5E3
+
+rectangle " parameter\n setLicencePlateNo() line 253\n Called when: null == response && null != licencePlateNo\n Est: ~5ms " as svc131 #D5F5E3
+
+rectangle " licencePlateNo\n toUpperCase() line 253\n Called when: null == response && null != licencePlateNo\n Est: ~5ms " as svc132 #D5F5E3
+
+rectangle " logger\n info() line 254\n Called when: null == response && null != licencePlateNo\n Est: ~5ms " as svc133 #D5F5E3
+
+rectangle " parameter\n getSource() line 257\n Called when: null == response && null != licencePlateNo\n Est: ~5ms " as svc134 #D5F5E3
+
+rectangle " parameter\n getDetails() line 257\n Called when: null == response && null != licencePlateNo\n Est: ~5ms " as svc135 #D5F5E3
+
+rectangle " parameter\n getIntent() line 257\n Called when: null == response && null != licencePlateNo\n Est: ~5ms " as svc136 #D5F5E3
+
+rectangle " parameter\n getVehicleDescriptionFull() line 257\n Called when: null == response && null != licencePlateNo\n Est: ~5ms " as svc137 #D5F5E3
+
+rectangle " parameter\n getContract() line 258\n Called when: null == response && null != licencePlateNo\n Est: ~5ms " as svc138 #D5F5E3
+
+rectangle " parameter\n getWarranty() line 258\n Called when: null == response && null != licencePlateNo\n Est: ~5ms " as svc139 #D5F5E3
+
+rectangle " parameter\n getAllWarranties() line 258\n Called when: null == response && null != licencePlateNo\n Est: ~5ms " as svc140 #D5F5E3
+
+rectangle " parameter\n getWarrantyClaims() line 258\n Called when: null == response && null != licencePlateNo\n Est: ~5ms " as svc141 #D5F5E3
+
+rectangle " parameter\n getServiceHistory() line 259\n Called when: null == response && null != licencePlateNo\n Est: ~5ms " as svc142 #D5F5E3
+
+rectangle " parameter\n getRecallCampaigns() line 259\n Called when: null == response && null != licencePlateNo\n Est: ~5ms " as svc143 #D5F5E3
+
+rectangle " parameter\n getForceRefresh() line 259\n Called when: null == response && null != licencePlateNo\n Est: ~5ms " as svc144 #D5F5E3
+
+rectangle " parameter\n getIsSagaiDeployed() line 259\n Called when: null == response && null != licencePlateNo\n Est: ~5ms " as svc145 #D5F5E3
+
+rectangle " parameter\n getBrandName() line 260\n Called when: null == response && null != licencePlateNo\n Est: ~5ms " as svc146 #D5F5E3
+
+rectangle " parameter\n getListLcdvOvip() line 260\n Called when: null == response && null != licencePlateNo\n Est: ~5ms " as svc147 #D5F5E3
+
+rectangle " parameter\n getListElectronic() line 260\n Called when: null == response && null != licencePlateNo\n Est: ~5ms " as svc148 #D5F5E3
+
+rectangle " parameter\n getCountry() line 260\n Called when: null == response && null != licencePlateNo\n Est: ~5ms " as svc149 #D5F5E3
+
+rectangle " VISServiceImpl\n getLpnResponseFromDatabase() line 266\n Called when: consumerNewFlow\n Est: ~5ms " as svc150 #D5F5E3
+
+rectangle " VISServiceImpl\n getLpnResponse() line 268\n Called when: consumerNewFlow\n Est: ~5ms " as svc151 #D5F5E3
+
+rectangle " logger\n debug() line 272\n Called when: null == response && null != idToCheck\n Est: ~5ms " as svc152 #D5F5E3
+
+rectangle " parameter\n setLanguageCode() line 273\n Called when: null == response && null != idToCheck\n Est: ~5ms " as svc153 #D5F5E3
+
+rectangle " logger\n info() line 274\n Called when: null == response && null != idToCheck\n Est: ~5ms " as svc154 #D5F5E3
+
+rectangle " parameter\n getSource() line 277\n Called when: null == response && null != idToCheck\n Est: ~5ms " as svc155 #D5F5E3
+
+rectangle " parameter\n getDetails() line 277\n Called when: null == response && null != idToCheck\n Est: ~5ms " as svc156 #D5F5E3
+
+rectangle " parameter\n getIntent() line 277\n Called when: null == response && null != idToCheck\n Est: ~5ms " as svc157 #D5F5E3
+
+rectangle " parameter\n getVehicleDescriptionFull() line 277\n Called when: null == response && null != idToCheck\n Est: ~5ms " as svc158 #D5F5E3
+
+rectangle " parameter\n getContract() line 278\n Called when: null == response && null != idToCheck\n Est: ~5ms " as svc159 #D5F5E3
+
+rectangle " parameter\n getWarranty() line 278\n Called when: null == response && null != idToCheck\n Est: ~5ms " as svc160 #D5F5E3
+
+rectangle " parameter\n getAllWarranties() line 278\n Called when: null == response && null != idToCheck\n Est: ~5ms " as svc161 #D5F5E3
+
+rectangle " parameter\n getWarrantyClaims() line 278\n Called when: null == response && null != idToCheck\n Est: ~5ms " as svc162 #D5F5E3
+
+rectangle " parameter\n getServiceHistory() line 279\n Called when: null == response && null != idToCheck\n Est: ~5ms " as svc163 #D5F5E3
+
+rectangle " parameter\n getRecallCampaigns() line 279\n Called when: null == response && null != idToCheck\n Est: ~5ms " as svc164 #D5F5E3
+
+rectangle " parameter\n getForceRefresh() line 279\n Called when: null == response && null != idToCheck\n Est: ~5ms " as svc165 #D5F5E3
+
+rectangle " parameter\n getIsSagaiDeployed() line 279\n Called when: null == response && null != idToCheck\n Est: ~5ms " as svc166 #D5F5E3
+
+rectangle " parameter\n getBrandName() line 280\n Called when: null == response && null != idToCheck\n Est: ~5ms " as svc167 #D5F5E3
+
+rectangle " parameter\n getListLcdvOvip() line 280\n Called when: null == response && null != idToCheck\n Est: ~5ms " as svc168 #D5F5E3
+
+rectangle " parameter\n getListElectronic() line 280\n Called when: null == response && null != idToCheck\n Est: ~5ms " as svc169 #D5F5E3
+
+rectangle " parameter\n getCountry() line 280\n Called when: null == response && null != idToCheck\n Est: ~5ms " as svc170 #D5F5E3
+
+database " Database " as db #D6EAF8
+
+rectangle " Response\n 200 OK " as resp #E8F8E8
+
+rectangle " Timing - GET /vins\n p50 ESTIMATED: ~913ms\n p95 ESTIMATED: ~2282ms\n Rating: SLOW " as timing #FADBD8
+
+client -[#2196F3,thickness=2]-> req
+req -[#2196F3,thickness=2]-> ctrl : GET /vins
+ctrl -[#27AE60,thickness=2]-> svc1 : put()
+ctrl -[#27AE60,thickness=2]-> svc2 : info()
+ctrl -[#27AE60,thickness=2]-> svc3 : setForceRefresh()
+ctrl -[#27AE60,thickness=2]-> svc4 : setDetails()
+ctrl -[#27AE60,thickness=2]-> svc5 : setVehicleDescriptionFull()
+ctrl -[#27AE60,thickness=2]-> svc6 : setContract()
+ctrl -[#27AE60,thickness=2]-> svc7 : setWarranty()
+ctrl -[#27AE60,thickness=2]-> svc8 : setAllWarranties()
+ctrl -[#27AE60,thickness=2]-> svc9 : setWarrantyClaims()
+ctrl -[#27AE60,thickness=2]-> svc10 : setServiceHistory()
+ctrl -[#27AE60,thickness=2]-> svc11 : setRecallCampaigns()
+ctrl -[#27AE60,thickness=2]-> svc12 : setLicencePlateNo()
+ctrl -[#27AE60,thickness=2]-> svc13 : encodeForHTML()
+ctrl -[#27AE60,thickness=2]-> svc14 : encoder()
+ctrl -[#27AE60,thickness=2]-> svc15 : setIdToCheck()
+ctrl -[#27AE60,thickness=2]-> svc16 : setIsSagaiDeployed()
+ctrl -[#27AE60,thickness=2]-> svc17 : setListLcdvOvip()
+ctrl -[#27AE60,thickness=2]-> svc18 : setListElectronic()
+ctrl -[#27AE60,thickness=2]-> svc19 : isNotBlank()
+ctrl -[#27AE60,thickness=2]-> svc20 : setBrandName()
+ctrl -[#27AE60,thickness=2]-> svc21 : encodeForHTML()
+ctrl -[#27AE60,thickness=2]-> svc22 : encoder()
+ctrl -[#27AE60,thickness=2]-> svc23 : getLanguage()
+ctrl -[#27AE60,thickness=2]-> svc24 : encodeForHTML()
+ctrl -[#27AE60,thickness=2]-> svc25 : encoder()
+ctrl -[#27AE60,thickness=2]-> svc26 : getHeader()
+ctrl -[#27AE60,thickness=2]-> svc27 : encodeForHTML()
+ctrl -[#27AE60,thickness=2]-> svc28 : encoder()
+ctrl -[#27AE60,thickness=2]-> svc29 : getHeader()
+ctrl -[#27AE60,thickness=2]-> svc30 : encodeForHTML()
+ctrl -[#27AE60,thickness=2]-> svc31 : encoder()
+ctrl -[#27AE60,thickness=2]-> svc32 : getHeader()
+ctrl -[#27AE60,thickness=2]-> svc33 : getConsumerNameByKey()
+ctrl -[#27AE60,thickness=2]-> svc34 : setConsumerName()
+ctrl -[#27AE60,thickness=2]-> svc35 : setApiKey()
+ctrl -[#27AE60,thickness=2]-> svc36 : isEmpty()
+ctrl -[#27AE60,thickness=2]-> svc37 : setCountry()
+ctrl -[#27AE60,thickness=2]-> svc38 : toLowerCase()
+ctrl -[#27AE60,thickness=2]-> svc39 : setVis()
+ctrl -[#27AE60,thickness=2]-> svc40 : setIntent()
+ctrl -[#27AE60,thickness=2]-> svc41 : setSource()
+ctrl -[#27AE60,thickness=2]-> svc42 : isEmpty()
+ctrl -[#27AE60,thickness=2]-> svc43 : isValidAlhaStr()
+ctrl -[#27AE60,thickness=2]-> svc44 : toLowerCase()
+ctrl -[#27AE60,thickness=2]-> svc45 : setLpnCountry()
+ctrl -[#27AE60,thickness=2]-> svc46 : toLowerCase()
+ctrl -[#27AE60,thickness=2]-> svc47 : setLanguageCode()
+ctrl -[#27AE60,thickness=2]-> svc48 : debug()
+ctrl -[#27AE60,thickness=2]-> svc49 : setVin()
+ctrl -[#27AE60,thickness=2]-> svc50 : toUpperCase()
+ctrl -[#27AE60,thickness=2]-> svc51 : length()
+ctrl -[#27AE60,thickness=2]-> svc52 : getVin()
+ctrl -[#27AE60,thickness=2]-> svc53 : getCountry()
+ctrl -[#27AE60,thickness=2]-> svc54 : setCountry()
+ctrl -[#27AE60,thickness=2]-> svc55 : info()
+ctrl -[#27AE60,thickness=2]-> svc56 : getSource()
+ctrl -[#27AE60,thickness=2]-> svc57 : getDetails()
+ctrl -[#27AE60,thickness=2]-> svc58 : getIntent()
+ctrl -[#27AE60,thickness=2]-> svc59 : getVehicleDescriptionFull()
+ctrl -[#27AE60,thickness=2]-> svc60 : getContract()
+ctrl -[#27AE60,thickness=2]-> svc61 : getWarranty()
+ctrl -[#27AE60,thickness=2]-> svc62 : getAllWarranties()
+ctrl -[#27AE60,thickness=2]-> svc63 : getWarrantyClaims()
+ctrl -[#27AE60,thickness=2]-> svc64 : getServiceHistory()
+ctrl -[#27AE60,thickness=2]-> svc65 : getRecallCampaigns()
+ctrl -[#27AE60,thickness=2]-> svc66 : getForceRefresh()
+ctrl -[#27AE60,thickness=2]-> svc67 : getIsSagaiDeployed()
+ctrl -[#27AE60,thickness=2]-> svc68 : getBrandName()
+ctrl -[#27AE60,thickness=2]-> svc69 : getListLcdvOvip()
+ctrl -[#27AE60,thickness=2]-> svc70 : getListElectronic()
+ctrl -[#27AE60,thickness=2]-> svc71 : getCountry()
+ctrl -[#27AE60,thickness=2]-> svc72 : processForCartellSource()
+ctrl -[#27AE60,thickness=2]-> svc73 : debug()
+ctrl -[#27AE60,thickness=2]-> svc74 : setVin()
+ctrl -[#27AE60,thickness=2]-> svc75 : toUpperCase()
+ctrl -[#27AE60,thickness=2]-> svc76 : length()
+ctrl -[#27AE60,thickness=2]-> svc77 : getVin()
+ctrl -[#27AE60,thickness=2]-> svc78 : contains()
+ctrl -[#27AE60,thickness=2]-> svc79 : asList()
+ctrl -[#27AE60,thickness=2]-> svc80 : split()
+ctrl -[#27AE60,thickness=2]-> svc81 : getNonPcdVins()
+ctrl -[#27AE60,thickness=2]-> svc82 : substring()
+ctrl -[#27AE60,thickness=2]-> svc83 : getVin()
+ctrl -[#27AE60,thickness=2]-> svc84 : info()
+ctrl -[#27AE60,thickness=2]-> svc85 : getSource()
+ctrl -[#27AE60,thickness=2]-> svc86 : getDetails()
+ctrl -[#27AE60,thickness=2]-> svc87 : getIntent()
+ctrl -[#27AE60,thickness=2]-> svc88 : getVehicleDescriptionFull()
+ctrl -[#27AE60,thickness=2]-> svc89 : getContract()
+ctrl -[#27AE60,thickness=2]-> svc90 : getWarranty()
+ctrl -[#27AE60,thickness=2]-> svc91 : getAllWarranties()
+ctrl -[#27AE60,thickness=2]-> svc92 : getWarrantyClaims()
+ctrl -[#27AE60,thickness=2]-> svc93 : getServiceHistory()
+ctrl -[#27AE60,thickness=2]-> svc94 : getRecallCampaigns()
+ctrl -[#27AE60,thickness=2]-> svc95 : getForceRefresh()
+ctrl -[#27AE60,thickness=2]-> svc96 : getIsSagaiDeployed()
+ctrl -[#27AE60,thickness=2]-> svc97 : getBrandName()
+ctrl -[#27AE60,thickness=2]-> svc98 : getListLcdvOvip()
+ctrl -[#27AE60,thickness=2]-> svc99 : getListElectronic()
+ctrl -[#27AE60,thickness=2]-> svc100 : getCountry()
+ctrl -[#27AE60,thickness=2]-> svc101 : getVinResponse()
+ctrl -[#27AE60,thickness=2]-> svc102 : getVinResponseFromEsa()
+ctrl -[#27AE60,thickness=2]-> svc103 : debug()
+ctrl -[#27AE60,thickness=2]-> svc104 : info()
+ctrl -[#27AE60,thickness=2]-> svc105 : setLanguageCode()
+ctrl -[#27AE60,thickness=2]-> svc106 : debug()
+ctrl -[#27AE60,thickness=2]-> svc107 : setVis()
+ctrl -[#27AE60,thickness=2]-> svc108 : toUpperCase()
+ctrl -[#27AE60,thickness=2]-> svc109 : info()
+ctrl -[#27AE60,thickness=2]-> svc110 : getSource()
+ctrl -[#27AE60,thickness=2]-> svc111 : getDetails()
+ctrl -[#27AE60,thickness=2]-> svc112 : getIntent()
+ctrl -[#27AE60,thickness=2]-> svc113 : getVehicleDescriptionFull()
+ctrl -[#27AE60,thickness=2]-> svc114 : getContract()
+ctrl -[#27AE60,thickness=2]-> svc115 : getWarranty()
+ctrl -[#27AE60,thickness=2]-> svc116 : getAllWarranties()
+ctrl -[#27AE60,thickness=2]-> svc117 : getWarrantyClaims()
+ctrl -[#27AE60,thickness=2]-> svc118 : getServiceHistory()
+ctrl -[#27AE60,thickness=2]-> svc119 : getRecallCampaigns()
+ctrl -[#27AE60,thickness=2]-> svc120 : getForceRefresh()
+ctrl -[#27AE60,thickness=2]-> svc121 : getIsSagaiDeployed()
+ctrl -[#27AE60,thickness=2]-> svc122 : getBrandName()
+ctrl -[#27AE60,thickness=2]-> svc123 : getListLcdvOvip()
+ctrl -[#27AE60,thickness=2]-> svc124 : getListElectronic()
+ctrl -[#27AE60,thickness=2]-> svc125 : getCountry()
+ctrl -[#27AE60,thickness=2]-> svc126 : getVisResponseForNewFlow()
+ctrl -[#27AE60,thickness=2]-> svc127 : getStatus()
+ctrl -[#27AE60,thickness=2]-> svc128 : getVisResponse()
+ctrl -[#27AE60,thickness=2]-> svc129 : setLanguageCode()
+ctrl -[#27AE60,thickness=2]-> svc130 : debug()
+ctrl -[#27AE60,thickness=2]-> svc131 : setLicencePlateNo()
+ctrl -[#27AE60,thickness=2]-> svc132 : toUpperCase()
+ctrl -[#27AE60,thickness=2]-> svc133 : info()
+ctrl -[#27AE60,thickness=2]-> svc134 : getSource()
+ctrl -[#27AE60,thickness=2]-> svc135 : getDetails()
+ctrl -[#27AE60,thickness=2]-> svc136 : getIntent()
+ctrl -[#27AE60,thickness=2]-> svc137 : getVehicleDescriptionFull()
+ctrl -[#27AE60,thickness=2]-> svc138 : getContract()
+ctrl -[#27AE60,thickness=2]-> svc139 : getWarranty()
+ctrl -[#27AE60,thickness=2]-> svc140 : getAllWarranties()
+ctrl -[#27AE60,thickness=2]-> svc141 : getWarrantyClaims()
+ctrl -[#27AE60,thickness=2]-> svc142 : getServiceHistory()
+ctrl -[#27AE60,thickness=2]-> svc143 : getRecallCampaigns()
+ctrl -[#27AE60,thickness=2]-> svc144 : getForceRefresh()
+ctrl -[#27AE60,thickness=2]-> svc145 : getIsSagaiDeployed()
+ctrl -[#27AE60,thickness=2]-> svc146 : getBrandName()
+ctrl -[#27AE60,thickness=2]-> svc147 : getListLcdvOvip()
+ctrl -[#27AE60,thickness=2]-> svc148 : getListElectronic()
+ctrl -[#27AE60,thickness=2]-> svc149 : getCountry()
+ctrl -[#27AE60,thickness=2]-> svc150 : getLpnResponseFromDatabase()
+ctrl -[#27AE60,thickness=2]-> svc151 : getLpnResponse()
+ctrl -[#27AE60,thickness=2]-> svc152 : debug()
+ctrl -[#27AE60,thickness=2]-> svc153 : setLanguageCode()
+ctrl -[#27AE60,thickness=2]-> svc154 : info()
+ctrl -[#27AE60,thickness=2]-> svc155 : getSource()
+ctrl -[#27AE60,thickness=2]-> svc156 : getDetails()
+ctrl -[#27AE60,thickness=2]-> svc157 : getIntent()
+ctrl -[#27AE60,thickness=2]-> svc158 : getVehicleDescriptionFull()
+ctrl -[#27AE60,thickness=2]-> svc159 : getContract()
+ctrl -[#27AE60,thickness=2]-> svc160 : getWarranty()
+ctrl -[#27AE60,thickness=2]-> svc161 : getAllWarranties()
+ctrl -[#27AE60,thickness=2]-> svc162 : getWarrantyClaims()
+ctrl -[#27AE60,thickness=2]-> svc163 : getServiceHistory()
+ctrl -[#27AE60,thickness=2]-> svc164 : getRecallCampaigns()
+ctrl -[#27AE60,thickness=2]-> svc165 : getForceRefresh()
+ctrl -[#27AE60,thickness=2]-> svc166 : getIsSagaiDeployed()
+ctrl -[#27AE60,thickness=2]-> svc167 : getBrandName()
+ctrl -[#27AE60,thickness=2]-> svc168 : getListLcdvOvip()
+ctrl -[#27AE60,thickness=2]-> svc169 : getListElectronic()
+ctrl -[#27AE60,thickness=2]-> svc170 : getCountry()
+ctrl -[#27AE60,thickness=2]-> resp
+resp -[#2196F3,thickness=2]-> client
+timing --> resp
+@enduml

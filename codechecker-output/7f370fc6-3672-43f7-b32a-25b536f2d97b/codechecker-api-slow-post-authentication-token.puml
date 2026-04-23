@@ -1,0 +1,106 @@
+@startuml codechecker_api_slow_post_authentication_token
+left to right direction
+skinparam defaultFontSize 11
+skinparam defaultFontName Arial
+skinparam titleFontSize 14
+skinparam titleFontStyle bold
+skinparam rectangle {
+  RoundCorner 8
+  BorderThickness 2
+}
+
+title A2 - SLOW API Analysis\nPOST /authentication/token\np50: ~1153ms | p95: ~2882ms | Rating: SLOW\n2026-04-08
+
+rectangle " ROOT CAUSE ANALYSIS\n A2-003: Synchronous REST call — AuthentiationServiceImpl.authenticate()\n A2-003: Synchronous REST call — AuthentiationServiceImpl.authenticate()\n A2-005: No timeout on REST client — RESOLVED_AT_RUNTIME\n A2-005: No timeout on REST client — RESOLVED_AT_RUNTIME\n " as rootcause #FADBD8
+
+rectangle " HTTP Request\n POST /authentication/token\n ~10ms routing " as http #EBF5FB
+
+rectangle " AuthenticationResource.generate()\n ~5ms binding " as ctrl #D6EAF8
+
+rectangle " MDC.put()\n line 126\n ~5ms " as svc0_0 #D5F5E3
+
+rectangle " AuthentiationServiceImpl.getConsumer()\n line 129\n ~10ms " as svc1_0 #D5F5E3
+
+  rectangle " ConsumerService.byApplicationApiKey()\n line 28\n When: !StringUtils.isEmpty(apiKey)\n ~5ms " as svc1_n0_1 #D5F5E3
+
+svc1_0 --> svc1_n0_1
+rectangle " consumer.isPresent()\n line 131\n When: !consumer.isPresent()\n ~5ms " as svc2_0 #D5F5E3
+
+rectangle " logger.error()\n line 132\n When: !consumer.isPresent()\n ~5ms " as svc3_0 #D5F5E3
+
+rectangle " Response.status(Response.Status.UNAUTHORIZED).build()\n line 133\n When: !consumer.isPresent()\n ~5ms " as svc4_0 #D5F5E3
+
+rectangle " Response.status()\n line 133\n When: !consumer.isPresent()\n ~5ms " as svc5_0 #D5F5E3
+
+rectangle " consumer.get().isAuthorizationRequired()\n line 136\n When: consumer.get().isAuthorizationRequired()\n ~5ms " as svc6_0 #D5F5E3
+
+rectangle " ConsumerServiceImpl.get()\n line 136\n When: consumer.get().isAuthorizationRequired()\n ~20ms " as svc7_0 #D5F5E3
+
+rectangle " DB: ConsumerRepository.get()\n ~15ms " as svc7_0_repo0 #FDEBD0
+svc7_0 --> svc7_0_repo0
+
+rectangle " request.getHeader()\n line 137\n When: consumer.get().isAuthorizationRequired()\n ~5ms " as svc8_0 #D5F5E3
+
+rectangle " AuthentiationServiceImpl.authenticate()\n line 142\n When: null != creds\n ~1005ms " as svc9_0 #FADBD8
+
+cloud " REST: PUT RESOLVED_AT_RUNTIME\n NO TIMEOUT — thread could hang\n ~500ms " as svc9_0_ext0 #FADBD8
+svc9_0 --> svc9_0_ext0
+
+cloud " REST: PUT RESOLVED_AT_RUNTIME\n NO TIMEOUT — thread could hang\n ~500ms " as svc9_0_ext1 #FADBD8
+svc9_0 --> svc9_0_ext1
+
+rectangle " CinUser.getUserRole()\n line 143\n When: null == user.getUserRole() || AuthConsta...\n ~5ms " as svc10_0 #D5F5E3
+
+rectangle " AuthConstant.INVALID_USER.equals()\n line 143\n When: null == user.getUserRole() || AuthConsta...\n ~5ms " as svc11_0 #D5F5E3
+
+rectangle " user.getUserRole()\n line 143\n When: null == user.getUserRole() || AuthConsta...\n ~5ms " as svc12_0 #D5F5E3
+
+rectangle " Response.status(Response.Status.UNAUTHORIZED).build()\n line 144\n When: null == user.getUserRole() || AuthConsta...\n ~5ms " as svc13_0 #D5F5E3
+
+rectangle " Response.status()\n line 144\n When: null == user.getUserRole() || AuthConsta...\n ~5ms " as svc14_0 #D5F5E3
+
+rectangle " AuthentiationServiceImpl.generateToken()\n line 150\n ~5ms " as svc15_0 #D5F5E3
+
+rectangle " consumer.get()\n line 150\n ~5ms " as svc16_0 #D5F5E3
+
+rectangle " logger.error()\n line 152\n ~5ms " as svc17_0 #D5F5E3
+
+rectangle " Response.status(Response.Status.UNAUTHORIZED).build()\n line 153\n ~5ms " as svc18_0 #D5F5E3
+
+rectangle " Response.status()\n line 153\n ~5ms " as svc19_0 #D5F5E3
+
+rectangle " logger.error()\n line 156\n ~5ms " as svc20_0 #D5F5E3
+
+rectangle " Response.status(Response.Status.INTERNAL_SERVER_ERROR).build()\n line 157\n ~5ms " as svc21_0 #D5F5E3
+
+rectangle " Response.status()\n line 157\n ~5ms " as svc22_0 #D5F5E3
+
+rectangle " TIMING BREAKDOWN\n Total p50: ~1153ms\n Total p95: ~2882ms\n " as timebox #FADBD8
+
+http --> ctrl
+ctrl -[#E74C3C,thickness=2]-> svc0_0
+ctrl -[#E74C3C,thickness=2]-> svc1_0
+ctrl -[#E74C3C,thickness=2]-> svc2_0
+ctrl -[#E74C3C,thickness=2]-> svc3_0
+ctrl -[#E74C3C,thickness=2]-> svc4_0
+ctrl -[#E74C3C,thickness=2]-> svc5_0
+ctrl -[#E74C3C,thickness=2]-> svc6_0
+ctrl -[#E74C3C,thickness=2]-> svc7_0
+ctrl -[#E74C3C,thickness=2]-> svc8_0
+ctrl -[#E74C3C,thickness=2]-> svc9_0
+ctrl -[#E74C3C,thickness=2]-> svc10_0
+ctrl -[#E74C3C,thickness=2]-> svc11_0
+ctrl -[#E74C3C,thickness=2]-> svc12_0
+ctrl -[#E74C3C,thickness=2]-> svc13_0
+ctrl -[#E74C3C,thickness=2]-> svc14_0
+ctrl -[#E74C3C,thickness=2]-> svc15_0
+ctrl -[#E74C3C,thickness=2]-> svc16_0
+ctrl -[#E74C3C,thickness=2]-> svc17_0
+ctrl -[#E74C3C,thickness=2]-> svc18_0
+ctrl -[#E74C3C,thickness=2]-> svc19_0
+ctrl -[#E74C3C,thickness=2]-> svc20_0
+ctrl -[#E74C3C,thickness=2]-> svc21_0
+ctrl -[#E74C3C,thickness=2]-> svc22_0
+rootcause -[hidden]-> http
+timebox -[hidden]-> ctrl
+@enduml

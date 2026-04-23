@@ -1,0 +1,93 @@
+@startuml codechecker_api_get_countcontract
+left to right direction
+skinparam defaultFontSize 11
+skinparam defaultFontName Arial
+skinparam titleFontSize 14
+skinparam titleFontStyle bold
+skinparam rectangle {
+  RoundCorner 8
+  BorderThickness 2
+}
+skinparam database {
+  BorderColor #2C3E50
+  BorderThickness 2
+}
+skinparam cloud {
+  BorderColor #8E44AD
+  BorderThickness 2
+}
+
+title A1 - GET /countcontract - CountResource.getContract()\nRated: MODERATE - 2026-04-06
+
+rectangle " HTTP Client " as client #EBF5FB
+
+rectangle " HTTP Request\n GET /countcontract\n Auth: NO AUTH\n @Valid: NO " as req #EBF5FB
+
+rectangle " CountResource\n getContract() line 91\n Framework: SEEDSTACK_JAXRS\n Issues: NONE " as ctrl #D6EAF8
+
+rectangle " MDC\n put() line 99\n Est: ~5ms " as svc1 #D5F5E3
+
+rectangle " StringUtils\n isBlank() line 101\n Called when: StringUtils.isBlank(sourceApplication)\n Est: ~5ms " as svc2 #D5F5E3
+
+rectangle " StringUtils\n isNotBlank() line 105\n Called when: StringUtils.isNotBlank(sourceApplication) && !app.containsKey(sourceApplication)\n Est: ~5ms " as svc3 #D5F5E3
+
+rectangle " app\n containsKey() line 105\n Called when: StringUtils.isNotBlank(sourceApplication) && !app.containsKey(sourceApplication)\n Est: ~5ms " as svc4 #D5F5E3
+
+rectangle " ContractCountService\n getContractCount() line 112\n Called when: errorresponse == null\n Est: ~5ms " as svc5 #D5F5E3
+
+rectangle " Response.ok()\n entity() line 115\n Called when: errorresponse == null\n Est: ~5ms " as svc6 #D5F5E3
+
+rectangle " Response\n ok() line 115\n Called when: errorresponse == null\n Est: ~5ms " as svc7 #D5F5E3
+
+rectangle " new Gson()\n toJson() line 115\n Called when: errorresponse == null\n Est: ~5ms " as svc8 #D5F5E3
+
+rectangle " CorsPolicy\n makeCORSComplaint() line 117\n Called when: errorresponse == null\n Est: ~5ms " as svc9 #D5F5E3
+
+rectangle " error\n setStatus() line 122\n Est: ~5ms " as svc10 #D5F5E3
+
+rectangle " error\n setMessage() line 123\n Est: ~5ms " as svc11 #D5F5E3
+
+rectangle " Response.status(Status.NOT_FOUND)\n entity() line 124\n Est: ~5ms " as svc12 #D5F5E3
+
+rectangle " Response\n status() line 124\n Est: ~5ms " as svc13 #D5F5E3
+
+rectangle " new Gson()\n toJson() line 124\n Est: ~5ms " as svc14 #D5F5E3
+
+rectangle " logger\n error() line 125\n Est: ~5ms " as svc15 #D5F5E3
+
+rectangle " CorsPolicy\n makeCORSComplaint() line 127\n Est: ~5ms " as svc16 #D5F5E3
+
+rectangle " response\n build() line 127\n Est: ~5ms " as svc17 #D5F5E3
+
+rectangle " response\n build() line 128\n Est: ~5ms " as svc18 #D5F5E3
+
+database " Database " as db #D6EAF8
+
+rectangle " Response\n 200 OK " as resp #E8F8E8
+
+rectangle " Timing - GET /countcontract\n p50 ESTIMATED: ~108ms\n p95 ESTIMATED: ~270ms\n Rating: MODERATE " as timing #FDEBD0
+
+client -[#2196F3,thickness=2]-> req
+req -[#2196F3,thickness=2]-> ctrl : GET /countcontract
+ctrl -[#27AE60,thickness=2]-> svc1 : put()
+ctrl -[#27AE60,thickness=2]-> svc2 : isBlank()
+ctrl -[#27AE60,thickness=2]-> svc3 : isNotBlank()
+ctrl -[#27AE60,thickness=2]-> svc4 : containsKey()
+ctrl -[#27AE60,thickness=2]-> svc5 : getContractCount()
+ctrl -[#27AE60,thickness=2]-> svc6 : entity()
+ctrl -[#27AE60,thickness=2]-> svc7 : ok()
+ctrl -[#27AE60,thickness=2]-> svc8 : toJson()
+ctrl -[#27AE60,thickness=2]-> svc9 : makeCORSComplaint()
+ctrl -[#27AE60,thickness=2]-> svc10 : setStatus()
+ctrl -[#27AE60,thickness=2]-> svc11 : setMessage()
+ctrl -[#27AE60,thickness=2]-> svc12 : entity()
+ctrl -[#27AE60,thickness=2]-> svc13 : status()
+ctrl -[#27AE60,thickness=2]-> svc14 : toJson()
+ctrl -[#27AE60,thickness=2]-> svc15 : error()
+ctrl -[#27AE60,thickness=2]-> svc16 : makeCORSComplaint()
+ctrl -[#27AE60,thickness=2]-> svc17 : build()
+ctrl -[#27AE60,thickness=2]-> svc18 : build()
+ctrl -[#27AE60,thickness=2]-> resp
+resp -[#2196F3,thickness=2]-> client
+timing --> resp
+@enduml

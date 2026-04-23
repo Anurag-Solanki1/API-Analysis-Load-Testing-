@@ -1,0 +1,32 @@
+@startuml codechecker_api_connectivity
+top to bottom direction
+skinparam defaultFontSize 11
+skinparam defaultFontName Arial
+skinparam titleFontSize 14
+skinparam titleFontStyle bold
+skinparam rectangle {
+  RoundCorner 8
+  BorderThickness 2
+}
+skinparam package {
+  BorderThickness 2
+  RoundCorner 6
+}
+
+title A1 - Full API Connectivity Map - TCL-Thesse\nAll 11 endpoints - 2026-04-17
+
+package "REST Endpoints [11]" #EBF5FB {
+  rectangle " POST /thesee/type\n ~28ms | FAST " as ep1 #D5F5E3
+  rectangle " POST /theseelabelSearch\n ~33ms | FAST " as ep2 #D5F5E3
+  rectangle " POST /theseecreateTranslation\n ~73ms | FAST " as ep3 #D5F5E3
+  rectangle " SOAP /ws/EnvoiTraductionSimplifiePortType/EnvoiTraductionSimplifie\n ~18ms | FAST " as ep4 #D5F5E3
+  rectangle " SOAP /ws/NewCreationDeLibellesPortType/NewCreationDeLibelles\n ~18ms | FAST " as ep5 #D5F5E3
+  rectangle " SOAP /ws/RechercheParCodePortType/RechercheParCode\n ~18ms | FAST " as ep6 #D5F5E3
+  rectangle " SOAP /ws/NewRechercheExactePortType/NewRechercheExacte\n ~18ms | FAST " as ep7 #D5F5E3
+  rectangle " SOAP /web/priseservice/EnvoiTraductionSimplifie\n ~18ms | FAST " as ep8 #D5F5E3
+  rectangle " SOAP /web/priseservice/NewCreationDeLibelles\n ~18ms | FAST " as ep9 #D5F5E3
+  rectangle " SOAP /web/priseservice/NewRechercheExacte\n ~18ms | FAST " as ep10 #D5F5E3
+  rectangle " SOAP /web/priseservice/RechercheParCode\n ~18ms | FAST " as ep11 #D5F5E3
+}
+
+@enduml

@@ -1,0 +1,51 @@
+@startuml codechecker_api_put_brands
+left to right direction
+skinparam defaultFontSize 11
+skinparam defaultFontName Arial
+skinparam titleFontSize 14
+skinparam titleFontStyle bold
+skinparam rectangle {
+  RoundCorner 8
+  BorderThickness 2
+}
+skinparam database {
+  BorderColor #2C3E50
+  BorderThickness 2
+}
+skinparam cloud {
+  BorderColor #8E44AD
+  BorderThickness 2
+}
+
+title A1 - PUT /brands - BrandResource.updateBrands()\nRated: FAST - 2026-04-08
+
+rectangle " HTTP Client " as client #EBF5FB
+
+rectangle " HTTP Request\n PUT /brands\n Auth: NO AUTH\n @Valid: NO " as req #EBF5FB
+
+rectangle " BrandResource\n updateBrands() line 107\n Framework: SEEDSTACK_JAXRS\n Issues: NONE " as ctrl #D6EAF8
+
+rectangle " MDC\n put() line 113\n Est: ~5ms " as svc1 #D5F5E3
+
+rectangle " request\n getHeader() line 116\n Est: ~5ms " as svc2 #D5F5E3
+
+rectangle " e\n getError() line 119\n Est: ~5ms " as svc3 #D5F5E3
+
+rectangle " builder\n build() line 121\n Est: ~5ms " as svc4 #D5F5E3
+
+database " Database " as db #D6EAF8
+
+rectangle " Response\n 200 OK " as resp #E8F8E8
+
+rectangle " Timing - PUT /brands\n p50 ESTIMATED: ~38ms\n p95 ESTIMATED: ~95ms\n Rating: FAST " as timing #D5F5E3
+
+client -[#2196F3,thickness=2]-> req
+req -[#2196F3,thickness=2]-> ctrl : PUT /brands
+ctrl -[#27AE60,thickness=2]-> svc1 : put()
+ctrl -[#27AE60,thickness=2]-> svc2 : getHeader()
+ctrl -[#27AE60,thickness=2]-> svc3 : getError()
+ctrl -[#27AE60,thickness=2]-> svc4 : build()
+ctrl -[#27AE60,thickness=2]-> resp
+resp -[#2196F3,thickness=2]-> client
+timing --> resp
+@enduml

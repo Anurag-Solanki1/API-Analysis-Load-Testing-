@@ -1,0 +1,102 @@
+@startuml codechecker_api_get_custathealth
+left to right direction
+skinparam defaultFontSize 11
+skinparam defaultFontName Arial
+skinparam titleFontSize 14
+skinparam titleFontStyle bold
+skinparam rectangle {
+  RoundCorner 8
+  BorderThickness 2
+}
+skinparam database {
+  BorderColor #2C3E50
+  BorderThickness 2
+}
+skinparam cloud {
+  BorderColor #8E44AD
+  BorderThickness 2
+}
+
+title A1 - GET /custAtHealth - HealthResource.getCustAtHealth()\nRated: MODERATE - 2026-04-06
+
+rectangle " HTTP Client " as client #EBF5FB
+
+rectangle " HTTP Request\n GET /custAtHealth\n Auth: NO AUTH\n @Valid: NO " as req #EBF5FB
+
+rectangle " HealthResource\n getCustAtHealth() line 109\n Framework: SEEDSTACK_JAXRS\n Issues: NONE " as ctrl #D6EAF8
+
+rectangle " MDC\n put() line 115\n Est: ~5ms " as svc1 #D5F5E3
+
+rectangle " CustomerAtRequestParameters\n setBrand() line 122\n Est: ~5ms " as svc2 #D5F5E3
+
+rectangle " CustomerAtRequestParameters\n setCountry() line 123\n Est: ~5ms " as svc3 #D5F5E3
+
+rectangle " CustomerAtRequestParameters\n setCustomerContractId() line 124\n Est: ~5ms " as svc4 #D5F5E3
+
+rectangle " CustomerAtRequestParameters\n setCustomerEmailId() line 125\n Est: ~5ms " as svc5 #D5F5E3
+
+rectangle " CustomerAtRequestParameters\n setCustomerLastName() line 126\n Est: ~5ms " as svc6 #D5F5E3
+
+rectangle " CustomerAtRequestParameters\n setCustomerPhoneNumber() line 127\n Est: ~5ms " as svc7 #D5F5E3
+
+rectangle " CustomerAtRequestParameters\n setLanguage() line 128\n Est: ~5ms " as svc8 #D5F5E3
+
+rectangle " CustomerAtRequestParameters\n setSubsidiary() line 129\n Est: ~5ms " as svc9 #D5F5E3
+
+rectangle " CustomerAtRequestParameters\n getBrand() line 129\n Est: ~5ms " as svc10 #D5F5E3
+
+rectangle " CustomerAtRequestParameters\n getCountry() line 129\n Est: ~5ms " as svc11 #D5F5E3
+
+rectangle " custAtService\n callCustService() line 131\n Est: ~5ms " as svc12 #D5F5E3
+
+rectangle " CustomerAtRequestParameters\n getCustomerLastName() line 131\n Est: ~5ms " as svc13 #D5F5E3
+
+rectangle " CustomerAtRequestParameters\n getCustomerEmailId() line 131\n Est: ~5ms " as svc14 #D5F5E3
+
+rectangle " CustomerAtRequestParameters\n getSubsidiary() line 132\n Est: ~5ms " as svc15 #D5F5E3
+
+rectangle " CustomerAtRequestParameters\n getCustomerContractId() line 132\n Est: ~5ms " as svc16 #D5F5E3
+
+rectangle " CustomerAtRequestParameters\n getLanguage() line 132\n Est: ~5ms " as svc17 #D5F5E3
+
+rectangle " CustomerAtRequestParameters\n getCustomerPhoneNumber() line 133\n Est: ~5ms " as svc18 #D5F5E3
+
+rectangle " logger\n info() line 138\n Called when: validate == true\n Est: ~5ms " as svc19 #D5F5E3
+
+rectangle " logger\n error() line 143\n Est: ~5ms " as svc20 #D5F5E3
+
+rectangle " logger\n info() line 147\n Est: ~5ms " as svc21 #D5F5E3
+
+database " Database " as db #D6EAF8
+
+rectangle " Response\n 200 OK " as resp #E8F8E8
+
+rectangle " Timing - GET /custAtHealth\n p50 ESTIMATED: ~123ms\n p95 ESTIMATED: ~307ms\n Rating: MODERATE " as timing #FDEBD0
+
+client -[#2196F3,thickness=2]-> req
+req -[#2196F3,thickness=2]-> ctrl : GET /custAtHealth
+ctrl -[#27AE60,thickness=2]-> svc1 : put()
+ctrl -[#27AE60,thickness=2]-> svc2 : setBrand()
+ctrl -[#27AE60,thickness=2]-> svc3 : setCountry()
+ctrl -[#27AE60,thickness=2]-> svc4 : setCustomerContractId()
+ctrl -[#27AE60,thickness=2]-> svc5 : setCustomerEmailId()
+ctrl -[#27AE60,thickness=2]-> svc6 : setCustomerLastName()
+ctrl -[#27AE60,thickness=2]-> svc7 : setCustomerPhoneNumber()
+ctrl -[#27AE60,thickness=2]-> svc8 : setLanguage()
+ctrl -[#27AE60,thickness=2]-> svc9 : setSubsidiary()
+ctrl -[#27AE60,thickness=2]-> svc10 : getBrand()
+ctrl -[#27AE60,thickness=2]-> svc11 : getCountry()
+ctrl -[#27AE60,thickness=2]-> svc12 : callCustService()
+ctrl -[#27AE60,thickness=2]-> svc13 : getCustomerLastName()
+ctrl -[#27AE60,thickness=2]-> svc14 : getCustomerEmailId()
+ctrl -[#27AE60,thickness=2]-> svc15 : getSubsidiary()
+ctrl -[#27AE60,thickness=2]-> svc16 : getCustomerContractId()
+ctrl -[#27AE60,thickness=2]-> svc17 : getLanguage()
+ctrl -[#27AE60,thickness=2]-> svc18 : getCustomerPhoneNumber()
+ctrl -[#27AE60,thickness=2]-> svc19 : info()
+ctrl -[#27AE60,thickness=2]-> svc20 : error()
+ctrl -[#27AE60,thickness=2]-> svc21 : info()
+ctrl -[#27AE60,thickness=2]-> resp
+resp -[#2196F3,thickness=2]-> client
+timing --> resp
+@enduml

@@ -1,0 +1,39 @@
+@startuml codechecker_api_soap_ws_rechercheparcodeporttype_rechercheparcode
+left to right direction
+skinparam defaultFontSize 11
+skinparam defaultFontName Arial
+skinparam titleFontSize 14
+skinparam titleFontStyle bold
+skinparam rectangle {
+  RoundCorner 8
+  BorderThickness 2
+}
+skinparam database {
+  BorderColor #2C3E50
+  BorderThickness 2
+}
+skinparam cloud {
+  BorderColor #8E44AD
+  BorderThickness 2
+}
+
+title A1 - SOAP /ws/RechercheParCodePortType/RechercheParCode - RechercheParCodePortType.rechercheParCode()\nRated: FAST - 2026-04-17
+
+rectangle " HTTP Client " as client #EBF5FB
+
+rectangle " HTTP Request\n SOAP /ws/RechercheParCodePortType/RechercheParCode\n Auth: NO AUTH\n @Valid: NO " as req #EBF5FB
+
+rectangle " RechercheParCodePortType\n rechercheParCode() line 35\n Framework: JAX_WS\n Issues: NONE " as ctrl #D6EAF8
+
+database " Database " as db #D6EAF8
+
+rectangle " Response\n 200 OK " as resp #E8F8E8
+
+rectangle " Performance - SOAP /ws/RechercheParCodePortType/RechercheParCode\n Rating: FAST\n Measured data available from APM load test " as timing #D5F5E3
+
+client -[#2196F3,thickness=2]-> req
+req -[#2196F3,thickness=2]-> ctrl : SOAP /ws/RechercheParCodePortType/RechercheParCode
+ctrl -[#27AE60,thickness=2]-> resp
+resp -[#2196F3,thickness=2]-> client
+timing --> resp
+@enduml

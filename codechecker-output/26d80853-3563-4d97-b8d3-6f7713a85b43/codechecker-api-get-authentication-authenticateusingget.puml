@@ -1,0 +1,54 @@
+@startuml codechecker_api_get_authentication_authenticateusingget
+left to right direction
+skinparam defaultFontSize 11
+skinparam defaultFontName Arial
+skinparam titleFontSize 14
+skinparam titleFontStyle bold
+skinparam rectangle {
+  RoundCorner 8
+  BorderThickness 2
+}
+skinparam database {
+  BorderColor #2C3E50
+  BorderThickness 2
+}
+skinparam cloud {
+  BorderColor #8E44AD
+  BorderThickness 2
+}
+
+title A1 - GET /authentication/authenticateUsingGet - AuthenticationResource.authenticateUsingGet()\nRated: FAST - 2026-04-02
+
+rectangle " HTTP Client " as client #EBF5FB
+
+rectangle " HTTP Request\n GET /authentication/authenticateUsingGet\n Auth: NO AUTH\n @Valid: NO " as req #EBF5FB
+
+rectangle " AuthenticationResource\n authenticateUsingGet() line 86\n Framework: SEEDSTACK_JAXRS\n Issues: NONE " as ctrl #D6EAF8
+
+rectangle " MDC\n put() line 100\n Est: ~5ms " as svc1 #D5F5E3
+
+rectangle " Response.status(Response.Status.GONE)\n entity() line 103\n Est: ~5ms " as svc2 #D5F5E3
+
+rectangle " Response\n status() line 103\n Est: ~5ms " as svc3 #D5F5E3
+
+rectangle " builder\n header() line 105\n Est: ~5ms " as svc4 #D5F5E3
+
+rectangle " builder\n build() line 106\n Est: ~5ms " as svc5 #D5F5E3
+
+database " Database " as db #D6EAF8
+
+rectangle " Response\n 200 OK " as resp #E8F8E8
+
+rectangle " Timing - GET /authentication/authenticateUsingGet\n p50 ESTIMATED: ~43ms\n p95 ESTIMATED: ~107ms\n Rating: FAST " as timing #D5F5E3
+
+client -[#2196F3,thickness=2]-> req
+req -[#2196F3,thickness=2]-> ctrl : GET /authentication/authenticateUsingGet
+ctrl -[#27AE60,thickness=2]-> svc1 : put()
+ctrl -[#27AE60,thickness=2]-> svc2 : entity()
+ctrl -[#27AE60,thickness=2]-> svc3 : status()
+ctrl -[#27AE60,thickness=2]-> svc4 : header()
+ctrl -[#27AE60,thickness=2]-> svc5 : build()
+ctrl -[#27AE60,thickness=2]-> resp
+resp -[#2196F3,thickness=2]-> client
+timing --> resp
+@enduml

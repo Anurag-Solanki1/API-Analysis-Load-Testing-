@@ -1,0 +1,150 @@
+@startuml codechecker_api_get_health_corvethealth
+left to right direction
+skinparam defaultFontSize 11
+skinparam defaultFontName Arial
+skinparam titleFontSize 14
+skinparam titleFontStyle bold
+skinparam rectangle {
+  RoundCorner 8
+  BorderThickness 2
+}
+skinparam database {
+  BorderColor #2C3E50
+  BorderThickness 2
+}
+skinparam cloud {
+  BorderColor #8E44AD
+  BorderThickness 2
+}
+
+title A1 - GET /health/corvetHealth - HealthResource.getCorvetHealth()\nRated: MODERATE - 2026-04-02
+
+rectangle " HTTP Client " as client #EBF5FB
+
+rectangle " HTTP Request\n GET /health/corvetHealth\n Auth: NO AUTH\n @Valid: NO " as req #EBF5FB
+
+rectangle " HealthResource\n getCorvetHealth() line 334\n Framework: SEEDSTACK_JAXRS\n Issues: NONE " as ctrl #D6EAF8
+
+rectangle " MDC\n put() line 340\n Est: ~5ms " as svc1 #D5F5E3
+
+rectangle " appConfig\n getVinSheet() line 343\n Est: ~5ms " as svc2 #D5F5E3
+
+rectangle " workbook\n getSheet() line 345\n Est: ~5ms " as svc3 #D5F5E3
+
+rectangle " sheet\n getLastRowNum() line 346\n Est: ~5ms " as svc4 #D5F5E3
+
+rectangle " sheet.getRow(i)\n getCell() line 350\n Est: ~5ms " as svc5 #D5F5E3
+
+rectangle " sheet\n getRow() line 350\n Est: ~5ms " as svc6 #D5F5E3
+
+rectangle " vinCell\n toString() line 351\n Est: ~5ms " as svc7 #D5F5E3
+
+rectangle " sheet.getRow(i)\n getCell() line 354\n Est: ~5ms " as svc8 #D5F5E3
+
+rectangle " sheet\n getRow() line 354\n Est: ~5ms " as svc9 #D5F5E3
+
+rectangle " countryCell\n toString() line 355\n Est: ~5ms " as svc10 #D5F5E3
+
+rectangle " logger\n info() line 357\n Est: ~5ms " as svc11 #D5F5E3
+
+rectangle " VinIdentifier\n setLanguage() line 360\n Est: ~5ms " as svc12 #D5F5E3
+
+rectangle " VinIdentifier\n setVinNumber() line 361\n Est: ~5ms " as svc13 #D5F5E3
+
+rectangle " VinIdentifier\n setSource() line 362\n Est: ~5ms " as svc14 #D5F5E3
+
+rectangle " parameter\n setVin() line 365\n Est: ~5ms " as svc15 #D5F5E3
+
+rectangle " parameter\n setIntent() line 366\n Est: ~5ms " as svc16 #D5F5E3
+
+rectangle " parameter\n setSource() line 367\n Est: ~5ms " as svc17 #D5F5E3
+
+rectangle " parameter\n setVehicleDescriptionFull() line 368\n Est: ~5ms " as svc18 #D5F5E3
+
+rectangle " parameter\n setForceRefresh() line 369\n Est: ~5ms " as svc19 #D5F5E3
+
+rectangle " parameter\n setLanguageCode() line 370\n Est: ~5ms " as svc20 #D5F5E3
+
+rectangle " parameter\n setAllWarranties() line 371\n Est: ~5ms " as svc21 #D5F5E3
+
+rectangle " parameter\n setRecallCampaigns() line 372\n Est: ~5ms " as svc22 #D5F5E3
+
+rectangle " parameter\n setServiceHistory() line 373\n Est: ~5ms " as svc23 #D5F5E3
+
+rectangle " parameter\n setWarranty() line 374\n Est: ~5ms " as svc24 #D5F5E3
+
+rectangle " parameter\n setWarrantyClaims() line 375\n Est: ~5ms " as svc25 #D5F5E3
+
+rectangle " parameter\n setContract() line 376\n Est: ~5ms " as svc26 #D5F5E3
+
+rectangle " parameter\n setCountry() line 377\n Est: ~5ms " as svc27 #D5F5E3
+
+rectangle " esaService\n getVinResponseFromEsa() line 378\n Est: ~5ms " as svc28 #D5F5E3
+
+rectangle " response\n getStatus() line 379\n Called when: response.getStatus() == Constants.STATUS_OK\n Est: ~5ms " as svc29 #D5F5E3
+
+rectangle " ovVinStatus\n add() line 382\n Called when: response.getStatus() == Constants.STATUS_OK\n Est: ~5ms " as svc30 #D5F5E3
+
+rectangle " vinNumber.concat('-')\n concat() line 382\n Called when: response.getStatus() == Constants.STATUS_OK\n Est: ~5ms " as svc31 #D5F5E3
+
+rectangle " vinNumber\n concat() line 382\n Called when: response.getStatus() == Constants.STATUS_OK\n Est: ~5ms " as svc32 #D5F5E3
+
+rectangle " response.getStatusInfo()\n toString() line 382\n Called when: response.getStatus() == Constants.STATUS_OK\n Est: ~5ms " as svc33 #D5F5E3
+
+rectangle " response\n getStatusInfo() line 382\n Called when: response.getStatus() == Constants.STATUS_OK\n Est: ~5ms " as svc34 #D5F5E3
+
+rectangle " logger\n error() line 388\n Est: ~5ms " as svc35 #D5F5E3
+
+rectangle " ovVinStatus\n add() line 389\n Est: ~5ms " as svc36 #D5F5E3
+
+rectangle " logger\n info() line 392\n Est: ~5ms " as svc37 #D5F5E3
+
+database " Database " as db #D6EAF8
+
+rectangle " Response\n 200 OK " as resp #E8F8E8
+
+rectangle " Timing - GET /health/corvetHealth\n p50 ESTIMATED: ~203ms\n p95 ESTIMATED: ~507ms\n Rating: MODERATE " as timing #FDEBD0
+
+client -[#2196F3,thickness=2]-> req
+req -[#2196F3,thickness=2]-> ctrl : GET /health/corvetHealth
+ctrl -[#27AE60,thickness=2]-> svc1 : put()
+ctrl -[#27AE60,thickness=2]-> svc2 : getVinSheet()
+ctrl -[#27AE60,thickness=2]-> svc3 : getSheet()
+ctrl -[#27AE60,thickness=2]-> svc4 : getLastRowNum()
+ctrl -[#27AE60,thickness=2]-> svc5 : getCell()
+ctrl -[#27AE60,thickness=2]-> svc6 : getRow()
+ctrl -[#27AE60,thickness=2]-> svc7 : toString()
+ctrl -[#27AE60,thickness=2]-> svc8 : getCell()
+ctrl -[#27AE60,thickness=2]-> svc9 : getRow()
+ctrl -[#27AE60,thickness=2]-> svc10 : toString()
+ctrl -[#27AE60,thickness=2]-> svc11 : info()
+ctrl -[#27AE60,thickness=2]-> svc12 : setLanguage()
+ctrl -[#27AE60,thickness=2]-> svc13 : setVinNumber()
+ctrl -[#27AE60,thickness=2]-> svc14 : setSource()
+ctrl -[#27AE60,thickness=2]-> svc15 : setVin()
+ctrl -[#27AE60,thickness=2]-> svc16 : setIntent()
+ctrl -[#27AE60,thickness=2]-> svc17 : setSource()
+ctrl -[#27AE60,thickness=2]-> svc18 : setVehicleDescriptionFull()
+ctrl -[#27AE60,thickness=2]-> svc19 : setForceRefresh()
+ctrl -[#27AE60,thickness=2]-> svc20 : setLanguageCode()
+ctrl -[#27AE60,thickness=2]-> svc21 : setAllWarranties()
+ctrl -[#27AE60,thickness=2]-> svc22 : setRecallCampaigns()
+ctrl -[#27AE60,thickness=2]-> svc23 : setServiceHistory()
+ctrl -[#27AE60,thickness=2]-> svc24 : setWarranty()
+ctrl -[#27AE60,thickness=2]-> svc25 : setWarrantyClaims()
+ctrl -[#27AE60,thickness=2]-> svc26 : setContract()
+ctrl -[#27AE60,thickness=2]-> svc27 : setCountry()
+ctrl -[#27AE60,thickness=2]-> svc28 : getVinResponseFromEsa()
+ctrl -[#27AE60,thickness=2]-> svc29 : getStatus()
+ctrl -[#27AE60,thickness=2]-> svc30 : add()
+ctrl -[#27AE60,thickness=2]-> svc31 : concat()
+ctrl -[#27AE60,thickness=2]-> svc32 : concat()
+ctrl -[#27AE60,thickness=2]-> svc33 : toString()
+ctrl -[#27AE60,thickness=2]-> svc34 : getStatusInfo()
+ctrl -[#27AE60,thickness=2]-> svc35 : error()
+ctrl -[#27AE60,thickness=2]-> svc36 : add()
+ctrl -[#27AE60,thickness=2]-> svc37 : info()
+ctrl -[#27AE60,thickness=2]-> resp
+resp -[#2196F3,thickness=2]-> client
+timing --> resp
+@enduml

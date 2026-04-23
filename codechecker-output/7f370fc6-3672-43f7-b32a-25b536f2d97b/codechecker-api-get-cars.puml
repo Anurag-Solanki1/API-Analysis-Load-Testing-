@@ -1,0 +1,90 @@
+@startuml codechecker_api_get_cars
+left to right direction
+skinparam defaultFontSize 11
+skinparam defaultFontName Arial
+skinparam titleFontSize 14
+skinparam titleFontStyle bold
+skinparam rectangle {
+  RoundCorner 8
+  BorderThickness 2
+}
+skinparam database {
+  BorderColor #2C3E50
+  BorderThickness 2
+}
+skinparam cloud {
+  BorderColor #8E44AD
+  BorderThickness 2
+}
+
+title A1 - GET /cars - CarResource.get()\nRated: MODERATE - 2026-04-08
+
+rectangle " HTTP Client " as client #EBF5FB
+
+rectangle " HTTP Request\n GET /cars\n Auth: NO AUTH\n @Valid: NO " as req #EBF5FB
+
+rectangle " CarResource\n get() line 103\n Framework: SEEDSTACK_JAXRS\n Issues: NONE " as ctrl #D6EAF8
+
+rectangle " MDC\n put() line 112\n Est: ~5ms " as svc1 #D5F5E3
+
+rectangle " request\n getHeader() line 115\n Est: ~5ms " as svc2 #D5F5E3
+
+rectangle " request\n getHeader() line 116\n Est: ~5ms " as svc3 #D5F5E3
+
+rectangle " request\n getHeader() line 117\n Est: ~5ms " as svc4 #D5F5E3
+
+rectangle " MisterAutoUtil.REFTECH\n equals() line 133\n Called when: MisterAutoUtil.REFTECH.equals(world)\n Est: ~5ms " as svc5 #D5F5E3
+
+rectangle " Language\n getId() line 134\n Called when: MisterAutoUtil.REFTECH.equals(world)\n Est: ~5ms " as svc6 #D5F5E3
+
+rectangle " world\n equals() line 135\n Called when: world.equals(INTENT.MAPPED) && source.equals(INTENT.REFTECH)\n Est: ~5ms " as svc7 #D5F5E3
+
+rectangle " source\n equals() line 135\n Called when: world.equals(INTENT.MAPPED) && source.equals(INTENT.REFTECH)\n Est: ~5ms " as svc8 #D5F5E3
+
+rectangle " language\n getId() line 136\n Called when: world.equals(INTENT.MAPPED) && source.equals(INTENT.REFTECH)\n Est: ~5ms " as svc9 #D5F5E3
+
+rectangle " world\n equals() line 137\n Called when: world.equals(INTENT.MAPPED)\n Est: ~5ms " as svc10 #D5F5E3
+
+rectangle " language\n getId() line 138\n Called when: world.equals(INTENT.MAPPED)\n Est: ~5ms " as svc11 #D5F5E3
+
+rectangle " language\n getId() line 145\n Called when: containIdentifier\n Est: ~5ms " as svc12 #D5F5E3
+
+rectangle " language\n getId() line 147\n Called when: containIdentifier\n Est: ~5ms " as svc13 #D5F5E3
+
+rectangle " response\n header() line 150\n Est: ~5ms " as svc14 #D5F5E3
+
+rectangle " e\n getError() line 154\n Est: ~5ms " as svc15 #D5F5E3
+
+rectangle " e\n getError() line 156\n Est: ~5ms " as svc16 #D5F5E3
+
+rectangle " response\n build() line 158\n Est: ~5ms " as svc17 #D5F5E3
+
+database " Database " as db #D6EAF8
+
+rectangle " Response\n 200 OK " as resp #E8F8E8
+
+rectangle " Timing - GET /cars\n p50 ESTIMATED: ~103ms\n p95 ESTIMATED: ~257ms\n Rating: MODERATE " as timing #FDEBD0
+
+client -[#2196F3,thickness=2]-> req
+req -[#2196F3,thickness=2]-> ctrl : GET /cars
+ctrl -[#27AE60,thickness=2]-> svc1 : put()
+ctrl -[#27AE60,thickness=2]-> svc2 : getHeader()
+ctrl -[#27AE60,thickness=2]-> svc3 : getHeader()
+ctrl -[#27AE60,thickness=2]-> svc4 : getHeader()
+ctrl -[#27AE60,thickness=2]-> svc5 : equals()
+ctrl -[#27AE60,thickness=2]-> svc6 : getId()
+ctrl -[#27AE60,thickness=2]-> svc7 : equals()
+ctrl -[#27AE60,thickness=2]-> svc8 : equals()
+ctrl -[#27AE60,thickness=2]-> svc9 : getId()
+ctrl -[#27AE60,thickness=2]-> svc10 : equals()
+ctrl -[#27AE60,thickness=2]-> svc11 : getId()
+ctrl -[#27AE60,thickness=2]-> svc12 : getId()
+ctrl -[#27AE60,thickness=2]-> svc13 : getId()
+ctrl -[#27AE60,thickness=2]-> svc14 : header()
+ctrl -[#27AE60,thickness=2]-> svc15 : getError()
+ctrl -[#27AE60,thickness=2]-> svc16 : getError()
+ctrl -[#27AE60,thickness=2]-> svc17 : build()
+ctrl -[#27AE60,thickness=2]-> resp
+resp -[#2196F3,thickness=2]-> client
+timing --> resp
+@enduml

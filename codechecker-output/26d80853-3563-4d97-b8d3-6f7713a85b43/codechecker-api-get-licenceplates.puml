@@ -1,0 +1,85 @@
+@startuml codechecker_api_get_licenceplates
+left to right direction
+skinparam defaultFontSize 11
+skinparam defaultFontName Arial
+skinparam titleFontSize 14
+skinparam titleFontStyle bold
+skinparam rectangle {
+  RoundCorner 8
+  BorderThickness 2
+}
+skinparam database {
+  BorderColor #2C3E50
+  BorderThickness 2
+}
+skinparam cloud {
+  BorderColor #8E44AD
+  BorderThickness 2
+}
+
+title A1 - GET /licenceplates - LicensePlateResource.getLicencePlates()\nRated: MODERATE - 2026-04-02
+
+rectangle " HTTP Client " as client #EBF5FB
+
+rectangle " HTTP Request\n GET /licenceplates\n Auth: NO AUTH\n @Valid: NO " as req #EBF5FB
+
+rectangle " LicensePlateResource\n getLicencePlates() line 103\n Framework: SEEDSTACK_JAXRS\n Issues: 1 " as ctrl #D6EAF8
+
+rectangle " ESAPI.encoder()\n encodeForHTML() line 112\n Est: ~5ms " as svc1 #D5F5E3
+
+rectangle " ESAPI\n encoder() line 112\n Est: ~5ms " as svc2 #D5F5E3
+
+rectangle " MDC\n put() line 115\n Est: ~5ms " as svc3 #D5F5E3
+
+rectangle " MisterAutoUtil\n isValidRequestParameter() line 116\n Called when: MisterAutoUtil.isValidRequestParameter(vinNumber)\n Est: ~5ms " as svc4 #D5F5E3
+
+rectangle " LicencePlateServiceImpl\n processValidLpnRequestByVin() line 117\n Called when: MisterAutoUtil.isValidRequestParameter(vinNumber)\n Est: ~5ms " as svc5 #D5F5E3
+
+rectangle " MisterAutoUtil\n getLanguagefromRequest() line 120\n Called when: MisterAutoUtil.isValidRequestParameter(vinNumber)\n Est: ~5ms " as svc6 #D5F5E3
+
+rectangle " appConfig\n getDefaultLanguage() line 120\n Called when: MisterAutoUtil.isValidRequestParameter(vinNumber)\n Est: ~5ms " as svc7 #D5F5E3
+
+rectangle " LanguageRepository\n byCode() line 121\n Called when: MisterAutoUtil.isValidRequestParameter(vinNumber)\n Est: ~5ms " as svc8 #D5F5E3
+
+rectangle " MisterAutoUtil\n isValidRequestParameterForceRefresh() line 122\n Called when: MisterAutoUtil.isValidRequestParameter(vinNumber)\n Est: ~5ms " as svc9 #D5F5E3
+
+rectangle " MisterAutoUtil\n isValidRequestParameterTechDoc() line 123\n Called when: MisterAutoUtil.isValidRequestParameter(vinNumber)\n Est: ~5ms " as svc10 #D5F5E3
+
+rectangle " request\n getHeader() line 124\n Called when: MisterAutoUtil.isValidRequestParameter(vinNumber)\n Est: ~5ms " as svc11 #D5F5E3
+
+rectangle " validateService\n getLpnTokenByApiKey() line 125\n Called when: MisterAutoUtil.isValidRequestParameter(vinNumber)\n Est: ~5ms " as svc12 #D5F5E3
+
+rectangle " LicencePlateServiceImpl\n processValidLpnRequest() line 127\n Called when: response == null\n Est: ~30ms " as svc13 #D5F5E3
+
+rectangle " LicensePlateNumberRepository\n byLicensePlateNumberAndCountry()\n Query: UNKNOWN\n Est: ~15ms " as repo1 #FFF8E1
+
+database " Database " as db #D6EAF8
+
+rectangle " Response\n 200 OK " as resp #E8F8E8
+
+rectangle " Issues on GET /licenceplates\n A3-004 MEDIUM: Potential missing index — LicensePlateNumberReposi...\n " as issues #FEF9E7
+
+rectangle " Timing - GET /licenceplates\n p50 ESTIMATED: ~108ms\n p95 ESTIMATED: ~270ms\n Rating: MODERATE " as timing #FDEBD0
+
+client -[#2196F3,thickness=2]-> req
+req -[#2196F3,thickness=2]-> ctrl : GET /licenceplates
+ctrl -[#27AE60,thickness=2]-> svc1 : encodeForHTML()
+ctrl -[#27AE60,thickness=2]-> svc2 : encoder()
+ctrl -[#27AE60,thickness=2]-> svc3 : put()
+ctrl -[#27AE60,thickness=2]-> svc4 : isValidRequestParameter()
+ctrl -[#27AE60,thickness=2]-> svc5 : processValidLpnRequestByVin()
+ctrl -[#27AE60,thickness=2]-> svc6 : getLanguagefromRequest()
+ctrl -[#27AE60,thickness=2]-> svc7 : getDefaultLanguage()
+ctrl -[#27AE60,thickness=2]-> svc8 : byCode()
+ctrl -[#27AE60,thickness=2]-> svc9 : isValidRequestParameterForceRefresh()
+ctrl -[#27AE60,thickness=2]-> svc10 : isValidRequestParameterTechDoc()
+ctrl -[#27AE60,thickness=2]-> svc11 : getHeader()
+ctrl -[#27AE60,thickness=2]-> svc12 : getLpnTokenByApiKey()
+ctrl -[#27AE60,thickness=2]-> svc13 : processValidLpnRequest()
+svc13 -[#8B4513,thickness=2]-> repo1
+repo1 -[#8B4513,thickness=2]-> db
+ctrl -[#27AE60,thickness=2]-> resp
+resp -[#2196F3,thickness=2]-> client
+timing --> resp
+issues --> ctrl
+@enduml

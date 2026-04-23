@@ -1,0 +1,37 @@
+@startuml codechecker_db_class_ScanRunRepository
+top to bottom direction
+skinparam defaultFontSize 11
+skinparam defaultFontName Arial
+skinparam titleFontSize 14
+skinparam titleFontStyle bold
+skinparam rectangle {
+  RoundCorner 8
+  BorderThickness 2
+}
+
+title A3 - DB Query Map - ScanRunRepository\n3 queries analyzed - 2026-04-01
+
+rectangle " ScanRunRepository\n Queries: 3\n Critical: 0\n Slow: 0\n Table: scan_run " as overview #D6EAF8
+
+rectangle " findAllByOrderByStartedAtDesc()\n line 12\n Type: SPRING_DATA_DERIVED\n SQL: SELECT * FROM scan_run WHERE order_by_started_at_desc = ?\n Rating: null\n Est: ~20ms\n Index: MISSING\n Pagination: NO\n Full Entity Load (SELECT *) " as q0 #D6EAF8
+
+overview --> q0
+rectangle " findByStatus()\n line 13\n Type: SPRING_DATA_DERIVED\n SQL: SELECT * FROM scan_run WHERE status = ?\n Rating: null\n Est: ~20ms\n Index: MISSING\n Pagination: NO\n Full Entity Load (SELECT *) " as q1 #D6EAF8
+
+overview --> q1
+rectangle " findByProjectNameOrderByStartedAtDesc()\n line 14\n Type: SPRING_DATA_DERIVED\n SQL: SELECT * FROM scan_run WHERE project_name = ? ORDER BY start...\n Rating: null\n Est: ~20ms\n Index: MISSING\n Pagination: NO\n Full Entity Load (SELECT *) " as q2 #D6EAF8
+
+overview --> q2
+
+database " Database\n Table: scan_run " as db #D6EAF8
+
+q0 --> db
+q1 --> db
+q2 --> db
+
+package "Calling APIs" {
+  rectangle " POST /api/scan " as api0 #EBF5FB
+}
+
+api0 --> overview
+@enduml

@@ -1,0 +1,96 @@
+@startuml codechecker_api_post_dimbo
+left to right direction
+skinparam defaultFontSize 11
+skinparam defaultFontName Arial
+skinparam titleFontSize 14
+skinparam titleFontStyle bold
+skinparam rectangle {
+  RoundCorner 8
+  BorderThickness 2
+}
+skinparam database {
+  BorderColor #2C3E50
+  BorderThickness 2
+}
+skinparam cloud {
+  BorderColor #8E44AD
+  BorderThickness 2
+}
+
+title A1 - POST /dimbo - DimboSubcriptionResource.addDummySubscription()\nRated: MODERATE - 2026-04-06
+
+rectangle " HTTP Client " as client #EBF5FB
+
+rectangle " HTTP Request\n POST /dimbo\n Auth: NO AUTH\n @Valid: NO " as req #EBF5FB
+
+rectangle " DimboSubcriptionResource\n addDummySubscription() line 444\n Framework: SEEDSTACK_JAXRS\n Issues: NONE " as ctrl #D6EAF8
+
+rectangle " MDC\n put() line 455\n Est: ~5ms " as svc1 #D5F5E3
+
+rectangle " logger\n isTraceEnabled() line 456\n Called when: logger.isTraceEnabled()\n Est: ~5ms " as svc2 #D5F5E3
+
+rectangle " logger\n trace() line 457\n Called when: logger.isTraceEnabled()\n Est: ~5ms " as svc3 #D5F5E3
+
+rectangle " logger\n info() line 459\n Est: ~5ms " as svc4 #D5F5E3
+
+rectangle " createLdapService.validate(token)\n equalsIgnoreCase() line 464\n Called when: createLdapService.validate(token).equalsIgnoreCase(SUCCESS)\n Est: ~5ms " as svc5 #D5F5E3
+
+rectangle " createLdapService\n validate() line 464\n Called when: createLdapService.validate(token).equalsIgnoreCase(SUCCESS)\n Est: ~5ms " as svc6 #D5F5E3
+
+rectangle " dimbo\n setVin() line 471\n Called when: response == null\n Est: ~5ms " as svc7 #D5F5E3
+
+rectangle " contractData\n getVin() line 471\n Called when: response == null\n Est: ~5ms " as svc8 #D5F5E3
+
+rectangle " dimbo\n setUpdatedBy() line 472\n Called when: response == null\n Est: ~5ms " as svc9 #D5F5E3
+
+rectangle " contractData\n getUserId() line 472\n Called when: response == null\n Est: ~5ms " as svc10 #D5F5E3
+
+rectangle " dummyContractService\n setContractDetails() line 473\n Called when: response == null\n Est: ~5ms " as svc11 #D5F5E3
+
+rectangle " dummyContractService\n addContractDetails() line 474\n Called when: response == null\n Est: ~5ms " as svc12 #D5F5E3
+
+rectangle " logger\n error() line 477\n Called when: createLdapService.validate(token).equalsIgnoreCase(SUCCESS)\n Est: ~5ms " as svc13 #D5F5E3
+
+rectangle " errorValidator\n returnErrorResponse() line 478\n Called when: createLdapService.validate(token).equalsIgnoreCase(SUCCESS)\n Est: ~5ms " as svc14 #D5F5E3
+
+rectangle " e\n getMessage() line 479\n Called when: createLdapService.validate(token).equalsIgnoreCase(SUCCESS)\n Est: ~5ms " as svc15 #D5F5E3
+
+rectangle " errorValidator\n returnErrorResponse() line 483\n Called when: createLdapService.validate(token).equalsIgnoreCase(SUCCESS)\n Est: ~5ms " as svc16 #D5F5E3
+
+rectangle " logger\n isTraceEnabled() line 488\n Called when: logger.isTraceEnabled()\n Est: ~5ms " as svc17 #D5F5E3
+
+rectangle " logger\n trace() line 489\n Called when: logger.isTraceEnabled()\n Est: ~5ms " as svc18 #D5F5E3
+
+rectangle " CorsPolicy\n makeCORSComplaint() line 491\n Est: ~5ms " as svc19 #D5F5E3
+
+database " Database " as db #D6EAF8
+
+rectangle " Response\n 200 OK " as resp #E8F8E8
+
+rectangle " Timing - POST /dimbo\n p50 ESTIMATED: ~113ms\n p95 ESTIMATED: ~282ms\n Rating: MODERATE " as timing #FDEBD0
+
+client -[#2196F3,thickness=2]-> req
+req -[#2196F3,thickness=2]-> ctrl : POST /dimbo
+ctrl -[#27AE60,thickness=2]-> svc1 : put()
+ctrl -[#27AE60,thickness=2]-> svc2 : isTraceEnabled()
+ctrl -[#27AE60,thickness=2]-> svc3 : trace()
+ctrl -[#27AE60,thickness=2]-> svc4 : info()
+ctrl -[#27AE60,thickness=2]-> svc5 : equalsIgnoreCase()
+ctrl -[#27AE60,thickness=2]-> svc6 : validate()
+ctrl -[#27AE60,thickness=2]-> svc7 : setVin()
+ctrl -[#27AE60,thickness=2]-> svc8 : getVin()
+ctrl -[#27AE60,thickness=2]-> svc9 : setUpdatedBy()
+ctrl -[#27AE60,thickness=2]-> svc10 : getUserId()
+ctrl -[#27AE60,thickness=2]-> svc11 : setContractDetails()
+ctrl -[#27AE60,thickness=2]-> svc12 : addContractDetails()
+ctrl -[#27AE60,thickness=2]-> svc13 : error()
+ctrl -[#27AE60,thickness=2]-> svc14 : returnErrorResponse()
+ctrl -[#27AE60,thickness=2]-> svc15 : getMessage()
+ctrl -[#27AE60,thickness=2]-> svc16 : returnErrorResponse()
+ctrl -[#27AE60,thickness=2]-> svc17 : isTraceEnabled()
+ctrl -[#27AE60,thickness=2]-> svc18 : trace()
+ctrl -[#27AE60,thickness=2]-> svc19 : makeCORSComplaint()
+ctrl -[#27AE60,thickness=2]-> resp
+resp -[#2196F3,thickness=2]-> client
+timing --> resp
+@enduml

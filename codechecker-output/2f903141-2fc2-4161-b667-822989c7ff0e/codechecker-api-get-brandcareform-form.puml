@@ -1,0 +1,189 @@
+@startuml codechecker_api_get_brandcareform_form
+left to right direction
+skinparam defaultFontSize 11
+skinparam defaultFontName Arial
+skinparam titleFontSize 14
+skinparam titleFontStyle bold
+skinparam rectangle {
+  RoundCorner 8
+  BorderThickness 2
+}
+skinparam database {
+  BorderColor #2C3E50
+  BorderThickness 2
+}
+skinparam cloud {
+  BorderColor #8E44AD
+  BorderThickness 2
+}
+
+title A1 - GET /brandcareform/form - BrandcareResource.getBrandcareForm()\nRated: MODERATE - 2026-04-06
+
+rectangle " HTTP Client " as client #EBF5FB
+
+rectangle " HTTP Request\n GET /brandcareform/form\n Auth: NO AUTH\n @Valid: NO " as req #EBF5FB
+
+rectangle " BrandcareResource\n getBrandcareForm() line 81\n Framework: SEEDSTACK_JAXRS\n Issues: NONE " as ctrl #D6EAF8
+
+rectangle " MDC\n put() line 91\n Est: ~5ms " as svc1 #D5F5E3
+
+rectangle " logger\n info() line 92\n Est: ~5ms " as svc2 #D5F5E3
+
+rectangle " System\n currentTimeMillis() line 93\n Est: ~5ms " as svc3 #D5F5E3
+
+rectangle " BrandcareUtils\n validateHeaderToken() line 95\n Est: ~40ms " as svc4 #D5F5E3
+
+rectangle " logger\n warn() line 97\n Called when: response != null\n Est: ~5ms " as svc5 #D5F5E3
+
+rectangle " BrandcareUtils\n getToken() line 101\n Est: ~5ms " as svc6 #D5F5E3
+
+rectangle " BrandcareUtils\n extractPayload() line 104\n Est: ~5ms " as svc7 #D5F5E3
+
+rectangle " logger\n debug() line 105\n Est: ~5ms " as svc8 #D5F5E3
+
+rectangle " BrandcareService\n buildBrandcareFormResponse() line 108\n Est: ~5ms " as svc9 #D5F5E3
+
+rectangle " System\n currentTimeMillis() line 109\n Est: ~5ms " as svc10 #D5F5E3
+
+rectangle " logger\n info() line 110\n Est: ~5ms " as svc11 #D5F5E3
+
+rectangle " logger\n info() line 112\n Est: ~5ms " as svc12 #D5F5E3
+
+rectangle " Response.ok(new Gson().toJson(brandcareResponse)).header(Constants.HEADER_X_CORRELATION_ID, correlationId)\n build() line 113\n Est: ~5ms " as svc13 #D5F5E3
+
+rectangle " Response.ok(new Gson().toJson(brandcareResponse))\n header() line 113\n Est: ~5ms " as svc14 #D5F5E3
+
+rectangle " Response\n ok() line 113\n Est: ~5ms " as svc15 #D5F5E3
+
+rectangle " new Gson()\n toJson() line 113\n Est: ~5ms " as svc16 #D5F5E3
+
+rectangle " logger\n warn() line 116\n Est: ~5ms " as svc17 #D5F5E3
+
+rectangle " ValidatorImpl\n returnErrorResponse() line 117\n Est: ~5ms " as svc18 #D5F5E3
+
+rectangle " e\n getMaxVehicleAge() line 118\n Est: ~5ms " as svc19 #D5F5E3
+
+rectangle " e.getMaxVehicleAge()\n toString() line 118\n Est: ~5ms " as svc20 #D5F5E3
+
+rectangle " e\n getMaxVehicleAge() line 118\n Est: ~5ms " as svc21 #D5F5E3
+
+rectangle " ValidatorImpl\n dimboErrorResponse() line 120\n Est: ~5ms " as svc22 #D5F5E3
+
+rectangle " logger\n warn() line 122\n Est: ~5ms " as svc23 #D5F5E3
+
+rectangle " validator\n returnErrorResponse() line 123\n Est: ~5ms " as svc24 #D5F5E3
+
+rectangle " validator\n dimboErrorResponse() line 126\n Est: ~5ms " as svc25 #D5F5E3
+
+rectangle " logger\n warn() line 128\n Est: ~5ms " as svc26 #D5F5E3
+
+rectangle " validator\n returnErrorResponse() line 129\n Est: ~5ms " as svc27 #D5F5E3
+
+rectangle " validator\n dimboErrorResponse() line 132\n Est: ~5ms " as svc28 #D5F5E3
+
+rectangle " logger\n error() line 134\n Est: ~5ms " as svc29 #D5F5E3
+
+rectangle " validator\n dimboErrorResponse() line 135\n Est: ~5ms " as svc30 #D5F5E3
+
+rectangle " validator\n returnErrorResponse() line 135\n Est: ~5ms " as svc31 #D5F5E3
+
+rectangle " logger\n error() line 138\n Est: ~5ms " as svc32 #D5F5E3
+
+rectangle " validator\n dimboErrorResponse() line 139\n Est: ~5ms " as svc33 #D5F5E3
+
+rectangle " validator\n returnErrorResponse() line 140\n Est: ~5ms " as svc34 #D5F5E3
+
+rectangle " e\n getMessage() line 141\n Est: ~5ms " as svc35 #D5F5E3
+
+rectangle " logger\n error() line 143\n Est: ~5ms " as svc36 #D5F5E3
+
+rectangle " validator\n dimboErrorResponse() line 144\n Est: ~5ms " as svc37 #D5F5E3
+
+rectangle " validator\n returnErrorResponse() line 145\n Est: ~5ms " as svc38 #D5F5E3
+
+rectangle " logger\n error() line 149\n Est: ~5ms " as svc39 #D5F5E3
+
+rectangle " validator\n dimboErrorResponse() line 150\n Est: ~5ms " as svc40 #D5F5E3
+
+rectangle " validator\n returnErrorResponse() line 150\n Est: ~5ms " as svc41 #D5F5E3
+
+rectangle " e\n getMessage() line 151\n Est: ~5ms " as svc42 #D5F5E3
+
+rectangle " logger\n error() line 153\n Est: ~5ms " as svc43 #D5F5E3
+
+rectangle " validator\n dimboErrorResponse() line 154\n Est: ~5ms " as svc44 #D5F5E3
+
+rectangle " validator\n returnErrorResponse() line 154\n Est: ~5ms " as svc45 #D5F5E3
+
+rectangle " e\n getMessage() line 155\n Est: ~5ms " as svc46 #D5F5E3
+
+rectangle " e\n getMessage() line 155\n Est: ~5ms " as svc47 #D5F5E3
+
+rectangle " logger\n error() line 157\n Est: ~5ms " as svc48 #D5F5E3
+
+rectangle " validator\n dimboErrorResponse() line 158\n Est: ~5ms " as svc49 #D5F5E3
+
+rectangle " validator\n returnErrorResponse() line 159\n Est: ~5ms " as svc50 #D5F5E3
+
+database " Database " as db #D6EAF8
+
+rectangle " Response\n 200 OK " as resp #E8F8E8
+
+rectangle " Timing - GET /brandcareform/form\n p50 ESTIMATED: ~303ms\n p95 ESTIMATED: ~757ms\n Rating: MODERATE " as timing #FDEBD0
+
+client -[#2196F3,thickness=2]-> req
+req -[#2196F3,thickness=2]-> ctrl : GET /brandcareform/form
+ctrl -[#27AE60,thickness=2]-> svc1 : put()
+ctrl -[#27AE60,thickness=2]-> svc2 : info()
+ctrl -[#27AE60,thickness=2]-> svc3 : currentTimeMillis()
+ctrl -[#27AE60,thickness=2]-> svc4 : validateHeaderToken()
+ctrl -[#27AE60,thickness=2]-> svc5 : warn()
+ctrl -[#27AE60,thickness=2]-> svc6 : getToken()
+ctrl -[#27AE60,thickness=2]-> svc7 : extractPayload()
+ctrl -[#27AE60,thickness=2]-> svc8 : debug()
+ctrl -[#27AE60,thickness=2]-> svc9 : buildBrandcareFormResponse()
+ctrl -[#27AE60,thickness=2]-> svc10 : currentTimeMillis()
+ctrl -[#27AE60,thickness=2]-> svc11 : info()
+ctrl -[#27AE60,thickness=2]-> svc12 : info()
+ctrl -[#27AE60,thickness=2]-> svc13 : build()
+ctrl -[#27AE60,thickness=2]-> svc14 : header()
+ctrl -[#27AE60,thickness=2]-> svc15 : ok()
+ctrl -[#27AE60,thickness=2]-> svc16 : toJson()
+ctrl -[#27AE60,thickness=2]-> svc17 : warn()
+ctrl -[#27AE60,thickness=2]-> svc18 : returnErrorResponse()
+ctrl -[#27AE60,thickness=2]-> svc19 : getMaxVehicleAge()
+ctrl -[#27AE60,thickness=2]-> svc20 : toString()
+ctrl -[#27AE60,thickness=2]-> svc21 : getMaxVehicleAge()
+ctrl -[#27AE60,thickness=2]-> svc22 : dimboErrorResponse()
+ctrl -[#27AE60,thickness=2]-> svc23 : warn()
+ctrl -[#27AE60,thickness=2]-> svc24 : returnErrorResponse()
+ctrl -[#27AE60,thickness=2]-> svc25 : dimboErrorResponse()
+ctrl -[#27AE60,thickness=2]-> svc26 : warn()
+ctrl -[#27AE60,thickness=2]-> svc27 : returnErrorResponse()
+ctrl -[#27AE60,thickness=2]-> svc28 : dimboErrorResponse()
+ctrl -[#27AE60,thickness=2]-> svc29 : error()
+ctrl -[#27AE60,thickness=2]-> svc30 : dimboErrorResponse()
+ctrl -[#27AE60,thickness=2]-> svc31 : returnErrorResponse()
+ctrl -[#27AE60,thickness=2]-> svc32 : error()
+ctrl -[#27AE60,thickness=2]-> svc33 : dimboErrorResponse()
+ctrl -[#27AE60,thickness=2]-> svc34 : returnErrorResponse()
+ctrl -[#27AE60,thickness=2]-> svc35 : getMessage()
+ctrl -[#27AE60,thickness=2]-> svc36 : error()
+ctrl -[#27AE60,thickness=2]-> svc37 : dimboErrorResponse()
+ctrl -[#27AE60,thickness=2]-> svc38 : returnErrorResponse()
+ctrl -[#27AE60,thickness=2]-> svc39 : error()
+ctrl -[#27AE60,thickness=2]-> svc40 : dimboErrorResponse()
+ctrl -[#27AE60,thickness=2]-> svc41 : returnErrorResponse()
+ctrl -[#27AE60,thickness=2]-> svc42 : getMessage()
+ctrl -[#27AE60,thickness=2]-> svc43 : error()
+ctrl -[#27AE60,thickness=2]-> svc44 : dimboErrorResponse()
+ctrl -[#27AE60,thickness=2]-> svc45 : returnErrorResponse()
+ctrl -[#27AE60,thickness=2]-> svc46 : getMessage()
+ctrl -[#27AE60,thickness=2]-> svc47 : getMessage()
+ctrl -[#27AE60,thickness=2]-> svc48 : error()
+ctrl -[#27AE60,thickness=2]-> svc49 : dimboErrorResponse()
+ctrl -[#27AE60,thickness=2]-> svc50 : returnErrorResponse()
+ctrl -[#27AE60,thickness=2]-> resp
+resp -[#2196F3,thickness=2]-> client
+timing --> resp
+@enduml

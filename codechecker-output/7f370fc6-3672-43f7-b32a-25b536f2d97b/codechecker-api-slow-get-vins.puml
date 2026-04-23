@@ -1,0 +1,562 @@
+@startuml codechecker_api_slow_get_vins
+left to right direction
+skinparam defaultFontSize 11
+skinparam defaultFontName Arial
+skinparam titleFontSize 14
+skinparam titleFontStyle bold
+skinparam rectangle {
+  RoundCorner 8
+  BorderThickness 2
+}
+
+title A2 - SLOW API Analysis\nGET /vins\np50: ~913ms | p95: ~2282ms | Rating: SLOW\n2026-04-08
+
+rectangle " ROOT CAUSE ANALYSIS\n No critical root cause — review all service layer calls\n " as rootcause #FADBD8
+
+rectangle " HTTP Request\n GET /vins\n ~10ms routing " as http #EBF5FB
+
+rectangle " VehicleIdentificationNumberResource.getVins()\n ~5ms binding " as ctrl #D6EAF8
+
+rectangle " MDC.put()\n line 128\n ~5ms " as svc0_0 #D5F5E3
+
+rectangle " logger.info()\n line 129\n ~5ms " as svc1_0 #D5F5E3
+
+rectangle " parameter.setForceRefresh()\n line 133\n ~5ms " as svc2_0 #D5F5E3
+
+rectangle " parameter.setDetails()\n line 134\n ~5ms " as svc3_0 #D5F5E3
+
+rectangle " parameter.setVehicleDescriptionFull()\n line 135\n ~5ms " as svc4_0 #D5F5E3
+
+rectangle " parameter.setContract()\n line 136\n ~5ms " as svc5_0 #D5F5E3
+
+rectangle " parameter.setWarranty()\n line 137\n ~5ms " as svc6_0 #D5F5E3
+
+rectangle " parameter.setAllWarranties()\n line 138\n ~5ms " as svc7_0 #D5F5E3
+
+rectangle " parameter.setWarrantyClaims()\n line 139\n ~5ms " as svc8_0 #D5F5E3
+
+rectangle " parameter.setServiceHistory()\n line 140\n ~5ms " as svc9_0 #D5F5E3
+
+rectangle " parameter.setRecallCampaigns()\n line 141\n ~5ms " as svc10_0 #D5F5E3
+
+rectangle " parameter.setLicencePlateNo()\n line 142\n ~5ms " as svc11_0 #D5F5E3
+
+rectangle " ESAPI.encoder().encodeForHTML()\n line 142\n ~5ms " as svc12_0 #D5F5E3
+
+rectangle " ESAPI.encoder()\n line 142\n ~5ms " as svc13_0 #D5F5E3
+
+rectangle " parameter.setIdToCheck()\n line 143\n ~5ms " as svc14_0 #D5F5E3
+
+rectangle " parameter.setIsSagaiDeployed()\n line 145\n ~5ms " as svc15_0 #D5F5E3
+
+rectangle " parameter.setListLcdvOvip()\n line 146\n ~5ms " as svc16_0 #D5F5E3
+
+rectangle " parameter.setListElectronic()\n line 147\n ~5ms " as svc17_0 #D5F5E3
+
+rectangle " StringUtils.isNotBlank()\n line 148\n When: StringUtils.isNotBlank(brandName)\n ~5ms " as svc18_0 #D5F5E3
+
+rectangle " parameter.setBrandName()\n line 149\n When: StringUtils.isNotBlank(brandName)\n ~5ms " as svc19_0 #D5F5E3
+
+rectangle " ESAPI.encoder().encodeForHTML()\n line 153\n ~5ms " as svc20_0 #D5F5E3
+
+rectangle " ESAPI.encoder()\n line 153\n ~5ms " as svc21_0 #D5F5E3
+
+rectangle " CartellService.getLanguage()\n line 156\n ~5ms " as svc22_0 #D5F5E3
+
+rectangle " ESAPI.encoder().encodeForHTML()\n line 156\n ~5ms " as svc23_0 #D5F5E3
+
+rectangle " ESAPI.encoder()\n line 156\n ~5ms " as svc24_0 #D5F5E3
+
+rectangle " request.getHeader()\n line 156\n ~5ms " as svc25_0 #D5F5E3
+
+rectangle " ESAPI.encoder().encodeForHTML()\n line 157\n ~5ms " as svc26_0 #D5F5E3
+
+rectangle " ESAPI.encoder()\n line 157\n ~5ms " as svc27_0 #D5F5E3
+
+rectangle " request.getHeader()\n line 157\n ~5ms " as svc28_0 #D5F5E3
+
+rectangle " ESAPI.encoder().encodeForHTML()\n line 158\n ~5ms " as svc29_0 #D5F5E3
+
+rectangle " ESAPI.encoder()\n line 158\n ~5ms " as svc30_0 #D5F5E3
+
+rectangle " request.getHeader()\n line 158\n ~5ms " as svc31_0 #D5F5E3
+
+rectangle " com.inetpsa.cin.vin.domain.shared.enums.Consumer.getConsumerNameByKey()\n line 159\n ~5ms " as svc32_0 #D5F5E3
+
+rectangle " parameter.setConsumerName()\n line 160\n ~5ms " as svc33_0 #D5F5E3
+
+rectangle " parameter.setApiKey()\n line 161\n ~5ms " as svc34_0 #D5F5E3
+
+rectangle " country.isEmpty()\n line 162\n When: null != country && !country.isEmpty()\n ~5ms " as svc35_0 #D5F5E3
+
+rectangle " parameter.setCountry()\n line 163\n When: null != country && !country.isEmpty()\n ~5ms " as svc36_0 #D5F5E3
+
+rectangle " country.toLowerCase()\n line 163\n When: null != country && !country.isEmpty()\n ~5ms " as svc37_0 #D5F5E3
+
+rectangle " parameter.setVis()\n line 164\n ~5ms " as svc38_0 #D5F5E3
+
+rectangle " parameter.setIntent()\n line 165\n ~5ms " as svc39_0 #D5F5E3
+
+rectangle " parameter.setSource()\n line 166\n ~5ms " as svc40_0 #D5F5E3
+
+rectangle " StringUtils.isEmpty()\n line 168\n When: !StringUtils.isEmpty(lpnCountry) && util...\n ~5ms " as svc41_0 #D5F5E3
+
+rectangle " util.isValidAlhaStr()\n line 168\n When: !StringUtils.isEmpty(lpnCountry) && util...\n ~5ms " as svc42_0 #D5F5E3
+
+rectangle " lpnCountry.toLowerCase()\n line 168\n When: !StringUtils.isEmpty(lpnCountry) && util...\n ~5ms " as svc43_0 #D5F5E3
+
+rectangle " parameter.setLpnCountry()\n line 169\n When: !StringUtils.isEmpty(lpnCountry) && util...\n ~5ms " as svc44_0 #D5F5E3
+
+rectangle " lpnCountry.toLowerCase()\n line 169\n When: !StringUtils.isEmpty(lpnCountry) && util...\n ~5ms " as svc45_0 #D5F5E3
+
+rectangle " parameter.setLanguageCode()\n line 172\n When: response == null && vinSource != null &&...\n ~5ms " as svc46_0 #D5F5E3
+
+rectangle " logger.debug()\n line 175\n When: response == null && vinSource != null &&...\n ~5ms " as svc47_0 #D5F5E3
+
+rectangle " parameter.setVin()\n line 178\n When: response == null && vinSource != null &&...\n ~5ms " as svc48_0 #D5F5E3
+
+rectangle " vinNumber.toUpperCase()\n line 178\n When: response == null && vinSource != null &&...\n ~5ms " as svc49_0 #D5F5E3
+
+rectangle " parameter.getVin().length()\n line 179\n When: parameter.getVin().length() != Constants...\n ~5ms " as svc50_0 #D5F5E3
+
+rectangle " parameter.getVin()\n line 179\n When: parameter.getVin().length() != Constants...\n ~5ms " as svc51_0 #D5F5E3
+
+rectangle " CartellService.getCountry()\n line 181\n When: response == null && vinSource != null &&...\n ~5ms " as svc52_0 #D5F5E3
+
+rectangle " parameter.setCountry()\n line 182\n When: response == null && vinSource != null &&...\n ~5ms " as svc53_0 #D5F5E3
+
+rectangle " logger.info()\n line 183\n When: response == null && vinSource != null &&...\n ~5ms " as svc54_0 #D5F5E3
+
+rectangle " parameter.getSource()\n line 186\n When: response == null && vinSource != null &&...\n ~5ms " as svc55_0 #D5F5E3
+
+rectangle " parameter.getDetails()\n line 186\n When: response == null && vinSource != null &&...\n ~5ms " as svc56_0 #D5F5E3
+
+rectangle " parameter.getIntent()\n line 186\n When: response == null && vinSource != null &&...\n ~5ms " as svc57_0 #D5F5E3
+
+rectangle " parameter.getVehicleDescriptionFull()\n line 186\n When: response == null && vinSource != null &&...\n ~5ms " as svc58_0 #D5F5E3
+
+rectangle " parameter.getContract()\n line 187\n When: response == null && vinSource != null &&...\n ~5ms " as svc59_0 #D5F5E3
+
+rectangle " parameter.getWarranty()\n line 187\n When: response == null && vinSource != null &&...\n ~5ms " as svc60_0 #D5F5E3
+
+rectangle " parameter.getAllWarranties()\n line 187\n When: response == null && vinSource != null &&...\n ~5ms " as svc61_0 #D5F5E3
+
+rectangle " parameter.getWarrantyClaims()\n line 187\n When: response == null && vinSource != null &&...\n ~5ms " as svc62_0 #D5F5E3
+
+rectangle " parameter.getServiceHistory()\n line 188\n When: response == null && vinSource != null &&...\n ~5ms " as svc63_0 #D5F5E3
+
+rectangle " parameter.getRecallCampaigns()\n line 188\n When: response == null && vinSource != null &&...\n ~5ms " as svc64_0 #D5F5E3
+
+rectangle " parameter.getForceRefresh()\n line 188\n When: response == null && vinSource != null &&...\n ~5ms " as svc65_0 #D5F5E3
+
+rectangle " parameter.getIsSagaiDeployed()\n line 188\n When: response == null && vinSource != null &&...\n ~5ms " as svc66_0 #D5F5E3
+
+rectangle " parameter.getBrandName()\n line 189\n When: response == null && vinSource != null &&...\n ~5ms " as svc67_0 #D5F5E3
+
+rectangle " parameter.getListLcdvOvip()\n line 189\n When: response == null && vinSource != null &&...\n ~5ms " as svc68_0 #D5F5E3
+
+rectangle " parameter.getListElectronic()\n line 189\n When: response == null && vinSource != null &&...\n ~5ms " as svc69_0 #D5F5E3
+
+rectangle " parameter.getCountry()\n line 189\n When: response == null && vinSource != null &&...\n ~5ms " as svc70_0 #D5F5E3
+
+rectangle " CartellService.processForCartellSource()\n line 192\n When: response == null && vinSource != null &&...\n ~5ms " as svc71_0 #D5F5E3
+
+rectangle " logger.debug()\n line 196\n When: response == null && vinSource != null &&...\n ~5ms " as svc72_0 #D5F5E3
+
+rectangle " parameter.setVin()\n line 197\n When: response == null && vinSource != null &&...\n ~5ms " as svc73_0 #D5F5E3
+
+rectangle " vinNumber.toUpperCase()\n line 197\n When: response == null && vinSource != null &&...\n ~5ms " as svc74_0 #D5F5E3
+
+rectangle " parameter.getVin().length()\n line 198\n When: parameter.getVin().length() != Constants...\n ~5ms " as svc75_0 #D5F5E3
+
+rectangle " parameter.getVin()\n line 198\n When: parameter.getVin().length() != Constants...\n ~5ms " as svc76_0 #D5F5E3
+
+rectangle " Arrays.asList(appConfig.getNonPcdVins().split(ACTION_SPLIT)).contains()\n line 200\n When: Arrays.asList(appConfig.getNonPcdVins()....\n ~5ms " as svc77_0 #D5F5E3
+
+rectangle " Arrays.asList()\n line 200\n When: Arrays.asList(appConfig.getNonPcdVins()....\n ~5ms " as svc78_0 #D5F5E3
+
+rectangle " appConfig.getNonPcdVins().split()\n line 200\n When: Arrays.asList(appConfig.getNonPcdVins()....\n ~5ms " as svc79_0 #D5F5E3
+
+rectangle " appConfig.getNonPcdVins()\n line 200\n When: Arrays.asList(appConfig.getNonPcdVins()....\n ~5ms " as svc80_0 #D5F5E3
+
+rectangle " parameter.getVin().substring()\n line 201\n When: Arrays.asList(appConfig.getNonPcdVins()....\n ~5ms " as svc81_0 #D5F5E3
+
+rectangle " parameter.getVin()\n line 201\n When: Arrays.asList(appConfig.getNonPcdVins()....\n ~5ms " as svc82_0 #D5F5E3
+
+rectangle " logger.info()\n line 203\n When: response == null && vinSource != null &&...\n ~5ms " as svc83_0 #D5F5E3
+
+rectangle " parameter.getSource()\n line 206\n When: response == null && vinSource != null &&...\n ~5ms " as svc84_0 #D5F5E3
+
+rectangle " parameter.getDetails()\n line 206\n When: response == null && vinSource != null &&...\n ~5ms " as svc85_0 #D5F5E3
+
+rectangle " parameter.getIntent()\n line 206\n When: response == null && vinSource != null &&...\n ~5ms " as svc86_0 #D5F5E3
+
+rectangle " parameter.getVehicleDescriptionFull()\n line 206\n When: response == null && vinSource != null &&...\n ~5ms " as svc87_0 #D5F5E3
+
+rectangle " parameter.getContract()\n line 207\n When: response == null && vinSource != null &&...\n ~5ms " as svc88_0 #D5F5E3
+
+rectangle " parameter.getWarranty()\n line 207\n When: response == null && vinSource != null &&...\n ~5ms " as svc89_0 #D5F5E3
+
+rectangle " parameter.getAllWarranties()\n line 207\n When: response == null && vinSource != null &&...\n ~5ms " as svc90_0 #D5F5E3
+
+rectangle " parameter.getWarrantyClaims()\n line 207\n When: response == null && vinSource != null &&...\n ~5ms " as svc91_0 #D5F5E3
+
+rectangle " parameter.getServiceHistory()\n line 208\n When: response == null && vinSource != null &&...\n ~5ms " as svc92_0 #D5F5E3
+
+rectangle " parameter.getRecallCampaigns()\n line 208\n When: response == null && vinSource != null &&...\n ~5ms " as svc93_0 #D5F5E3
+
+rectangle " parameter.getForceRefresh()\n line 208\n When: response == null && vinSource != null &&...\n ~5ms " as svc94_0 #D5F5E3
+
+rectangle " parameter.getIsSagaiDeployed()\n line 208\n When: response == null && vinSource != null &&...\n ~5ms " as svc95_0 #D5F5E3
+
+rectangle " parameter.getBrandName()\n line 209\n When: response == null && vinSource != null &&...\n ~5ms " as svc96_0 #D5F5E3
+
+rectangle " parameter.getListLcdvOvip()\n line 209\n When: response == null && vinSource != null &&...\n ~5ms " as svc97_0 #D5F5E3
+
+rectangle " parameter.getListElectronic()\n line 209\n When: response == null && vinSource != null &&...\n ~5ms " as svc98_0 #D5F5E3
+
+rectangle " parameter.getCountry()\n line 209\n When: response == null && vinSource != null &&...\n ~5ms " as svc99_0 #D5F5E3
+
+rectangle " RecoverDescriptionServiceImpl.getVinResponse()\n line 215\n When: consumerNewFlow\n ~25ms " as svc100_0 #D5F5E3
+
+  rectangle " StatusCode.setResponseCode()\n line 56\n ~5ms " as svc100_n0_1 #D5F5E3
+
+svc100_0 --> svc100_n0_1
+  rectangle " ApplicationConfig.getApiKeyDiag()\n line 185\n ~5ms " as svc100_n1_1 #D5F5E3
+
+svc100_0 --> svc100_n1_1
+  rectangle " VinBrandService.getBrandForNewFlow()\n line 59\n ~5ms " as svc100_n2_1 #D5F5E3
+
+svc100_0 --> svc100_n2_1
+  rectangle " ApplicationConfig.getPcdVins()\n line 1388\n ~5ms " as svc100_n3_1 #D5F5E3
+
+svc100_0 --> svc100_n3_1
+rectangle " esaService.getVinResponseFromEsa()\n line 217\n When: consumerNewFlow\n ~5ms " as svc101_0 #D5F5E3
+
+rectangle " logger.debug()\n line 221\n When: response == null && vinSource != null &&...\n ~5ms " as svc102_0 #D5F5E3
+
+rectangle " logger.info()\n line 224\n When: response == null && vinSource != null &&...\n ~5ms " as svc103_0 #D5F5E3
+
+rectangle " parameter.setLanguageCode()\n line 227\n When: null == response && null != visNumber\n ~5ms " as svc104_0 #D5F5E3
+
+rectangle " logger.debug()\n line 228\n When: null == response && null != visNumber\n ~5ms " as svc105_0 #D5F5E3
+
+rectangle " parameter.setVis()\n line 229\n When: null == response && null != visNumber\n ~5ms " as svc106_0 #D5F5E3
+
+rectangle " visNumber.toUpperCase()\n line 229\n When: null == response && null != visNumber\n ~5ms " as svc107_0 #D5F5E3
+
+rectangle " logger.info()\n line 230\n When: null == response && null != visNumber\n ~5ms " as svc108_0 #D5F5E3
+
+rectangle " parameter.getSource()\n line 233\n When: null == response && null != visNumber\n ~5ms " as svc109_0 #D5F5E3
+
+rectangle " parameter.getDetails()\n line 233\n When: null == response && null != visNumber\n ~5ms " as svc110_0 #D5F5E3
+
+rectangle " parameter.getIntent()\n line 233\n When: null == response && null != visNumber\n ~5ms " as svc111_0 #D5F5E3
+
+rectangle " parameter.getVehicleDescriptionFull()\n line 233\n When: null == response && null != visNumber\n ~5ms " as svc112_0 #D5F5E3
+
+rectangle " parameter.getContract()\n line 234\n When: null == response && null != visNumber\n ~5ms " as svc113_0 #D5F5E3
+
+rectangle " parameter.getWarranty()\n line 234\n When: null == response && null != visNumber\n ~5ms " as svc114_0 #D5F5E3
+
+rectangle " parameter.getAllWarranties()\n line 234\n When: null == response && null != visNumber\n ~5ms " as svc115_0 #D5F5E3
+
+rectangle " parameter.getWarrantyClaims()\n line 234\n When: null == response && null != visNumber\n ~5ms " as svc116_0 #D5F5E3
+
+rectangle " parameter.getServiceHistory()\n line 235\n When: null == response && null != visNumber\n ~5ms " as svc117_0 #D5F5E3
+
+rectangle " parameter.getRecallCampaigns()\n line 235\n When: null == response && null != visNumber\n ~5ms " as svc118_0 #D5F5E3
+
+rectangle " parameter.getForceRefresh()\n line 235\n When: null == response && null != visNumber\n ~5ms " as svc119_0 #D5F5E3
+
+rectangle " parameter.getIsSagaiDeployed()\n line 235\n When: null == response && null != visNumber\n ~5ms " as svc120_0 #D5F5E3
+
+rectangle " parameter.getBrandName()\n line 236\n When: null == response && null != visNumber\n ~5ms " as svc121_0 #D5F5E3
+
+rectangle " parameter.getListLcdvOvip()\n line 236\n When: null == response && null != visNumber\n ~5ms " as svc122_0 #D5F5E3
+
+rectangle " parameter.getListElectronic()\n line 236\n When: null == response && null != visNumber\n ~5ms " as svc123_0 #D5F5E3
+
+rectangle " parameter.getCountry()\n line 236\n When: null == response && null != visNumber\n ~5ms " as svc124_0 #D5F5E3
+
+rectangle " VISServiceImpl.getVisResponseForNewFlow()\n line 242\n When: consumerNewFlow\n ~10ms " as svc125_0 #D5F5E3
+
+  rectangle " ApplicationConfig.getPcdVins()\n line 1388\n ~5ms " as svc125_n0_1 #D5F5E3
+
+svc125_0 --> svc125_n0_1
+rectangle " response.getStatus()\n line 243\n When: response != null && response.getStatus()...\n ~5ms " as svc126_0 #D5F5E3
+
+rectangle " VISServiceImpl.getVisResponse()\n line 248\n When: consumerNewFlow\n ~25ms " as svc127_0 #D5F5E3
+
+  rectangle " ApplicationConfig.getPcdVins()\n line 1388\n ~5ms " as svc127_n0_1 #D5F5E3
+
+svc127_0 --> svc127_n0_1
+  rectangle " ApplicationConfig.getPcdVins()\n line 1388\n ~5ms " as svc127_n1_1 #D5F5E3
+
+svc127_0 --> svc127_n1_1
+  rectangle " ThubService.getAlcdvForVin()\n line 28\n ~5ms " as svc127_n2_1 #D5F5E3
+
+svc127_0 --> svc127_n2_1
+  rectangle " ThubService.getAlcdvForVin()\n line 28\n ~5ms " as svc127_n3_1 #D5F5E3
+
+svc127_0 --> svc127_n3_1
+rectangle " parameter.setLanguageCode()\n line 251\n When: null == response && null != licencePlate...\n ~5ms " as svc128_0 #D5F5E3
+
+rectangle " logger.debug()\n line 252\n When: null == response && null != licencePlate...\n ~5ms " as svc129_0 #D5F5E3
+
+rectangle " parameter.setLicencePlateNo()\n line 253\n When: null == response && null != licencePlate...\n ~5ms " as svc130_0 #D5F5E3
+
+rectangle " licencePlateNo.toUpperCase()\n line 253\n When: null == response && null != licencePlate...\n ~5ms " as svc131_0 #D5F5E3
+
+rectangle " logger.info()\n line 254\n When: null == response && null != licencePlate...\n ~5ms " as svc132_0 #D5F5E3
+
+rectangle " parameter.getSource()\n line 257\n When: null == response && null != licencePlate...\n ~5ms " as svc133_0 #D5F5E3
+
+rectangle " parameter.getDetails()\n line 257\n When: null == response && null != licencePlate...\n ~5ms " as svc134_0 #D5F5E3
+
+rectangle " parameter.getIntent()\n line 257\n When: null == response && null != licencePlate...\n ~5ms " as svc135_0 #D5F5E3
+
+rectangle " parameter.getVehicleDescriptionFull()\n line 257\n When: null == response && null != licencePlate...\n ~5ms " as svc136_0 #D5F5E3
+
+rectangle " parameter.getContract()\n line 258\n When: null == response && null != licencePlate...\n ~5ms " as svc137_0 #D5F5E3
+
+rectangle " parameter.getWarranty()\n line 258\n When: null == response && null != licencePlate...\n ~5ms " as svc138_0 #D5F5E3
+
+rectangle " parameter.getAllWarranties()\n line 258\n When: null == response && null != licencePlate...\n ~5ms " as svc139_0 #D5F5E3
+
+rectangle " parameter.getWarrantyClaims()\n line 258\n When: null == response && null != licencePlate...\n ~5ms " as svc140_0 #D5F5E3
+
+rectangle " parameter.getServiceHistory()\n line 259\n When: null == response && null != licencePlate...\n ~5ms " as svc141_0 #D5F5E3
+
+rectangle " parameter.getRecallCampaigns()\n line 259\n When: null == response && null != licencePlate...\n ~5ms " as svc142_0 #D5F5E3
+
+rectangle " parameter.getForceRefresh()\n line 259\n When: null == response && null != licencePlate...\n ~5ms " as svc143_0 #D5F5E3
+
+rectangle " parameter.getIsSagaiDeployed()\n line 259\n When: null == response && null != licencePlate...\n ~5ms " as svc144_0 #D5F5E3
+
+rectangle " parameter.getBrandName()\n line 260\n When: null == response && null != licencePlate...\n ~5ms " as svc145_0 #D5F5E3
+
+rectangle " parameter.getListLcdvOvip()\n line 260\n When: null == response && null != licencePlate...\n ~5ms " as svc146_0 #D5F5E3
+
+rectangle " parameter.getListElectronic()\n line 260\n When: null == response && null != licencePlate...\n ~5ms " as svc147_0 #D5F5E3
+
+rectangle " parameter.getCountry()\n line 260\n When: null == response && null != licencePlate...\n ~5ms " as svc148_0 #D5F5E3
+
+rectangle " VISServiceImpl.getLpnResponseFromDatabase()\n line 266\n When: consumerNewFlow\n ~5ms " as svc149_0 #D5F5E3
+
+rectangle " VISServiceImpl.getLpnResponse()\n line 268\n When: consumerNewFlow\n ~5ms " as svc150_0 #D5F5E3
+
+rectangle " logger.debug()\n line 272\n When: null == response && null != idToCheck\n ~5ms " as svc151_0 #D5F5E3
+
+rectangle " parameter.setLanguageCode()\n line 273\n When: null == response && null != idToCheck\n ~5ms " as svc152_0 #D5F5E3
+
+rectangle " logger.info()\n line 274\n When: null == response && null != idToCheck\n ~5ms " as svc153_0 #D5F5E3
+
+rectangle " parameter.getSource()\n line 277\n When: null == response && null != idToCheck\n ~5ms " as svc154_0 #D5F5E3
+
+rectangle " parameter.getDetails()\n line 277\n When: null == response && null != idToCheck\n ~5ms " as svc155_0 #D5F5E3
+
+rectangle " parameter.getIntent()\n line 277\n When: null == response && null != idToCheck\n ~5ms " as svc156_0 #D5F5E3
+
+rectangle " parameter.getVehicleDescriptionFull()\n line 277\n When: null == response && null != idToCheck\n ~5ms " as svc157_0 #D5F5E3
+
+rectangle " parameter.getContract()\n line 278\n When: null == response && null != idToCheck\n ~5ms " as svc158_0 #D5F5E3
+
+rectangle " parameter.getWarranty()\n line 278\n When: null == response && null != idToCheck\n ~5ms " as svc159_0 #D5F5E3
+
+rectangle " parameter.getAllWarranties()\n line 278\n When: null == response && null != idToCheck\n ~5ms " as svc160_0 #D5F5E3
+
+rectangle " parameter.getWarrantyClaims()\n line 278\n When: null == response && null != idToCheck\n ~5ms " as svc161_0 #D5F5E3
+
+rectangle " parameter.getServiceHistory()\n line 279\n When: null == response && null != idToCheck\n ~5ms " as svc162_0 #D5F5E3
+
+rectangle " parameter.getRecallCampaigns()\n line 279\n When: null == response && null != idToCheck\n ~5ms " as svc163_0 #D5F5E3
+
+rectangle " parameter.getForceRefresh()\n line 279\n When: null == response && null != idToCheck\n ~5ms " as svc164_0 #D5F5E3
+
+rectangle " parameter.getIsSagaiDeployed()\n line 279\n When: null == response && null != idToCheck\n ~5ms " as svc165_0 #D5F5E3
+
+rectangle " parameter.getBrandName()\n line 280\n When: null == response && null != idToCheck\n ~5ms " as svc166_0 #D5F5E3
+
+rectangle " parameter.getListLcdvOvip()\n line 280\n When: null == response && null != idToCheck\n ~5ms " as svc167_0 #D5F5E3
+
+rectangle " parameter.getListElectronic()\n line 280\n When: null == response && null != idToCheck\n ~5ms " as svc168_0 #D5F5E3
+
+rectangle " parameter.getCountry()\n line 280\n When: null == response && null != idToCheck\n ~5ms " as svc169_0 #D5F5E3
+
+rectangle " TIMING BREAKDOWN\n Total p50: ~913ms\n Total p95: ~2282ms\n " as timebox #FADBD8
+
+http --> ctrl
+ctrl -[#E74C3C,thickness=2]-> svc0_0
+ctrl -[#E74C3C,thickness=2]-> svc1_0
+ctrl -[#E74C3C,thickness=2]-> svc2_0
+ctrl -[#E74C3C,thickness=2]-> svc3_0
+ctrl -[#E74C3C,thickness=2]-> svc4_0
+ctrl -[#E74C3C,thickness=2]-> svc5_0
+ctrl -[#E74C3C,thickness=2]-> svc6_0
+ctrl -[#E74C3C,thickness=2]-> svc7_0
+ctrl -[#E74C3C,thickness=2]-> svc8_0
+ctrl -[#E74C3C,thickness=2]-> svc9_0
+ctrl -[#E74C3C,thickness=2]-> svc10_0
+ctrl -[#E74C3C,thickness=2]-> svc11_0
+ctrl -[#E74C3C,thickness=2]-> svc12_0
+ctrl -[#E74C3C,thickness=2]-> svc13_0
+ctrl -[#E74C3C,thickness=2]-> svc14_0
+ctrl -[#E74C3C,thickness=2]-> svc15_0
+ctrl -[#E74C3C,thickness=2]-> svc16_0
+ctrl -[#E74C3C,thickness=2]-> svc17_0
+ctrl -[#E74C3C,thickness=2]-> svc18_0
+ctrl -[#E74C3C,thickness=2]-> svc19_0
+ctrl -[#E74C3C,thickness=2]-> svc20_0
+ctrl -[#E74C3C,thickness=2]-> svc21_0
+ctrl -[#E74C3C,thickness=2]-> svc22_0
+ctrl -[#E74C3C,thickness=2]-> svc23_0
+ctrl -[#E74C3C,thickness=2]-> svc24_0
+ctrl -[#E74C3C,thickness=2]-> svc25_0
+ctrl -[#E74C3C,thickness=2]-> svc26_0
+ctrl -[#E74C3C,thickness=2]-> svc27_0
+ctrl -[#E74C3C,thickness=2]-> svc28_0
+ctrl -[#E74C3C,thickness=2]-> svc29_0
+ctrl -[#E74C3C,thickness=2]-> svc30_0
+ctrl -[#E74C3C,thickness=2]-> svc31_0
+ctrl -[#E74C3C,thickness=2]-> svc32_0
+ctrl -[#E74C3C,thickness=2]-> svc33_0
+ctrl -[#E74C3C,thickness=2]-> svc34_0
+ctrl -[#E74C3C,thickness=2]-> svc35_0
+ctrl -[#E74C3C,thickness=2]-> svc36_0
+ctrl -[#E74C3C,thickness=2]-> svc37_0
+ctrl -[#E74C3C,thickness=2]-> svc38_0
+ctrl -[#E74C3C,thickness=2]-> svc39_0
+ctrl -[#E74C3C,thickness=2]-> svc40_0
+ctrl -[#E74C3C,thickness=2]-> svc41_0
+ctrl -[#E74C3C,thickness=2]-> svc42_0
+ctrl -[#E74C3C,thickness=2]-> svc43_0
+ctrl -[#E74C3C,thickness=2]-> svc44_0
+ctrl -[#E74C3C,thickness=2]-> svc45_0
+ctrl -[#E74C3C,thickness=2]-> svc46_0
+ctrl -[#E74C3C,thickness=2]-> svc47_0
+ctrl -[#E74C3C,thickness=2]-> svc48_0
+ctrl -[#E74C3C,thickness=2]-> svc49_0
+ctrl -[#E74C3C,thickness=2]-> svc50_0
+ctrl -[#E74C3C,thickness=2]-> svc51_0
+ctrl -[#E74C3C,thickness=2]-> svc52_0
+ctrl -[#E74C3C,thickness=2]-> svc53_0
+ctrl -[#E74C3C,thickness=2]-> svc54_0
+ctrl -[#E74C3C,thickness=2]-> svc55_0
+ctrl -[#E74C3C,thickness=2]-> svc56_0
+ctrl -[#E74C3C,thickness=2]-> svc57_0
+ctrl -[#E74C3C,thickness=2]-> svc58_0
+ctrl -[#E74C3C,thickness=2]-> svc59_0
+ctrl -[#E74C3C,thickness=2]-> svc60_0
+ctrl -[#E74C3C,thickness=2]-> svc61_0
+ctrl -[#E74C3C,thickness=2]-> svc62_0
+ctrl -[#E74C3C,thickness=2]-> svc63_0
+ctrl -[#E74C3C,thickness=2]-> svc64_0
+ctrl -[#E74C3C,thickness=2]-> svc65_0
+ctrl -[#E74C3C,thickness=2]-> svc66_0
+ctrl -[#E74C3C,thickness=2]-> svc67_0
+ctrl -[#E74C3C,thickness=2]-> svc68_0
+ctrl -[#E74C3C,thickness=2]-> svc69_0
+ctrl -[#E74C3C,thickness=2]-> svc70_0
+ctrl -[#E74C3C,thickness=2]-> svc71_0
+ctrl -[#E74C3C,thickness=2]-> svc72_0
+ctrl -[#E74C3C,thickness=2]-> svc73_0
+ctrl -[#E74C3C,thickness=2]-> svc74_0
+ctrl -[#E74C3C,thickness=2]-> svc75_0
+ctrl -[#E74C3C,thickness=2]-> svc76_0
+ctrl -[#E74C3C,thickness=2]-> svc77_0
+ctrl -[#E74C3C,thickness=2]-> svc78_0
+ctrl -[#E74C3C,thickness=2]-> svc79_0
+ctrl -[#E74C3C,thickness=2]-> svc80_0
+ctrl -[#E74C3C,thickness=2]-> svc81_0
+ctrl -[#E74C3C,thickness=2]-> svc82_0
+ctrl -[#E74C3C,thickness=2]-> svc83_0
+ctrl -[#E74C3C,thickness=2]-> svc84_0
+ctrl -[#E74C3C,thickness=2]-> svc85_0
+ctrl -[#E74C3C,thickness=2]-> svc86_0
+ctrl -[#E74C3C,thickness=2]-> svc87_0
+ctrl -[#E74C3C,thickness=2]-> svc88_0
+ctrl -[#E74C3C,thickness=2]-> svc89_0
+ctrl -[#E74C3C,thickness=2]-> svc90_0
+ctrl -[#E74C3C,thickness=2]-> svc91_0
+ctrl -[#E74C3C,thickness=2]-> svc92_0
+ctrl -[#E74C3C,thickness=2]-> svc93_0
+ctrl -[#E74C3C,thickness=2]-> svc94_0
+ctrl -[#E74C3C,thickness=2]-> svc95_0
+ctrl -[#E74C3C,thickness=2]-> svc96_0
+ctrl -[#E74C3C,thickness=2]-> svc97_0
+ctrl -[#E74C3C,thickness=2]-> svc98_0
+ctrl -[#E74C3C,thickness=2]-> svc99_0
+ctrl -[#E74C3C,thickness=2]-> svc100_0
+ctrl -[#E74C3C,thickness=2]-> svc101_0
+ctrl -[#E74C3C,thickness=2]-> svc102_0
+ctrl -[#E74C3C,thickness=2]-> svc103_0
+ctrl -[#E74C3C,thickness=2]-> svc104_0
+ctrl -[#E74C3C,thickness=2]-> svc105_0
+ctrl -[#E74C3C,thickness=2]-> svc106_0
+ctrl -[#E74C3C,thickness=2]-> svc107_0
+ctrl -[#E74C3C,thickness=2]-> svc108_0
+ctrl -[#E74C3C,thickness=2]-> svc109_0
+ctrl -[#E74C3C,thickness=2]-> svc110_0
+ctrl -[#E74C3C,thickness=2]-> svc111_0
+ctrl -[#E74C3C,thickness=2]-> svc112_0
+ctrl -[#E74C3C,thickness=2]-> svc113_0
+ctrl -[#E74C3C,thickness=2]-> svc114_0
+ctrl -[#E74C3C,thickness=2]-> svc115_0
+ctrl -[#E74C3C,thickness=2]-> svc116_0
+ctrl -[#E74C3C,thickness=2]-> svc117_0
+ctrl -[#E74C3C,thickness=2]-> svc118_0
+ctrl -[#E74C3C,thickness=2]-> svc119_0
+ctrl -[#E74C3C,thickness=2]-> svc120_0
+ctrl -[#E74C3C,thickness=2]-> svc121_0
+ctrl -[#E74C3C,thickness=2]-> svc122_0
+ctrl -[#E74C3C,thickness=2]-> svc123_0
+ctrl -[#E74C3C,thickness=2]-> svc124_0
+ctrl -[#E74C3C,thickness=2]-> svc125_0
+ctrl -[#E74C3C,thickness=2]-> svc126_0
+ctrl -[#E74C3C,thickness=2]-> svc127_0
+ctrl -[#E74C3C,thickness=2]-> svc128_0
+ctrl -[#E74C3C,thickness=2]-> svc129_0
+ctrl -[#E74C3C,thickness=2]-> svc130_0
+ctrl -[#E74C3C,thickness=2]-> svc131_0
+ctrl -[#E74C3C,thickness=2]-> svc132_0
+ctrl -[#E74C3C,thickness=2]-> svc133_0
+ctrl -[#E74C3C,thickness=2]-> svc134_0
+ctrl -[#E74C3C,thickness=2]-> svc135_0
+ctrl -[#E74C3C,thickness=2]-> svc136_0
+ctrl -[#E74C3C,thickness=2]-> svc137_0
+ctrl -[#E74C3C,thickness=2]-> svc138_0
+ctrl -[#E74C3C,thickness=2]-> svc139_0
+ctrl -[#E74C3C,thickness=2]-> svc140_0
+ctrl -[#E74C3C,thickness=2]-> svc141_0
+ctrl -[#E74C3C,thickness=2]-> svc142_0
+ctrl -[#E74C3C,thickness=2]-> svc143_0
+ctrl -[#E74C3C,thickness=2]-> svc144_0
+ctrl -[#E74C3C,thickness=2]-> svc145_0
+ctrl -[#E74C3C,thickness=2]-> svc146_0
+ctrl -[#E74C3C,thickness=2]-> svc147_0
+ctrl -[#E74C3C,thickness=2]-> svc148_0
+ctrl -[#E74C3C,thickness=2]-> svc149_0
+ctrl -[#E74C3C,thickness=2]-> svc150_0
+ctrl -[#E74C3C,thickness=2]-> svc151_0
+ctrl -[#E74C3C,thickness=2]-> svc152_0
+ctrl -[#E74C3C,thickness=2]-> svc153_0
+ctrl -[#E74C3C,thickness=2]-> svc154_0
+ctrl -[#E74C3C,thickness=2]-> svc155_0
+ctrl -[#E74C3C,thickness=2]-> svc156_0
+ctrl -[#E74C3C,thickness=2]-> svc157_0
+ctrl -[#E74C3C,thickness=2]-> svc158_0
+ctrl -[#E74C3C,thickness=2]-> svc159_0
+ctrl -[#E74C3C,thickness=2]-> svc160_0
+ctrl -[#E74C3C,thickness=2]-> svc161_0
+ctrl -[#E74C3C,thickness=2]-> svc162_0
+ctrl -[#E74C3C,thickness=2]-> svc163_0
+ctrl -[#E74C3C,thickness=2]-> svc164_0
+ctrl -[#E74C3C,thickness=2]-> svc165_0
+ctrl -[#E74C3C,thickness=2]-> svc166_0
+ctrl -[#E74C3C,thickness=2]-> svc167_0
+ctrl -[#E74C3C,thickness=2]-> svc168_0
+ctrl -[#E74C3C,thickness=2]-> svc169_0
+rootcause -[hidden]-> http
+timebox -[hidden]-> ctrl
+@enduml

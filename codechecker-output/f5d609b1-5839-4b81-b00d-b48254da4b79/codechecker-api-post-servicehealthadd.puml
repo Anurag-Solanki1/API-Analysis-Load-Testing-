@@ -1,0 +1,84 @@
+@startuml codechecker_api_post_servicehealthadd
+left to right direction
+skinparam defaultFontSize 11
+skinparam defaultFontName Arial
+skinparam titleFontSize 14
+skinparam titleFontStyle bold
+skinparam rectangle {
+  RoundCorner 8
+  BorderThickness 2
+}
+skinparam database {
+  BorderColor #2C3E50
+  BorderThickness 2
+}
+skinparam cloud {
+  BorderColor #8E44AD
+  BorderThickness 2
+}
+
+title A1 - POST /Servicehealthadd - ServicesHealthResouce.add()\nRated: MODERATE - 2026-04-09
+
+rectangle " HTTP Client " as client #EBF5FB
+
+rectangle " HTTP Request\n POST /Servicehealthadd\n Auth: NO AUTH\n @Valid: NO " as req #EBF5FB
+
+rectangle " ServicesHealthResouce\n add() line 130\n Framework: SEEDSTACK_JAXRS\n Issues: NONE " as ctrl #D6EAF8
+
+rectangle " MDC\n put() line 140\n Est: ~5ms " as svc1 #D5F5E3
+
+rectangle " ServiceHealthService\n add() line 145\n Est: ~5ms " as svc2 #D5F5E3
+
+rectangle " statResponse\n setStatus() line 146\n Est: ~5ms " as svc3 #D5F5E3
+
+rectangle " Status.OK\n toString() line 146\n Est: ~5ms " as svc4 #D5F5E3
+
+rectangle " statResponse\n setMessage() line 147\n Est: ~5ms " as svc5 #D5F5E3
+
+rectangle " Response.ok().entity(statResponse)\n build() line 148\n Est: ~5ms " as svc6 #D5F5E3
+
+rectangle " Response.ok()\n entity() line 148\n Est: ~5ms " as svc7 #D5F5E3
+
+rectangle " Response\n ok() line 148\n Est: ~5ms " as svc8 #D5F5E3
+
+rectangle " statResponse\n setStatus() line 150\n Est: ~5ms " as svc9 #D5F5E3
+
+rectangle " statResponse\n setStatus() line 151\n Est: ~5ms " as svc10 #D5F5E3
+
+rectangle " Response.status(Status.EXPECTATION_FAILED).entity(statResponse)\n build() line 152\n Est: ~5ms " as svc11 #D5F5E3
+
+rectangle " Response.status(Status.EXPECTATION_FAILED)\n entity() line 152\n Est: ~5ms " as svc12 #D5F5E3
+
+rectangle " Response\n status() line 152\n Est: ~5ms " as svc13 #D5F5E3
+
+rectangle " logger\n error() line 153\n Est: ~5ms " as svc14 #D5F5E3
+
+rectangle " e\n getMessage() line 153\n Est: ~5ms " as svc15 #D5F5E3
+
+database " Database " as db #D6EAF8
+
+rectangle " Response\n 200 OK " as resp #E8F8E8
+
+rectangle " Timing - POST /Servicehealthadd\n p50 ESTIMATED: ~93ms\n p95 ESTIMATED: ~232ms\n Rating: MODERATE " as timing #FDEBD0
+
+client -[#2196F3,thickness=2]-> req
+req -[#2196F3,thickness=2]-> ctrl : POST /Servicehealthadd
+ctrl -[#27AE60,thickness=2]-> svc1 : put()
+ctrl -[#27AE60,thickness=2]-> svc2 : add()
+ctrl -[#27AE60,thickness=2]-> svc3 : setStatus()
+ctrl -[#27AE60,thickness=2]-> svc4 : toString()
+ctrl -[#27AE60,thickness=2]-> svc5 : setMessage()
+ctrl -[#27AE60,thickness=2]-> svc6 : build()
+ctrl -[#27AE60,thickness=2]-> svc7 : entity()
+ctrl -[#27AE60,thickness=2]-> svc8 : ok()
+ctrl -[#27AE60,thickness=2]-> svc9 : setStatus()
+ctrl -[#27AE60,thickness=2]-> svc10 : setStatus()
+ctrl -[#27AE60,thickness=2]-> svc11 : build()
+ctrl -[#27AE60,thickness=2]-> svc12 : entity()
+ctrl -[#27AE60,thickness=2]-> svc13 : status()
+ctrl -[#27AE60,thickness=2]-> svc14 : error()
+ctrl -[#27AE60,thickness=2]-> svc15 : getMessage()
+ctrl -[#27AE60,thickness=2]-> resp
+resp -[#2196F3,thickness=2]-> client
+timing --> resp
+@enduml

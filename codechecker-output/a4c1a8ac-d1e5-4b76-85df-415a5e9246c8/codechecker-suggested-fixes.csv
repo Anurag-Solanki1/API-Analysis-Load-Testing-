@@ -1,0 +1,222 @@
+Rule,File,Line,Before,After,Severity
+A3-004,,0,,"@Index(name=""idx_table_col"", columnList=""col"") on @Entity @Table",MEDIUM
+A3-004,,0,,"@Index(name=""idx_table_col"", columnList=""col"") on @Entity @Table",MEDIUM
+A3-004,,0,,"@Index(name=""idx_table_col"", columnList=""col"") on @Entity @Table",MEDIUM
+A3-004,,0,,"@Index(name=""idx_table_col"", columnList=""col"") on @Entity @Table",MEDIUM
+A3-004,,0,,"@Index(name=""idx_table_col"", columnList=""col"") on @Entity @Table",MEDIUM
+A3-004,,0,,"@Index(name=""idx_table_col"", columnList=""col"") on @Entity @Table",MEDIUM
+D1-001,ApplicationConfig.java,0,,"Split into ApplicationConfigCrudService, ApplicationConfigQueryService, etc.",MEDIUM
+D1-002,CorvetRequestTestDefault.java,12,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,SagaiDeployedRepositoryImpl.java,57,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,SagaiDeployedRepositoryImpl.java,96,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,ServiceHistoryRepositoryImpl.java,103,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,VehicleDescriptionDetailsRepositoryImpl.java,47,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,VehicleDescriptionDetailsRepositoryImpl.java,83,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,VehicleIdentificationNumberJpaRepository.java,83,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,VehicleIdentifierSectionRepositoryImpl.java,41,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,VinBrandRepositoryImpl.java,48,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,VinWarrantyJpaRepository.java,49,,Extract private helper methods for logical blocks,MEDIUM
+D1-004,CicsConfiguration.java,110,,private static final int CONSTANT_NAME = 31;,LOW
+D1-001,ApplicableServiceCampaignsJsonRepresentation.java,0,,"Split into ApplicableServiceCampaignsJsonRepresentationCrudService, ApplicableServiceCampaignsJsonRepresentationQueryService, etc.",MEDIUM
+D1-001,ApplicableWarrantyClaimsJsonRepresentation.java,0,,"Split into ApplicableWarrantyClaimsJsonRepresentationCrudService, ApplicableWarrantyClaimsJsonRepresentationQueryService, etc.",MEDIUM
+D1-001,CorvetVehiculeListJsonResponse.java,0,,"Split into CorvetVehiculeListJsonResponseCrudService, CorvetVehiculeListJsonResponseQueryService, etc.",MEDIUM
+D1-004,CountryConstRangeResponse.java,81,,private static final int CONSTANT_NAME = 31;,LOW
+D7-001,CountryConstRangeResponse.java,65,Date,LocalDate / LocalDateTime,LOW
+D1-001,EsaResponseJson.java,0,,"Split into EsaResponseJsonCrudService, EsaResponseJsonQueryService, etc.",MEDIUM
+D1-001,LicensePlateJsonRepresentation.java,0,,"Split into LicensePlateJsonRepresentationCrudService, LicensePlateJsonRepresentationQueryService, etc.",MEDIUM
+D1-001,SagaiWarrantyContractJsonResponse.java,0,,"Split into SagaiWarrantyContractJsonResponseCrudService, SagaiWarrantyContractJsonResponseQueryService, etc.",MEDIUM
+D1-001,SagaiWarrantyContractListJsonResponse.java,0,,"Split into SagaiWarrantyContractListJsonResponseCrudService, SagaiWarrantyContractListJsonResponseQueryService, etc.",MEDIUM
+D1-001,SagaiWarrantyProductsJsonResponse.java,0,,"Split into SagaiWarrantyProductsJsonResponseCrudService, SagaiWarrantyProductsJsonResponseQueryService, etc.",MEDIUM
+D1-001,SagaiWarrantyQuantitiesJsonResponse.java,0,,"Split into SagaiWarrantyQuantitiesJsonResponseCrudService, SagaiWarrantyQuantitiesJsonResponseQueryService, etc.",MEDIUM
+D1-001,ServiceDealerJsonResponse.java,0,,"Split into ServiceDealerJsonResponseCrudService, ServiceDealerJsonResponseQueryService, etc.",MEDIUM
+D1-001,ServiceHistoryJson.java,0,,"Split into ServiceHistoryJsonCrudService, ServiceHistoryJsonQueryService, etc.",MEDIUM
+D1-001,TraxioJsonRepresentation.java,0,,"Split into TraxioJsonRepresentationCrudService, TraxioJsonRepresentationQueryService, etc.",MEDIUM
+D1-001,VehicleJsonRepresentation.java,0,,"Split into VehicleJsonRepresentationCrudService, VehicleJsonRepresentationQueryService, etc.",MEDIUM
+D7-001,ServiceHistory.java,40,Date,LocalDate / LocalDateTime,LOW
+D7-001,ServiceHistory.java,83,Date,LocalDate / LocalDateTime,LOW
+D7-001,ServiceHistory.java,92,Date,LocalDate / LocalDateTime,LOW
+D1-004,ServiceHistoryIdentifier.java,95,,private static final int CONSTANT_NAME = 31;,LOW
+D1-001,VehicleDescriptionDetails.java,0,,"Split into VehicleDescriptionDetailsCrudService, VehicleDescriptionDetailsQueryService, etc.",MEDIUM
+D1-002,VehicleDescriptionDetails.java,239,,Extract private helper methods for logical blocks,MEDIUM
+D1-004,VehicleDescriptionDetails.java,314,,private static final int CONSTANT_NAME = 31;,LOW
+D7-001,VehicleDescriptionDetails.java,34,Date,LocalDate / LocalDateTime,LOW
+D7-001,VehicleDescriptionDetails.java,37,Date,LocalDate / LocalDateTime,LOW
+D7-001,VehicleDescriptionDetails.java,46,Date,LocalDate / LocalDateTime,LOW
+D7-001,VehicleDescriptionDetails.java,49,Date,LocalDate / LocalDateTime,LOW
+D7-001,VehicleDescriptionDetails.java,95,Date,LocalDate / LocalDateTime,LOW
+D7-001,VehicleDescriptionDetails.java,104,Date,LocalDate / LocalDateTime,LOW
+D7-001,VehicleDescriptionDetails.java,113,Date,LocalDate / LocalDateTime,LOW
+D7-001,VehicleDescriptionDetails.java,122,Date,LocalDate / LocalDateTime,LOW
+D7-001,VehicleDescriptionDetails.java,167,Date,LocalDate / LocalDateTime,LOW
+D7-001,VehicleDescriptionDetails.java,176,Date,LocalDate / LocalDateTime,LOW
+D7-001,VehicleDescriptionDetails.java,185,Date,LocalDate / LocalDateTime,LOW
+D7-001,VehicleDescriptionDetails.java,194,Date,LocalDate / LocalDateTime,LOW
+D7-001,VehicleIdentificationNumber.java,40,Date,LocalDate / LocalDateTime,LOW
+D7-001,VehicleIdentificationNumber.java,65,Date,LocalDate / LocalDateTime,LOW
+D7-001,VehicleIdentificationNumber.java,74,Date,LocalDate / LocalDateTime,LOW
+D7-001,VehicleIdentifierSection.java,34,Date,LocalDate / LocalDateTime,LOW
+D7-001,VehicleIdentifierSection.java,99,Date,LocalDate / LocalDateTime,LOW
+D7-001,VehicleIdentifierSection.java,108,Date,LocalDate / LocalDateTime,LOW
+D7-001,VinWarranty.java,39,Date,LocalDate / LocalDateTime,LOW
+D7-001,VinWarranty.java,82,Date,LocalDate / LocalDateTime,LOW
+D7-001,VinWarranty.java,91,Date,LocalDate / LocalDateTime,LOW
+D1-001,AbstractService.java,0,,"Split into AbstractServiceCrudService, AbstractServiceQueryService, etc.",MEDIUM
+D1-003,AbstractService.java,126,,Group parameters into a Request DTO,LOW
+D1-002,AbstractService.java,379,,Extract private helper methods for logical blocks,MEDIUM
+D7-001,AbstractService.java,464,Date,LocalDate / LocalDateTime,LOW
+D7-001,AbstractService.java,465,Date,LocalDate / LocalDateTime,LOW
+D7-001,AbstractService.java,485,Date,LocalDate / LocalDateTime,LOW
+D7-001,AbstractService.java,486,Date,LocalDate / LocalDateTime,LOW
+D7-001,AbstractService.java,502,Date,LocalDate / LocalDateTime,LOW
+D7-001,AbstractService.java,506,Date,LocalDate / LocalDateTime,LOW
+D1-001,CartellServiceImpl.java,0,,"Split into CartellServiceImplCrudService, CartellServiceImplQueryService, etc.",MEDIUM
+D1-002,CartellServiceImpl.java,353,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,CartellServiceImpl.java,393,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,CartellServiceImpl.java,465,,Extract private helper methods for logical blocks,MEDIUM
+D1-003,CartellServiceImpl.java,465,,Group parameters into a Request DTO,LOW
+D1-002,CartellServiceImpl.java,518,,Extract private helper methods for logical blocks,MEDIUM
+D1-003,CartellServiceImpl.java,643,,Group parameters into a Request DTO,LOW
+D1-003,CartellServiceImpl.java,674,,Group parameters into a Request DTO,LOW
+D1-003,CartellServiceImpl.java,813,,Group parameters into a Request DTO,LOW
+D1-001,CorvetServiceImpl.java,0,,"Split into CorvetServiceImplCrudService, CorvetServiceImplQueryService, etc.",MEDIUM
+D1-002,CorvetServiceImpl.java,119,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,CorvetServiceImpl.java,187,,Extract private helper methods for logical blocks,MEDIUM
+D1-003,CorvetServiceImpl.java,187,,Group parameters into a Request DTO,LOW
+D1-002,CorvetServiceImpl.java,283,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,CorvetServiceImpl.java,360,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,CorvetServiceImpl.java,432,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,CorvetServiceImpl.java,519,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,CorvetServiceImpl.java,568,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,CorvetServiceImpl.java,714,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,CorvetServiceImpl.java,814,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,CorvetServiceImpl.java,932,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,CorvetServiceImpl.java,1008,,Extract private helper methods for logical blocks,MEDIUM
+D1-003,CorvetServiceImpl.java,1008,,Group parameters into a Request DTO,LOW
+D1-002,CorvetServiceImpl.java,1105,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,CorvetServiceImpl.java,1173,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,CorvetServiceImpl.java,1364,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,CorvetServiceImpl.java,1438,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,CorvetServiceImpl.java,1640,,Extract private helper methods for logical blocks,MEDIUM
+D7-001,CorvetServiceImpl.java,692,Date,LocalDate / LocalDateTime,LOW
+D7-001,CorvetServiceImpl.java,729,Date,LocalDate / LocalDateTime,LOW
+D7-001,CorvetServiceImpl.java,730,Date,LocalDate / LocalDateTime,LOW
+D1-001,ElectronicServiceAssistantServiceImpl.java,0,,"Split into ElectronicServiceAssistantServiceImplCrudService, ElectronicServiceAssistantServiceImplQueryService, etc.",MEDIUM
+D1-002,ElectronicServiceAssistantServiceImpl.java,139,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,ElectronicServiceAssistantServiceImpl.java,230,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,ElectronicServiceAssistantServiceImpl.java,307,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,ElectronicServiceAssistantServiceImpl.java,436,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,ElectronicServiceAssistantServiceImpl.java,590,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,ElectronicServiceAssistantServiceImpl.java,656,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,ElectronicServiceAssistantServiceImpl.java,789,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,ElectronicServiceAssistantServiceImpl.java,1059,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,EsaServiceHistoryImpl.java,119,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,EsaServiceHistoryImpl.java,212,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,EsaServiceHistoryImpl.java,268,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,EsaServiceHistoryImpl.java,335,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,RecoverDescriptionServiceImpl.java,130,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,RecoverDescriptionServiceImpl.java,175,,Extract private helper methods for logical blocks,MEDIUM
+D1-004,RecoverDescriptionServiceImpl.java,205,,private static final int CONSTANT_NAME = 408;,LOW
+D1-002,RecoverDescriptionServiceImpl.java,229,,Extract private helper methods for logical blocks,MEDIUM
+D1-004,RecoverDescriptionServiceImpl.java,264,,private static final int CONSTANT_NAME = 408;,LOW
+D1-002,RecoverDescriptionServiceImpl.java,281,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,RecoverDescriptionServiceImpl.java,322,,Extract private helper methods for logical blocks,MEDIUM
+D1-004,RecoverDescriptionServiceImpl.java,345,,private static final int CONSTANT_NAME = 4;,LOW
+D1-002,RecoverDescriptionServiceImpl.java,555,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,RecoverDescriptionServiceImpl.java,721,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,RecoverDescriptionServiceImpl.java,768,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,SagaiContractServiceImpl.java,71,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,SagaiContractServiceImpl.java,165,,Extract private helper methods for logical blocks,MEDIUM
+D1-001,SagaiWarrantyServiceImpl.java,0,,"Split into SagaiWarrantyServiceImplCrudService, SagaiWarrantyServiceImplQueryService, etc.",MEDIUM
+D1-002,SagaiWarrantyServiceImpl.java,155,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,SagaiWarrantyServiceImpl.java,206,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,SagaiWarrantyServiceImpl.java,271,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,SagaiWarrantyServiceImpl.java,342,,Extract private helper methods for logical blocks,MEDIUM
+D1-003,SagaiWarrantyServiceImpl.java,342,,Group parameters into a Request DTO,LOW
+D1-002,SagaiWarrantyServiceImpl.java,382,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,SagaiWarrantyServiceImpl.java,470,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,SagaiWarrantyServiceImpl.java,532,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,SagaiWarrantyServiceImpl.java,591,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,SagaiWarrantyServiceImpl.java,633,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,SagaiWarrantyServiceImpl.java,891,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,SagaiWarrantyServiceImpl.java,952,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,SagaiWarrantyServiceImpl.java,1111,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,SagaiZosServiceImpl.java,87,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,SagaiZosServiceImpl.java,148,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,SagaiZosServiceImpl.java,215,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,SagaiZosServiceImpl.java,289,,Extract private helper methods for logical blocks,MEDIUM
+D1-003,SagaiZosServiceImpl.java,289,,Group parameters into a Request DTO,LOW
+D1-002,SagaiZosServiceImpl.java,351,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,SagaiZosServiceImpl.java,415,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,SagaiZosServiceImpl.java,559,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,ThubServiceImpl.java,89,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,ThubServiceImpl.java,197,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,ThubServiceImpl.java,341,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,ThubServiceImpl.java,429,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,ThubServiceImpl.java,518,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,ThubServiceImpl.java,598,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,ThubServiceImpl.java,695,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,ThubServiceImpl.java,826,,Extract private helper methods for logical blocks,MEDIUM
+D7-001,ThubServiceImpl.java,356,Date,LocalDate / LocalDateTime,LOW
+D7-001,ThubServiceImpl.java,357,Date,LocalDate / LocalDateTime,LOW
+D7-001,ThubServiceImpl.java,504,Date,LocalDate / LocalDateTime,LOW
+D1-002,TraxioServiceImpl.java,73,,Extract private helper methods for logical blocks,MEDIUM
+D1-003,TraxioServiceImpl.java,223,,Group parameters into a Request DTO,LOW
+D1-002,VinBrandServiceImpl.java,99,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,VinBrandServiceImpl.java,152,,Extract private helper methods for logical blocks,MEDIUM
+D1-001,VISServiceImpl.java,0,,"Split into VISServiceImplCrudService, VISServiceImplQueryService, etc.",MEDIUM
+D1-002,VISServiceImpl.java,104,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,VISServiceImpl.java,227,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,VISServiceImpl.java,272,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,VISServiceImpl.java,483,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,VISServiceImpl.java,564,,Extract private helper methods for logical blocks,MEDIUM
+D1-004,VISServiceImpl.java,590,,private static final int CONSTANT_NAME = 408;,LOW
+D1-004,VISServiceImpl.java,593,,private static final int CONSTANT_NAME = 406;,LOW
+D1-002,VISServiceImpl.java,635,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,VISServiceImpl.java,681,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,VISServiceImpl.java,738,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,VISServiceImpl.java,878,,Extract private helper methods for logical blocks,MEDIUM
+D1-001,ActiveContractsRequestParameter.java,0,,"Split into ActiveContractsRequestParameterCrudService, ActiveContractsRequestParameterQueryService, etc.",MEDIUM
+D7-001,ActiveContractsRequestParameter.java,51,StringBuffer,StringBuilder (if single-threaded),LOW
+D11-001,Constants.java,567,"private String API_KEY = ""API-Key"";","@Value(""${api_key}"") private String API_KEY;",CRITICAL
+D11-001,Constants.java,737,"private String API_KEY_SPLIT = ""\\s*,\\s*"";","@Value(""${api_key_split}"") private String API_KEY_SPLIT;",CRITICAL
+D1-001,VinRequestParameter.java,0,,"Split into VinRequestParameterCrudService, VinRequestParameterQueryService, etc.",MEDIUM
+D1-002,ActiveContractResource.java,71,,Extract private helper methods for logical blocks,MEDIUM
+D1-003,ActiveContractResource.java,71,,Group parameters into a Request DTO,LOW
+D7-001,ActiveContractResource.java,108,Date,LocalDate / LocalDateTime,LOW
+D1-002,HealthResource.java,96,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,HealthResource.java,159,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,HealthResource.java,221,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,HealthResource.java,282,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,HealthResource.java,338,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,HealthResource.java,407,,Extract private helper methods for logical blocks,MEDIUM
+D1-004,HealthResource.java,433,,private static final int CONSTANT_NAME = 6;,LOW
+D1-002,HealthResource.java,496,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,HealthResource.java,641,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,HealthResource.java,694,,Extract private helper methods for logical blocks,MEDIUM
+D7-001,HealthResource.java,464,Date,LocalDate / LocalDateTime,LOW
+D1-002,VehicleIdentificationNumberResource.java,112,,Extract private helper methods for logical blocks,MEDIUM
+D1-003,VehicleIdentificationNumberResource.java,112,,Group parameters into a Request DTO,LOW
+D1-004,VehicleIdentificationNumberResource.java,243,,private static final int CONSTANT_NAME = 408;,LOW
+D1-002,VehicleIdentificationNumberResource.java,300,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,VehicleIdentificationNumberResource.java,469,,Extract private helper methods for logical blocks,MEDIUM
+D1-003,VehicleIdentificationNumberResource.java,469,,Group parameters into a Request DTO,LOW
+D1-002,VehicleIdentificationNumberResource.java,596,,Extract private helper methods for logical blocks,MEDIUM
+D1-004,VehicleIdentificationNumberResource.java,636,,private static final int CONSTANT_NAME = 408;,LOW
+D1-004,VehicleIdentificationNumberResource.java,638,,private static final int CONSTANT_NAME = 406;,LOW
+D1-004,VehicleIdentificationNumberResource.java,640,,private static final int CONSTANT_NAME = 406;,LOW
+D1-002,ProcessIN02.java,36,,Extract private helper methods for logical blocks,MEDIUM
+D3-001,ProcessIN02.java,46,,Use StringBuilder instead of String concatenation in loops,MEDIUM
+D1-002,ProcessIN07.java,37,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,ProcessIN07.java,83,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,ProcessIN07.java,122,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,ProcessVe01.java,27,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,SagaiMain.java,80,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,SagaiMain.java,175,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,SagaiMain.java,240,,Extract private helper methods for logical blocks,MEDIUM
+D1-004,SagaiMain.java,276,,private static final int CONSTANT_NAME = 3;,LOW
+D1-004,SagaiMain.java,278,,private static final int CONSTANT_NAME = 3;,LOW
+D1-004,SagaiMain.java,278,,private static final int CONSTANT_NAME = 9;,LOW
+D1-004,SagaiMain.java,280,,private static final int CONSTANT_NAME = 9;,LOW
+D1-004,SagaiMain.java,280,,private static final int CONSTANT_NAME = 17;,LOW
+D8-001,SagaiMain.java,80,Connection resource = new Connection(...);,try (Connection resource = new Connection(...)) { ... },HIGH
+D1-002,SagaiServiceCall.java,77,,Extract private helper methods for logical blocks,MEDIUM

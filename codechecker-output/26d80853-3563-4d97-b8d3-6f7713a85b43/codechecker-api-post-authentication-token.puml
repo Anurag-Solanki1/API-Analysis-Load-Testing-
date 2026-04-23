@@ -1,0 +1,121 @@
+@startuml codechecker_api_post_authentication_token
+left to right direction
+skinparam defaultFontSize 11
+skinparam defaultFontName Arial
+skinparam titleFontSize 14
+skinparam titleFontStyle bold
+skinparam rectangle {
+  RoundCorner 8
+  BorderThickness 2
+}
+skinparam database {
+  BorderColor #2C3E50
+  BorderThickness 2
+}
+skinparam cloud {
+  BorderColor #8E44AD
+  BorderThickness 2
+}
+
+title A1 - POST /authentication/token - AuthenticationResource.generate()\nRated: SLOW - 2026-04-02
+
+rectangle " HTTP Client " as client #EBF5FB
+
+rectangle " HTTP Request\n POST /authentication/token\n Auth: NO AUTH\n @Valid: NO " as req #EBF5FB
+
+rectangle " AuthenticationResource\n generate() line 117\n Framework: SEEDSTACK_JAXRS\n Issues: 7 " as ctrl #D6EAF8
+
+rectangle " MDC\n put() line 129\n Est: ~5ms " as svc1 #D5F5E3
+
+rectangle " AuthentiationServiceImpl\n getConsumer() line 132\n Est: ~10ms " as svc2 #D5F5E3
+
+rectangle " consumer\n isPresent() line 134\n Called when: !consumer.isPresent()\n Est: ~5ms " as svc3 #D5F5E3
+
+rectangle " logger\n error() line 135\n Called when: !consumer.isPresent()\n Est: ~5ms " as svc4 #D5F5E3
+
+rectangle " Response.status(Response.Status.UNAUTHORIZED)\n build() line 136\n Called when: !consumer.isPresent()\n Est: ~5ms " as svc5 #D5F5E3
+
+rectangle " Response\n status() line 136\n Called when: !consumer.isPresent()\n Est: ~5ms " as svc6 #D5F5E3
+
+rectangle " consumer.get()\n isAuthorizationRequired() line 139\n Called when: consumer.get().isAuthorizationRequired()\n Est: ~5ms " as svc7 #D5F5E3
+
+rectangle " ConsumerServiceImpl\n get() line 139\n Called when: consumer.get().isAuthorizationRequired()\n Est: ~20ms " as svc8 #D5F5E3
+
+rectangle " request\n getHeader() line 140\n Called when: consumer.get().isAuthorizationRequired()\n Est: ~5ms " as svc9 #D5F5E3
+
+rectangle " AuthentiationServiceImpl\n authenticate() line 145\n Called when: null != creds\n Est: ~1005ms " as svc10 #D5F5E3
+
+rectangle " CinUser\n getUserRole() line 146\n Called when: null == user.getUserRole() || AuthConstant.INVALID_USER.equals(user.getUserRole())\n Est: ~5ms " as svc11 #D5F5E3
+
+rectangle " AuthConstant.INVALID_USER\n equals() line 146\n Called when: null == user.getUserRole() || AuthConstant.INVALID_USER.equals(user.getUserRole())\n Est: ~5ms " as svc12 #D5F5E3
+
+rectangle " user\n getUserRole() line 146\n Called when: null == user.getUserRole() || AuthConstant.INVALID_USER.equals(user.getUserRole())\n Est: ~5ms " as svc13 #D5F5E3
+
+rectangle " Response.status(Response.Status.UNAUTHORIZED)\n build() line 147\n Called when: null == user.getUserRole() || AuthConstant.INVALID_USER.equals(user.getUserRole())\n Est: ~5ms " as svc14 #D5F5E3
+
+rectangle " Response\n status() line 147\n Called when: null == user.getUserRole() || AuthConstant.INVALID_USER.equals(user.getUserRole())\n Est: ~5ms " as svc15 #D5F5E3
+
+rectangle " AuthentiationServiceImpl\n generateToken() line 153\n Est: ~5ms " as svc16 #D5F5E3
+
+rectangle " consumer\n get() line 153\n Est: ~5ms " as svc17 #D5F5E3
+
+rectangle " logger\n error() line 155\n Est: ~5ms " as svc18 #D5F5E3
+
+rectangle " Response.status(Response.Status.UNAUTHORIZED)\n build() line 156\n Est: ~5ms " as svc19 #D5F5E3
+
+rectangle " Response\n status() line 156\n Est: ~5ms " as svc20 #D5F5E3
+
+rectangle " logger\n error() line 159\n Est: ~5ms " as svc21 #D5F5E3
+
+rectangle " Response.status(Response.Status.INTERNAL_SERVER_ERROR)\n build() line 160\n Est: ~5ms " as svc22 #D5F5E3
+
+rectangle " Response\n status() line 160\n Est: ~5ms " as svc23 #D5F5E3
+
+rectangle " ConsumerRepository\n get()\n Query: UNKNOWN\n Est: ~15ms " as repo1 #FFF8E1
+
+database " Database " as db #D6EAF8
+
+cloud " REST Call\n PUT RESOLVED_AT_RUNTIME\n Timeout: NOT SET\n Async: SYNCHRONOUS\n In @Tx: NO " as ext1 #E74C3C
+
+cloud " REST Call\n PUT RESOLVED_AT_RUNTIME\n Timeout: NOT SET\n Async: SYNCHRONOUS\n In @Tx: NO " as ext2 #E74C3C
+
+rectangle " Response\n 200 OK " as resp #E8F8E8
+
+rectangle " Issues on POST /authentication/token\n A2-003 HIGH: Synchronous REST call — AuthentiationServiceImpl.a...\n A2-003 HIGH: Synchronous REST call — AuthentiationServiceImpl.a...\n A2-005 HIGH: No timeout on REST client — RESOLVED_AT_RUNTIME\n A2-005 HIGH: No timeout on REST client — RESOLVED_AT_RUNTIME\n A2-006 MEDIUM: No circuit breaker on external call — RESOLVED_AT_...\n A2-006 MEDIUM: No circuit breaker on external call — RESOLVED_AT_...\n A3-004 MEDIUM: Potential missing index — ConsumerRepository.get()\n " as issues #FEF9E7
+
+rectangle " Timing - POST /authentication/token\n p50 ESTIMATED: ~1153ms\n p95 ESTIMATED: ~2882ms\n Rating: SLOW " as timing #FADBD8
+
+client -[#2196F3,thickness=2]-> req
+req -[#2196F3,thickness=2]-> ctrl : POST /authentication/token
+ctrl -[#27AE60,thickness=2]-> svc1 : put()
+ctrl -[#27AE60,thickness=2]-> svc2 : getConsumer()
+ctrl -[#27AE60,thickness=2]-> svc3 : isPresent()
+ctrl -[#27AE60,thickness=2]-> svc4 : error()
+ctrl -[#27AE60,thickness=2]-> svc5 : build()
+ctrl -[#27AE60,thickness=2]-> svc6 : status()
+ctrl -[#27AE60,thickness=2]-> svc7 : isAuthorizationRequired()
+ctrl -[#27AE60,thickness=2]-> svc8 : get()
+ctrl -[#27AE60,thickness=2]-> svc9 : getHeader()
+ctrl -[#27AE60,thickness=2]-> svc10 : authenticate()
+ctrl -[#27AE60,thickness=2]-> svc11 : getUserRole()
+ctrl -[#27AE60,thickness=2]-> svc12 : equals()
+ctrl -[#27AE60,thickness=2]-> svc13 : getUserRole()
+ctrl -[#27AE60,thickness=2]-> svc14 : build()
+ctrl -[#27AE60,thickness=2]-> svc15 : status()
+ctrl -[#27AE60,thickness=2]-> svc16 : generateToken()
+ctrl -[#27AE60,thickness=2]-> svc17 : get()
+ctrl -[#27AE60,thickness=2]-> svc18 : error()
+ctrl -[#27AE60,thickness=2]-> svc19 : build()
+ctrl -[#27AE60,thickness=2]-> svc20 : status()
+ctrl -[#27AE60,thickness=2]-> svc21 : error()
+ctrl -[#27AE60,thickness=2]-> svc22 : build()
+ctrl -[#27AE60,thickness=2]-> svc23 : status()
+svc8 -[#8B4513,thickness=2]-> repo1
+repo1 -[#8B4513,thickness=2]-> db
+ctrl -[#E74C3C,dashed,thickness=2]-> ext1
+ctrl -[#E74C3C,dashed,thickness=2]-> ext2
+ctrl -[#27AE60,thickness=2]-> resp
+resp -[#2196F3,thickness=2]-> client
+timing --> resp
+issues --> ctrl
+@enduml

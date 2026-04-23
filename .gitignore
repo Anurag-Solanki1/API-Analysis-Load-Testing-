@@ -1,0 +1,77 @@
+# =====================
+# Java / Maven (backend)
+# =====================
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+*.zip
+*.tar.gz
+*.rar
+hs_err_pid*
+
+# Maven wrapper
+.mvn/wrapper/maven-wrapper.jar
+
+# =====================
+# IDE & Editor
+# =====================
+.idea/
+*.iml
+*.iws
+*.ipr
+.classpath
+.project
+.settings/
+.vscode/*
+!.vscode/extensions.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+Thumbs.db
+
+# =====================
+# Frontend (Vite / Node)
+# =====================
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+frontend/*.local
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+
+# =====================
+# Database files
+# =====================
+data/*.mv.db
+data/*.trace.db
+
+# =====================
+# Logs
+# =====================
+*.log
+backend.log
+logs/
+
+# =====================
+# Scan output (large/generated artifacts)
+# =====================
+codechecker-output/**/*.html
+codechecker-output/**/*.png
+
+# =====================
+# Secrets & local config
+# =====================
+*.env
+.env
+.env.*
+application.yaml
+application.yml
+config/

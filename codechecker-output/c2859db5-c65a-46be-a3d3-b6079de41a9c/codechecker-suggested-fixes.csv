@@ -1,0 +1,69 @@
+Rule,File,Line,Before,After,Severity
+D1-001,ObjectFactory.java,0,,"Split into ObjectFactoryCrudService, ObjectFactoryQueryService, etc.",MEDIUM
+D1-001,LibelleType.java,0,,"Split into LibelleTypeCrudService, LibelleTypeQueryService, etc.",MEDIUM
+D1-001,ObjectFactory.java,0,,"Split into ObjectFactoryCrudService, ObjectFactoryQueryService, etc.",MEDIUM
+D1-002,HttpUtillityImpl.java,36,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,TheseeCodeLabelTranslationServiceImpl.java,132,,Extract private helper methods for logical blocks,MEDIUM
+D1-003,TheseeCodeLabelTranslationServiceImpl.java,132,,Group parameters into a Request DTO,LOW
+D1-002,TheseeCodeLabelTranslationServiceImpl.java,270,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,TheseeCodeLabelTranslationServiceImpl.java,359,,Extract private helper methods for logical blocks,MEDIUM
+D1-004,TheseeCodeLabelTranslationServiceImpl.java,378,,private static final int CONSTANT_NAME = 4;,LOW
+D1-002,TheseeCodeLabelTranslationServiceImpl.java,440,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,TheseeCodeLabelTranslationServiceImpl.java,499,,Extract private helper methods for logical blocks,MEDIUM
+D1-003,TheseeCodeLabelTranslationServiceImpl.java,499,,Group parameters into a Request DTO,LOW
+D7-001,TheseeCodeLabelTranslationServiceImpl.java,154,StringBuffer,StringBuilder (if single-threaded),LOW
+D7-001,TheseeCodeLabelTranslationServiceImpl.java,154,StringBuffer,StringBuilder (if single-threaded),LOW
+D7-001,TheseeCodeLabelTranslationServiceImpl.java,175,StringBuffer,StringBuilder (if single-threaded),LOW
+D7-001,TheseeCodeLabelTranslationServiceImpl.java,175,StringBuffer,StringBuilder (if single-threaded),LOW
+D7-001,TheseeCodeLabelTranslationServiceImpl.java,516,Date,LocalDate / LocalDateTime,LOW
+D1-002,TheseeCreateTranslationServiceImpl.java,84,,Extract private helper methods for logical blocks,MEDIUM
+D1-003,TheseeCreateTranslationServiceImpl.java,84,,Group parameters into a Request DTO,LOW
+D7-001,TheseeCreateTranslationServiceImpl.java,94,StringBuffer,StringBuilder (if single-threaded),LOW
+D7-001,TheseeCreateTranslationServiceImpl.java,94,StringBuffer,StringBuilder (if single-threaded),LOW
+D7-001,TheseeCreateTranslationServiceImpl.java,95,StringBuffer,StringBuilder (if single-threaded),LOW
+D7-001,TheseeCreateTranslationServiceImpl.java,95,StringBuffer,StringBuilder (if single-threaded),LOW
+D7-001,TheseeCreateTranslationServiceImpl.java,117,Date,LocalDate / LocalDateTime,LOW
+D1-002,TheseeCreationServiceImpl.java,103,,Extract private helper methods for logical blocks,MEDIUM
+D1-003,TheseeCreationServiceImpl.java,103,,Group parameters into a Request DTO,LOW
+D1-002,TheseeCreationServiceImpl.java,327,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,TheseeCreationServiceImpl.java,395,,Extract private helper methods for logical blocks,MEDIUM
+D7-001,TheseeCreationServiceImpl.java,122,StringBuffer,StringBuilder (if single-threaded),LOW
+D7-001,TheseeCreationServiceImpl.java,122,StringBuffer,StringBuilder (if single-threaded),LOW
+D7-001,TheseeCreationServiceImpl.java,130,StringBuffer,StringBuilder (if single-threaded),LOW
+D7-001,TheseeCreationServiceImpl.java,130,StringBuffer,StringBuilder (if single-threaded),LOW
+D7-001,TheseeCreationServiceImpl.java,138,StringBuffer,StringBuilder (if single-threaded),LOW
+D7-001,TheseeCreationServiceImpl.java,138,StringBuffer,StringBuilder (if single-threaded),LOW
+D7-001,TheseeCreationServiceImpl.java,181,StringBuffer,StringBuilder (if single-threaded),LOW
+D7-001,TheseeCreationServiceImpl.java,181,StringBuffer,StringBuilder (if single-threaded),LOW
+D7-001,TheseeCreationServiceImpl.java,302,Date,LocalDate / LocalDateTime,LOW
+D1-002,TheseeRechercheServiceImpl.java,93,,Extract private helper methods for logical blocks,MEDIUM
+D1-003,TheseeRechercheServiceImpl.java,93,,Group parameters into a Request DTO,LOW
+D1-002,TheseeRechercheServiceImpl.java,233,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,TheseeRechercheServiceImpl.java,395,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,TheseeRechercheServiceImpl.java,441,,Extract private helper methods for logical blocks,MEDIUM
+D7-001,TheseeRechercheServiceImpl.java,111,StringBuffer,StringBuilder (if single-threaded),LOW
+D7-001,TheseeRechercheServiceImpl.java,111,StringBuffer,StringBuilder (if single-threaded),LOW
+D7-001,TheseeRechercheServiceImpl.java,130,StringBuffer,StringBuilder (if single-threaded),LOW
+D7-001,TheseeRechercheServiceImpl.java,130,StringBuffer,StringBuilder (if single-threaded),LOW
+D7-001,TheseeRechercheServiceImpl.java,357,Date,LocalDate / LocalDateTime,LOW
+D1-003,TheseeCodeLabelTranslationService.java,36,,Group parameters into a Request DTO,LOW
+D1-003,TheseeCreateTranslationService.java,19,,Group parameters into a Request DTO,LOW
+D1-003,TheseeCreationService.java,20,,Group parameters into a Request DTO,LOW
+D1-003,TheseeRechercheService.java,20,,Group parameters into a Request DTO,LOW
+D1-002,ThesseResource.java,338,,Extract private helper methods for logical blocks,MEDIUM
+D1-002,NewTheseeCreation.java,50,,Extract private helper methods for logical blocks,MEDIUM
+D3-001,NewTheseeCreation.java,167,for(x : list) { result += x.toString(); },StringBuilder sb = new StringBuilder(); for(x : list) { sb.append(x); },MEDIUM
+D7-001,NewTheseeCreation.java,69,Date,LocalDate / LocalDateTime,LOW
+D1-002,NewTheseeRecherche.java,42,,Extract private helper methods for logical blocks,MEDIUM
+D3-001,NewTheseeRecherche.java,131,for(x : list) { result += x.toString(); },StringBuilder sb = new StringBuilder(); for(x : list) { sb.append(x); },MEDIUM
+D3-001,NewTheseeRecherche.java,135,for(x : list) { result += x.toString(); },StringBuilder sb = new StringBuilder(); for(x : list) { sb.append(x); },MEDIUM
+D7-001,NewTheseeRecherche.java,62,Date,LocalDate / LocalDateTime,LOW
+D1-002,RechercheParCode.java,43,,Extract private helper methods for logical blocks,MEDIUM
+D3-001,RechercheParCode.java,158,for(x : list) { result += x.toString(); },StringBuilder sb = new StringBuilder(); for(x : list) { sb.append(x); },MEDIUM
+D7-001,RechercheParCode.java,60,Date,LocalDate / LocalDateTime,LOW
+D1-002,ThesseCreateTranslation.java,39,,Extract private helper methods for logical blocks,MEDIUM
+D7-001,ThesseCreateTranslation.java,56,Date,LocalDate / LocalDateTime,LOW
+D1-001,LibelleType.java,0,,"Split into LibelleTypeCrudService, LibelleTypeQueryService, etc.",MEDIUM
+D1-001,ObjectFactory.java,0,,"Split into ObjectFactoryCrudService, ObjectFactoryQueryService, etc.",MEDIUM
+D1-001,LibelleType.java,0,,"Split into LibelleTypeCrudService, LibelleTypeQueryService, etc.",MEDIUM
+D1-001,ObjectFactory.java,0,,"Split into ObjectFactoryCrudService, ObjectFactoryQueryService, etc.",MEDIUM

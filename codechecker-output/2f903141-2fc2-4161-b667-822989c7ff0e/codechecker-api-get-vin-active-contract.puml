@@ -1,0 +1,99 @@
+@startuml codechecker_api_get_vin_active_contract
+left to right direction
+skinparam defaultFontSize 11
+skinparam defaultFontName Arial
+skinparam titleFontSize 14
+skinparam titleFontStyle bold
+skinparam rectangle {
+  RoundCorner 8
+  BorderThickness 2
+}
+skinparam database {
+  BorderColor #2C3E50
+  BorderThickness 2
+}
+skinparam cloud {
+  BorderColor #8E44AD
+  BorderThickness 2
+}
+
+title A1 - GET /vin/active-contract - DimboResource.getDimbo()\nRated: MODERATE - 2026-04-06
+
+rectangle " HTTP Client " as client #EBF5FB
+
+rectangle " HTTP Request\n GET /vin/active-contract\n Auth: NO AUTH\n @Valid: NO " as req #EBF5FB
+
+rectangle " DimboResource\n getDimbo() line 109\n Framework: SEEDSTACK_JAXRS\n Issues: NONE " as ctrl #D6EAF8
+
+rectangle " MDC\n put() line 123\n Est: ~5ms " as svc1 #D5F5E3
+
+rectangle " request\n getHeader() line 125\n Est: ~5ms " as svc2 #D5F5E3
+
+rectangle " StringUtils\n isNotBlank() line 126\n Called when: StringUtils.isNotBlank(token)\n Est: ~5ms " as svc3 #D5F5E3
+
+rectangle " DimboUtils\n validateHeaderToken() line 127\n Called when: StringUtils.isNotBlank(token)\n Est: ~40ms " as svc4 #D5F5E3
+
+rectangle " StringUtils\n isNotBlank() line 128\n Called when: StringUtils.isNotBlank(basicAuth)\n Est: ~5ms " as svc5 #D5F5E3
+
+rectangle " ldapService.validate(basicAuth)\n equalsIgnoreCase() line 129\n Called when: !ldapService.validate(basicAuth).equalsIgnoreCase('success')\n Est: ~5ms " as svc6 #D5F5E3
+
+rectangle " ldapService\n validate() line 129\n Called when: !ldapService.validate(basicAuth).equalsIgnoreCase('success')\n Est: ~5ms " as svc7 #D5F5E3
+
+rectangle " ValidatorImpl\n dimboErrorResponse() line 130\n Called when: !ldapService.validate(basicAuth).equalsIgnoreCase('success')\n Est: ~5ms " as svc8 #D5F5E3
+
+rectangle " ValidatorImpl\n returnErrorResponse() line 131\n Called when: !ldapService.validate(basicAuth).equalsIgnoreCase('success')\n Est: ~5ms " as svc9 #D5F5E3
+
+rectangle " StringUtils\n isBlank() line 135\n Called when: StringUtils.isBlank(token) && StringUtils.isBlank(basicAuth)\n Est: ~5ms " as svc10 #D5F5E3
+
+rectangle " StringUtils\n isBlank() line 135\n Called when: StringUtils.isBlank(token) && StringUtils.isBlank(basicAuth)\n Est: ~5ms " as svc11 #D5F5E3
+
+rectangle " validator\n dimboErrorResponse() line 136\n Called when: StringUtils.isBlank(token) && StringUtils.isBlank(basicAuth)\n Est: ~5ms " as svc12 #D5F5E3
+
+rectangle " validator\n returnErrorResponse() line 137\n Called when: StringUtils.isBlank(token) && StringUtils.isBlank(basicAuth)\n Est: ~5ms " as svc13 #D5F5E3
+
+rectangle " BookletDataRequestParameter\n setVin() line 143\n Called when: sourceApplication != null\n Est: ~5ms " as svc14 #D5F5E3
+
+rectangle " ValidatorImpl\n validatePathParams() line 144\n Called when: sourceApplication != null\n Est: ~5ms " as svc15 #D5F5E3
+
+rectangle " logger\n info() line 146\n Called when: response == null\n Est: ~5ms " as svc16 #D5F5E3
+
+rectangle " DimboService\n getBookletData() line 147\n Called when: response == null\n Est: ~5ms " as svc17 #D5F5E3
+
+rectangle " validator\n dimboErrorResponse() line 150\n Called when: sourceApplication != null\n Est: ~5ms " as svc18 #D5F5E3
+
+rectangle " validator\n returnErrorResponse() line 151\n Called when: sourceApplication != null\n Est: ~5ms " as svc19 #D5F5E3
+
+rectangle " CorsPolicy\n makeCORSComplaint() line 156\n Est: ~5ms " as svc20 #D5F5E3
+
+database " Database " as db #D6EAF8
+
+rectangle " Response\n 200 OK " as resp #E8F8E8
+
+rectangle " Timing - GET /vin/active-contract\n p50 ESTIMATED: ~153ms\n p95 ESTIMATED: ~382ms\n Rating: MODERATE " as timing #FDEBD0
+
+client -[#2196F3,thickness=2]-> req
+req -[#2196F3,thickness=2]-> ctrl : GET /vin/active-contract
+ctrl -[#27AE60,thickness=2]-> svc1 : put()
+ctrl -[#27AE60,thickness=2]-> svc2 : getHeader()
+ctrl -[#27AE60,thickness=2]-> svc3 : isNotBlank()
+ctrl -[#27AE60,thickness=2]-> svc4 : validateHeaderToken()
+ctrl -[#27AE60,thickness=2]-> svc5 : isNotBlank()
+ctrl -[#27AE60,thickness=2]-> svc6 : equalsIgnoreCase()
+ctrl -[#27AE60,thickness=2]-> svc7 : validate()
+ctrl -[#27AE60,thickness=2]-> svc8 : dimboErrorResponse()
+ctrl -[#27AE60,thickness=2]-> svc9 : returnErrorResponse()
+ctrl -[#27AE60,thickness=2]-> svc10 : isBlank()
+ctrl -[#27AE60,thickness=2]-> svc11 : isBlank()
+ctrl -[#27AE60,thickness=2]-> svc12 : dimboErrorResponse()
+ctrl -[#27AE60,thickness=2]-> svc13 : returnErrorResponse()
+ctrl -[#27AE60,thickness=2]-> svc14 : setVin()
+ctrl -[#27AE60,thickness=2]-> svc15 : validatePathParams()
+ctrl -[#27AE60,thickness=2]-> svc16 : info()
+ctrl -[#27AE60,thickness=2]-> svc17 : getBookletData()
+ctrl -[#27AE60,thickness=2]-> svc18 : dimboErrorResponse()
+ctrl -[#27AE60,thickness=2]-> svc19 : returnErrorResponse()
+ctrl -[#27AE60,thickness=2]-> svc20 : makeCORSComplaint()
+ctrl -[#27AE60,thickness=2]-> resp
+resp -[#2196F3,thickness=2]-> client
+timing --> resp
+@enduml

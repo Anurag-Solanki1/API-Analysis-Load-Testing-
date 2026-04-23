@@ -1,0 +1,84 @@
+@startuml codechecker_api_get_vinhealth
+left to right direction
+skinparam defaultFontSize 11
+skinparam defaultFontName Arial
+skinparam titleFontSize 14
+skinparam titleFontStyle bold
+skinparam rectangle {
+  RoundCorner 8
+  BorderThickness 2
+}
+skinparam database {
+  BorderColor #2C3E50
+  BorderThickness 2
+}
+skinparam cloud {
+  BorderColor #8E44AD
+  BorderThickness 2
+}
+
+title A1 - GET /vinHealth - HealthResource.getOVHealth()\nRated: MODERATE - 2026-04-06
+
+rectangle " HTTP Client " as client #EBF5FB
+
+rectangle " HTTP Request\n GET /vinHealth\n Auth: NO AUTH\n @Valid: NO " as req #EBF5FB
+
+rectangle " HealthResource\n getOVHealth() line 64\n Framework: SEEDSTACK_JAXRS\n Issues: NONE " as ctrl #D6EAF8
+
+rectangle " MDC\n put() line 70\n Est: ~5ms " as svc1 #D5F5E3
+
+rectangle " V360RequestParameter\n setVin() line 77\n Est: ~5ms " as svc2 #D5F5E3
+
+rectangle " parameter\n setApiKey() line 78\n Est: ~5ms " as svc3 #D5F5E3
+
+rectangle " V360RequestParameter\n setCountry() line 79\n Est: ~5ms " as svc4 #D5F5E3
+
+rectangle " parameter\n setIntent() line 80\n Est: ~5ms " as svc5 #D5F5E3
+
+rectangle " V360RequestParameter\n setLanguage() line 81\n Est: ~5ms " as svc6 #D5F5E3
+
+rectangle " parameter\n setServiceHistory() line 82\n Est: ~5ms " as svc7 #D5F5E3
+
+rectangle " parameter\n setSource() line 83\n Est: ~5ms " as svc8 #D5F5E3
+
+rectangle " parameter\n setWarrantyClaims() line 84\n Est: ~5ms " as svc9 #D5F5E3
+
+rectangle " VehicleInformationService\n getCinResponse() line 86\n Est: ~5ms " as svc10 #D5F5E3
+
+rectangle " response\n getStatus() line 87\n Called when: response.getStatus() == Constants.STATUS_OK\n Est: ~5ms " as svc11 #D5F5E3
+
+rectangle " logger\n info() line 90\n Called when: response.getStatus() == Constants.STATUS_OK\n Est: ~5ms " as svc12 #D5F5E3
+
+rectangle " response\n getEntity() line 90\n Called when: response.getStatus() == Constants.STATUS_OK\n Est: ~5ms " as svc13 #D5F5E3
+
+rectangle " logger\n error() line 95\n Est: ~5ms " as svc14 #D5F5E3
+
+rectangle " logger\n info() line 99\n Est: ~5ms " as svc15 #D5F5E3
+
+database " Database " as db #D6EAF8
+
+rectangle " Response\n 200 OK " as resp #E8F8E8
+
+rectangle " Timing - GET /vinHealth\n p50 ESTIMATED: ~93ms\n p95 ESTIMATED: ~232ms\n Rating: MODERATE " as timing #FDEBD0
+
+client -[#2196F3,thickness=2]-> req
+req -[#2196F3,thickness=2]-> ctrl : GET /vinHealth
+ctrl -[#27AE60,thickness=2]-> svc1 : put()
+ctrl -[#27AE60,thickness=2]-> svc2 : setVin()
+ctrl -[#27AE60,thickness=2]-> svc3 : setApiKey()
+ctrl -[#27AE60,thickness=2]-> svc4 : setCountry()
+ctrl -[#27AE60,thickness=2]-> svc5 : setIntent()
+ctrl -[#27AE60,thickness=2]-> svc6 : setLanguage()
+ctrl -[#27AE60,thickness=2]-> svc7 : setServiceHistory()
+ctrl -[#27AE60,thickness=2]-> svc8 : setSource()
+ctrl -[#27AE60,thickness=2]-> svc9 : setWarrantyClaims()
+ctrl -[#27AE60,thickness=2]-> svc10 : getCinResponse()
+ctrl -[#27AE60,thickness=2]-> svc11 : getStatus()
+ctrl -[#27AE60,thickness=2]-> svc12 : info()
+ctrl -[#27AE60,thickness=2]-> svc13 : getEntity()
+ctrl -[#27AE60,thickness=2]-> svc14 : error()
+ctrl -[#27AE60,thickness=2]-> svc15 : info()
+ctrl -[#27AE60,thickness=2]-> resp
+resp -[#2196F3,thickness=2]-> client
+timing --> resp
+@enduml

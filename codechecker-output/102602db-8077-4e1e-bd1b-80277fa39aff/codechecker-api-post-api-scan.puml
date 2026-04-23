@@ -1,0 +1,154 @@
+@startuml codechecker_api_post_api_scan
+left to right direction
+skinparam defaultFontSize 11
+skinparam defaultFontName Arial
+skinparam titleFontSize 14
+skinparam titleFontStyle bold
+skinparam rectangle {
+  RoundCorner 8
+  BorderThickness 2
+}
+skinparam database {
+  BorderColor #2C3E50
+  BorderThickness 2
+}
+skinparam cloud {
+  BorderColor #8E44AD
+  BorderThickness 2
+}
+
+title A1 - POST /api/scan - ScanController.startScan()\nRated: FAST - 2026-04-02
+
+rectangle " HTTP Client " as client #EBF5FB
+
+rectangle " HTTP Request\n POST /api/scan\n Auth: NO AUTH\n @Valid: NO " as req #EBF5FB
+
+rectangle " ScanController\n startScan() line 28\n Framework: SPRING_MVC\n Issues: 41 " as ctrl #D6EAF8
+
+rectangle " UUID.randomUUID()\n toString() line 30\n Est: ~5ms " as svc1 #D5F5E3
+
+rectangle " UUID\n randomUUID() line 30\n Est: ~5ms " as svc2 #D5F5E3
+
+rectangle " ScanOrchestrator\n runScan() line 33\n @Async — non-blocking\n Est: ~4400ms " as svc3 #D5F5E3
+
+rectangle " response\n put() line 36\n Est: ~5ms " as svc4 #D5F5E3
+
+rectangle " response\n put() line 37\n Est: ~5ms " as svc5 #D5F5E3
+
+rectangle " response\n put() line 38\n Est: ~5ms " as svc6 #D5F5E3
+
+rectangle " ScanRequest\n getProjectName() line 38\n Est: ~5ms " as svc7 #D5F5E3
+
+rectangle " ResponseEntity\n ok() line 40\n Est: ~5ms " as svc8 #D5F5E3
+
+rectangle " ScanRunRepository\n save()\n Query: SPRING_DATA_WRITE\n Est: ~5ms " as repo1 #FFF8E1
+
+rectangle " RepositoryParser\n parse()\n Query: UNKNOWN\n Est: ~15ms " as repo2 #FFF8E1
+
+rectangle " parsedRepos\n put()\n Query: UNKNOWN\n Est: ~15ms " as repo3 #FFF8E1
+
+rectangle " RepositoryParser\n enrichFromParsedRepos()\n Query: UNKNOWN\n Est: ~15ms " as repo4 #FFF8E1
+
+rectangle " parsedRepos\n entrySet()\n Query: UNKNOWN\n Est: ~15ms " as repo5 #FFF8E1
+
+rectangle " parsedRepos\n forEach()\n Query: UNKNOWN\n Est: ~15ms " as repo6 #FFF8E1
+
+rectangle " allRepoQueries\n put()\n Query: UNKNOWN\n Est: ~15ms " as repo7 #FFF8E1
+
+rectangle " allIssues.stream().filter(i -> "CRITICAL".equals(i.getSeverity()))\n count()\n Query: SPRING_DATA_DERIVED\n Est: ~5ms " as repo8 #FFF8E1
+
+rectangle " allIssues.stream().filter(i -> "HIGH".equals(i.getSeverity()))\n count()\n Query: SPRING_DATA_DERIVED\n Est: ~5ms " as repo9 #FFF8E1
+
+rectangle " allIssues.stream().filter(i -> "MEDIUM".equals(i.getSeverity()))\n count()\n Query: SPRING_DATA_DERIVED\n Est: ~5ms " as repo10 #FFF8E1
+
+rectangle " allIssues.stream().filter(i -> "LOW".equals(i.getSeverity()))\n count()\n Query: SPRING_DATA_DERIVED\n Est: ~5ms " as repo11 #FFF8E1
+
+rectangle " ScanRunRepository\n save()\n Query: SPRING_DATA_WRITE\n Est: ~5ms " as repo12 #FFF8E1
+
+rectangle " MarkdownReportGenerator\n generateSummary()\n Query: UNKNOWN\n Est: ~15ms " as repo13 #FFF8E1
+
+rectangle " CsvReportGenerator\n generateReportCsv()\n Query: UNKNOWN\n Est: ~15ms " as repo14 #FFF8E1
+
+rectangle " CsvReportGenerator\n generateFixesCsv()\n Query: UNKNOWN\n Est: ~15ms " as repo15 #FFF8E1
+
+rectangle " HtmlReportGenerator\n generateReport()\n Query: UNKNOWN\n Est: ~15ms " as repo16 #FFF8E1
+
+database " Database " as db #D6EAF8
+
+cloud " REST Call\n PUT RESOLVED_AT_RUNTIME\n Timeout: NOT SET\n Async: SYNCHRONOUS\n In @Tx: NO " as ext1 #E74C3C
+
+cloud " REST Call\n PUT RESOLVED_AT_RUNTIME\n Timeout: NOT SET\n Async: SYNCHRONOUS\n In @Tx: NO " as ext2 #E74C3C
+
+cloud " REST Call\n PUT RESOLVED_AT_RUNTIME\n Timeout: NOT SET\n Async: SYNCHRONOUS\n In @Tx: NO " as ext3 #E74C3C
+
+cloud " REST Call\n PUT RESOLVED_AT_RUNTIME\n Timeout: NOT SET\n Async: SYNCHRONOUS\n In @Tx: NO " as ext4 #E74C3C
+
+cloud " REST Call\n PUT RESOLVED_AT_RUNTIME\n Timeout: NOT SET\n Async: SYNCHRONOUS\n In @Tx: NO " as ext5 #E74C3C
+
+cloud " REST Call\n PUT RESOLVED_AT_RUNTIME\n Timeout: NOT SET\n Async: SYNCHRONOUS\n In @Tx: NO " as ext6 #E74C3C
+
+cloud " REST Call\n PUT RESOLVED_AT_RUNTIME\n Timeout: NOT SET\n Async: SYNCHRONOUS\n In @Tx: NO " as ext7 #E74C3C
+
+cloud " REST Call\n PUT RESOLVED_AT_RUNTIME\n Timeout: NOT SET\n Async: SYNCHRONOUS\n In @Tx: NO " as ext8 #E74C3C
+
+rectangle " Response\n 200 OK " as resp #E8F8E8
+
+rectangle " Issues on POST /api/scan\n A2-003 HIGH: Synchronous REST call — ScanOrchestrator.runScan()\n A2-003 HIGH: Synchronous REST call — ProjectScanner.categorize(...\n A2-003 HIGH: Synchronous REST call — ProjectScanner.categorize(...\n A2-003 HIGH: Synchronous REST call — ProjectScanner.categorize(...\n A2-003 HIGH: Synchronous REST call — ProjectScanner.categorize(...\n A2-003 HIGH: Synchronous REST call — ProjectScanner.categorize(...\n A2-003 HIGH: Synchronous REST call — ProjectScanner.categorize(...\n A2-003 HIGH: Synchronous REST call — ProjectScanner.categorize(...\n A2-005 HIGH: No timeout on REST client — RESOLVED_AT_RUNTIME\n A2-005 HIGH: No timeout on REST client — RESOLVED_AT_RUNTIME\n A2-005 HIGH: No timeout on REST client — RESOLVED_AT_RUNTIME\n A2-005 HIGH: No timeout on REST client — RESOLVED_AT_RUNTIME\n A2-005 HIGH: No timeout on REST client — RESOLVED_AT_RUNTIME\n A2-005 HIGH: No timeout on REST client — RESOLVED_AT_RUNTIME\n A2-005 HIGH: No timeout on REST client — RESOLVED_AT_RUNTIME\n A2-005 HIGH: No timeout on REST client — RESOLVED_AT_RUNTIME\n A2-006 MEDIUM: No circuit breaker on external call — RESOLVED_AT_...\n A2-006 MEDIUM: No circuit breaker on external call — RESOLVED_AT_...\n A2-006 MEDIUM: No circuit breaker on external call — RESOLVED_AT_...\n A2-006 MEDIUM: No circuit breaker on external call — RESOLVED_AT_...\n A2-006 MEDIUM: No circuit breaker on external call — RESOLVED_AT_...\n A2-006 MEDIUM: No circuit breaker on external call — RESOLVED_AT_...\n A2-006 MEDIUM: No circuit breaker on external call — RESOLVED_AT_...\n A2-006 MEDIUM: No circuit breaker on external call — RESOLVED_AT_...\n A3-004 MEDIUM: Potential missing index — RepositoryParser.parse()\n A3-004 MEDIUM: Potential missing index — parsedRepos.put()\n A3-004 MEDIUM: Potential missing index — RepositoryParser.enrichF...\n A3-004 MEDIUM: Potential missing index — parsedRepos.entrySet()\n A3-004 MEDIUM: Potential missing index — parsedRepos.forEach()\n A3-004 MEDIUM: Potential missing index — allRepoQueries.put()\n A3-004 MEDIUM: Potential missing index — allIssues.stream().filte...\n A3-004 MEDIUM: Potential missing index — allIssues.stream().filte...\n A3-004 MEDIUM: Potential missing index — allIssues.stream().filte...\n A3-004 MEDIUM: Potential missing index — allIssues.stream().filte...\n A3-004 MEDIUM: Potential missing index — MarkdownReportGenerator....\n A3-004 MEDIUM: Potential missing index — CsvReportGenerator.gener...\n A3-004 MEDIUM: Potential missing index — CsvReportGenerator.gener...\n A3-004 MEDIUM: Potential missing index — HtmlReportGenerator.gene...\n A3-001 MEDIUM: SELECT * — full entity load in cu.findAll()\n A3-003 HIGH: No pagination — cu.findAll()\n A3-004 MEDIUM: Potential missing index — cu.findAll()\n " as issues #FEF9E7
+
+rectangle " Timing - POST /api/scan\n p50 ESTIMATED: ~53ms\n p95 ESTIMATED: ~132ms\n Rating: FAST " as timing #D5F5E3
+
+client -[#2196F3,thickness=2]-> req
+req -[#2196F3,thickness=2]-> ctrl : POST /api/scan
+ctrl -[#27AE60,thickness=2]-> svc1 : toString()
+ctrl -[#27AE60,thickness=2]-> svc2 : randomUUID()
+ctrl -[#27AE60,thickness=2]-> svc3 : runScan()
+ctrl -[#27AE60,thickness=2]-> svc4 : put()
+ctrl -[#27AE60,thickness=2]-> svc5 : put()
+ctrl -[#27AE60,thickness=2]-> svc6 : put()
+ctrl -[#27AE60,thickness=2]-> svc7 : getProjectName()
+ctrl -[#27AE60,thickness=2]-> svc8 : ok()
+svc3 -[#8B4513,thickness=2]-> repo1
+repo1 -[#8B4513,thickness=2]-> db
+svc3 -[#8B4513,thickness=2]-> repo2
+repo2 -[#8B4513,thickness=2]-> db
+svc3 -[#8B4513,thickness=2]-> repo3
+repo3 -[#8B4513,thickness=2]-> db
+svc3 -[#8B4513,thickness=2]-> repo4
+repo4 -[#8B4513,thickness=2]-> db
+svc3 -[#8B4513,thickness=2]-> repo5
+repo5 -[#8B4513,thickness=2]-> db
+svc3 -[#8B4513,thickness=2]-> repo6
+repo6 -[#8B4513,thickness=2]-> db
+svc3 -[#8B4513,thickness=2]-> repo7
+repo7 -[#8B4513,thickness=2]-> db
+svc3 -[#8B4513,thickness=2]-> repo8
+repo8 -[#8B4513,thickness=2]-> db
+svc3 -[#8B4513,thickness=2]-> repo9
+repo9 -[#8B4513,thickness=2]-> db
+svc3 -[#8B4513,thickness=2]-> repo10
+repo10 -[#8B4513,thickness=2]-> db
+svc3 -[#8B4513,thickness=2]-> repo11
+repo11 -[#8B4513,thickness=2]-> db
+svc3 -[#8B4513,thickness=2]-> repo12
+repo12 -[#8B4513,thickness=2]-> db
+svc3 -[#8B4513,thickness=2]-> repo13
+repo13 -[#8B4513,thickness=2]-> db
+svc3 -[#8B4513,thickness=2]-> repo14
+repo14 -[#8B4513,thickness=2]-> db
+svc3 -[#8B4513,thickness=2]-> repo15
+repo15 -[#8B4513,thickness=2]-> db
+svc3 -[#8B4513,thickness=2]-> repo16
+repo16 -[#8B4513,thickness=2]-> db
+ctrl -[#E74C3C,dashed,thickness=2]-> ext1
+ctrl -[#E74C3C,dashed,thickness=2]-> ext2
+ctrl -[#E74C3C,dashed,thickness=2]-> ext3
+ctrl -[#E74C3C,dashed,thickness=2]-> ext4
+ctrl -[#E74C3C,dashed,thickness=2]-> ext5
+ctrl -[#E74C3C,dashed,thickness=2]-> ext6
+ctrl -[#E74C3C,dashed,thickness=2]-> ext7
+ctrl -[#E74C3C,dashed,thickness=2]-> ext8
+ctrl -[#27AE60,thickness=2]-> resp
+resp -[#2196F3,thickness=2]-> client
+timing --> resp
+issues --> ctrl
+@enduml

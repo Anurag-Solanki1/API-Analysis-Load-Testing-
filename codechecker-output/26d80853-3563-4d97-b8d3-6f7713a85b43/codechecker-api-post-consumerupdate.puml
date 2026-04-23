@@ -1,0 +1,191 @@
+@startuml codechecker_api_post_consumerupdate
+left to right direction
+skinparam defaultFontSize 11
+skinparam defaultFontName Arial
+skinparam titleFontSize 14
+skinparam titleFontStyle bold
+skinparam rectangle {
+  RoundCorner 8
+  BorderThickness 2
+}
+skinparam database {
+  BorderColor #2C3E50
+  BorderThickness 2
+}
+skinparam cloud {
+  BorderColor #8E44AD
+  BorderThickness 2
+}
+
+title A1 - POST /Consumerupdate - ApiResource.getById()\nRated: MODERATE - 2026-04-02
+
+rectangle " HTTP Client " as client #EBF5FB
+
+rectangle " HTTP Request\n POST /Consumerupdate\n Auth: NO AUTH\n @Valid: NO " as req #EBF5FB
+
+rectangle " ApiResource\n getById() line 84\n Framework: SEEDSTACK_JAXRS\n Issues: 2 " as ctrl #D6EAF8
+
+rectangle " MDC\n put() line 102\n Est: ~5ms " as svc1 #D5F5E3
+
+rectangle " ConsumerServiceImpl\n get() line 104\n Est: ~20ms " as svc2 #D5F5E3
+
+rectangle " consumer\n getId() line 104\n Est: ~5ms " as svc3 #D5F5E3
+
+rectangle " Objects\n isNull() line 105\n Called when: !Objects.isNull(con)\n Est: ~5ms " as svc4 #D5F5E3
+
+rectangle " con\n setApplicationApiKey() line 107\n Called when: generateApi\n Est: ~5ms " as svc5 #D5F5E3
+
+rectangle " con\n setApplicationName() line 109\n Called when: generateApi\n Est: ~5ms " as svc6 #D5F5E3
+
+rectangle " consumer\n getApplicationName() line 109\n Called when: generateApi\n Est: ~5ms " as svc7 #D5F5E3
+
+rectangle " con\n setStartDate() line 110\n Called when: generateApi\n Est: ~5ms " as svc8 #D5F5E3
+
+rectangle " consumer\n getStartDate() line 110\n Called when: generateApi\n Est: ~5ms " as svc9 #D5F5E3
+
+rectangle " con\n setEndDate() line 111\n Called when: generateApi\n Est: ~5ms " as svc10 #D5F5E3
+
+rectangle " consumer\n getEndDate() line 111\n Called when: generateApi\n Est: ~5ms " as svc11 #D5F5E3
+
+rectangle " con\n setDescription() line 112\n Called when: generateApi\n Est: ~5ms " as svc12 #D5F5E3
+
+rectangle " consumer\n getDescription() line 112\n Called when: generateApi\n Est: ~5ms " as svc13 #D5F5E3
+
+rectangle " con\n setEncryptionKeySuffix() line 113\n Called when: generateApi\n Est: ~5ms " as svc14 #D5F5E3
+
+rectangle " consumer\n getEncryptionKeySuffix() line 113\n Called when: generateApi\n Est: ~5ms " as svc15 #D5F5E3
+
+rectangle " con\n setExpirationPeriod() line 114\n Called when: generateApi\n Est: ~5ms " as svc16 #D5F5E3
+
+rectangle " consumer\n getExpirationPeriod() line 114\n Called when: generateApi\n Est: ~5ms " as svc17 #D5F5E3
+
+rectangle " con\n setSigningKeySuffix() line 115\n Called when: generateApi\n Est: ~5ms " as svc18 #D5F5E3
+
+rectangle " consumer\n getSigningKeySuffix() line 115\n Called when: generateApi\n Est: ~5ms " as svc19 #D5F5E3
+
+rectangle " con\n setSigningRequired() line 116\n Called when: generateApi\n Est: ~5ms " as svc20 #D5F5E3
+
+rectangle " consumer\n isSigningRequired() line 116\n Called when: generateApi\n Est: ~5ms " as svc21 #D5F5E3
+
+rectangle " con\n setExpirationRequired() line 117\n Called when: generateApi\n Est: ~5ms " as svc22 #D5F5E3
+
+rectangle " consumer\n isExpirationRequired() line 117\n Called when: generateApi\n Est: ~5ms " as svc23 #D5F5E3
+
+rectangle " con\n setExpirationPeriod() line 118\n Called when: generateApi\n Est: ~5ms " as svc24 #D5F5E3
+
+rectangle " consumer\n getExpirationPeriod() line 118\n Called when: generateApi\n Est: ~5ms " as svc25 #D5F5E3
+
+rectangle " con\n setEncryptionRequired() line 119\n Called when: generateApi\n Est: ~5ms " as svc26 #D5F5E3
+
+rectangle " consumer\n isEncryptionRequired() line 119\n Called when: generateApi\n Est: ~5ms " as svc27 #D5F5E3
+
+rectangle " con\n setAuthorizationRequired() line 120\n Called when: generateApi\n Est: ~5ms " as svc28 #D5F5E3
+
+rectangle " consumer\n isAuthorizationRequired() line 120\n Called when: generateApi\n Est: ~5ms " as svc29 #D5F5E3
+
+rectangle " ConsumerServiceImpl\n update() line 122\n Called when: !Objects.isNull(con)\n Est: ~20ms " as svc30 #D5F5E3
+
+rectangle " Objects\n isNull() line 123\n Called when: !Objects.isNull(con)\n Est: ~5ms " as svc31 #D5F5E3
+
+rectangle " Response.ok().entity(new Gson().toJson(con))\n build() line 124\n Called when: !Objects.isNull(con)\n Est: ~5ms " as svc32 #D5F5E3
+
+rectangle " Response.ok()\n entity() line 124\n Called when: !Objects.isNull(con)\n Est: ~5ms " as svc33 #D5F5E3
+
+rectangle " Response\n ok() line 124\n Called when: !Objects.isNull(con)\n Est: ~5ms " as svc34 #D5F5E3
+
+rectangle " new Gson()\n toJson() line 124\n Called when: !Objects.isNull(con)\n Est: ~5ms " as svc35 #D5F5E3
+
+rectangle " error\n setMessage() line 127\n Called when: !Objects.isNull(con)\n Est: ~5ms " as svc36 #D5F5E3
+
+rectangle " consumer\n getId() line 127\n Called when: !Objects.isNull(con)\n Est: ~5ms " as svc37 #D5F5E3
+
+rectangle " error\n setStatus() line 128\n Called when: !Objects.isNull(con)\n Est: ~5ms " as svc38 #D5F5E3
+
+rectangle " Response.status(Status.EXPECTATION_FAILED).entity(error)\n build() line 129\n Called when: !Objects.isNull(con)\n Est: ~5ms " as svc39 #D5F5E3
+
+rectangle " Response.status(Status.EXPECTATION_FAILED)\n entity() line 129\n Called when: !Objects.isNull(con)\n Est: ~5ms " as svc40 #D5F5E3
+
+rectangle " Response\n status() line 129\n Called when: !Objects.isNull(con)\n Est: ~5ms " as svc41 #D5F5E3
+
+rectangle " error\n setMessage() line 133\n Called when: !Objects.isNull(con)\n Est: ~5ms " as svc42 #D5F5E3
+
+rectangle " consumer\n getId() line 133\n Called when: !Objects.isNull(con)\n Est: ~5ms " as svc43 #D5F5E3
+
+rectangle " error\n setStatus() line 134\n Called when: !Objects.isNull(con)\n Est: ~5ms " as svc44 #D5F5E3
+
+rectangle " Response.status(Status.EXPECTATION_FAILED).entity(error)\n build() line 135\n Called when: !Objects.isNull(con)\n Est: ~5ms " as svc45 #D5F5E3
+
+rectangle " Response.status(Status.EXPECTATION_FAILED)\n entity() line 135\n Called when: !Objects.isNull(con)\n Est: ~5ms " as svc46 #D5F5E3
+
+rectangle " Response\n status() line 135\n Called when: !Objects.isNull(con)\n Est: ~5ms " as svc47 #D5F5E3
+
+rectangle " ConsumerRepository\n get()\n Query: UNKNOWN\n Est: ~15ms " as repo1 #FFF8E1
+
+rectangle " ConsumerRepository\n update()\n Query: UNKNOWN\n Est: ~15ms " as repo2 #FFF8E1
+
+database " Database " as db #D6EAF8
+
+rectangle " Response\n 200 OK " as resp #E8F8E8
+
+rectangle " Issues on POST /Consumerupdate\n A3-004 MEDIUM: Potential missing index — ConsumerRepository.get()\n A3-004 MEDIUM: Potential missing index — ConsumerRepository.updat...\n " as issues #FEF9E7
+
+rectangle " Timing - POST /Consumerupdate\n p50 ESTIMATED: ~283ms\n p95 ESTIMATED: ~707ms\n Rating: MODERATE " as timing #FDEBD0
+
+client -[#2196F3,thickness=2]-> req
+req -[#2196F3,thickness=2]-> ctrl : POST /Consumerupdate
+ctrl -[#27AE60,thickness=2]-> svc1 : put()
+ctrl -[#27AE60,thickness=2]-> svc2 : get()
+ctrl -[#27AE60,thickness=2]-> svc3 : getId()
+ctrl -[#27AE60,thickness=2]-> svc4 : isNull()
+ctrl -[#27AE60,thickness=2]-> svc5 : setApplicationApiKey()
+ctrl -[#27AE60,thickness=2]-> svc6 : setApplicationName()
+ctrl -[#27AE60,thickness=2]-> svc7 : getApplicationName()
+ctrl -[#27AE60,thickness=2]-> svc8 : setStartDate()
+ctrl -[#27AE60,thickness=2]-> svc9 : getStartDate()
+ctrl -[#27AE60,thickness=2]-> svc10 : setEndDate()
+ctrl -[#27AE60,thickness=2]-> svc11 : getEndDate()
+ctrl -[#27AE60,thickness=2]-> svc12 : setDescription()
+ctrl -[#27AE60,thickness=2]-> svc13 : getDescription()
+ctrl -[#27AE60,thickness=2]-> svc14 : setEncryptionKeySuffix()
+ctrl -[#27AE60,thickness=2]-> svc15 : getEncryptionKeySuffix()
+ctrl -[#27AE60,thickness=2]-> svc16 : setExpirationPeriod()
+ctrl -[#27AE60,thickness=2]-> svc17 : getExpirationPeriod()
+ctrl -[#27AE60,thickness=2]-> svc18 : setSigningKeySuffix()
+ctrl -[#27AE60,thickness=2]-> svc19 : getSigningKeySuffix()
+ctrl -[#27AE60,thickness=2]-> svc20 : setSigningRequired()
+ctrl -[#27AE60,thickness=2]-> svc21 : isSigningRequired()
+ctrl -[#27AE60,thickness=2]-> svc22 : setExpirationRequired()
+ctrl -[#27AE60,thickness=2]-> svc23 : isExpirationRequired()
+ctrl -[#27AE60,thickness=2]-> svc24 : setExpirationPeriod()
+ctrl -[#27AE60,thickness=2]-> svc25 : getExpirationPeriod()
+ctrl -[#27AE60,thickness=2]-> svc26 : setEncryptionRequired()
+ctrl -[#27AE60,thickness=2]-> svc27 : isEncryptionRequired()
+ctrl -[#27AE60,thickness=2]-> svc28 : setAuthorizationRequired()
+ctrl -[#27AE60,thickness=2]-> svc29 : isAuthorizationRequired()
+ctrl -[#27AE60,thickness=2]-> svc30 : update()
+ctrl -[#27AE60,thickness=2]-> svc31 : isNull()
+ctrl -[#27AE60,thickness=2]-> svc32 : build()
+ctrl -[#27AE60,thickness=2]-> svc33 : entity()
+ctrl -[#27AE60,thickness=2]-> svc34 : ok()
+ctrl -[#27AE60,thickness=2]-> svc35 : toJson()
+ctrl -[#27AE60,thickness=2]-> svc36 : setMessage()
+ctrl -[#27AE60,thickness=2]-> svc37 : getId()
+ctrl -[#27AE60,thickness=2]-> svc38 : setStatus()
+ctrl -[#27AE60,thickness=2]-> svc39 : build()
+ctrl -[#27AE60,thickness=2]-> svc40 : entity()
+ctrl -[#27AE60,thickness=2]-> svc41 : status()
+ctrl -[#27AE60,thickness=2]-> svc42 : setMessage()
+ctrl -[#27AE60,thickness=2]-> svc43 : getId()
+ctrl -[#27AE60,thickness=2]-> svc44 : setStatus()
+ctrl -[#27AE60,thickness=2]-> svc45 : build()
+ctrl -[#27AE60,thickness=2]-> svc46 : entity()
+ctrl -[#27AE60,thickness=2]-> svc47 : status()
+svc2 -[#8B4513,thickness=2]-> repo1
+repo1 -[#8B4513,thickness=2]-> db
+svc30 -[#8B4513,thickness=2]-> repo2
+repo2 -[#8B4513,thickness=2]-> db
+ctrl -[#27AE60,thickness=2]-> resp
+resp -[#2196F3,thickness=2]-> client
+timing --> resp
+issues --> ctrl
+@enduml

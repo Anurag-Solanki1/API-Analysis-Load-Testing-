@@ -1,0 +1,11 @@
+{
+  "scanId" : "ae558b67-796e-4274-a8ac-cfd438bddb11",
+  "ruleId" : "AI-002",
+  "title" : "TLS certificate validation disabled across all HTTP client construction sites",
+  "file" : "src/main/java/com/inetpsa/cin/vin/domain/services/impl/AbstractService.java",
+  "lineNumber" : "707",
+  "beforeCode" : "final TrustStrategy acceptingTrustStrategy = (certificate, authType) -> true;\nsslContext = SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy).build();\nfinal SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);",
+  "afterCode" : "// Load the proper trust store and remove NoopHostnameVerifier\nsslContext = SSLContexts.createSystemDefault();\nfinal SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslContext, SSLConnectionSocketFactory.getDefaultHostnameVerifier());",
+  "projectPath" : "C:\\CIN CNAX Batch Improvement\\CODE\\cin-vin",
+  "createdAt" : "2026-04-16T06:51:54.787015800Z"
+}

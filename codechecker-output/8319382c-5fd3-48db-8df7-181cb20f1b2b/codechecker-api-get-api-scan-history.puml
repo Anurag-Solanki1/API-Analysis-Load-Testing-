@@ -1,0 +1,45 @@
+@startuml codechecker_api_get_api_scan_history
+left to right direction
+skinparam defaultFontSize 11
+skinparam defaultFontName Arial
+skinparam titleFontSize 14
+skinparam titleFontStyle bold
+skinparam rectangle {
+  RoundCorner 8
+  BorderThickness 2
+}
+skinparam database {
+  BorderColor #2C3E50
+  BorderThickness 2
+}
+skinparam cloud {
+  BorderColor #8E44AD
+  BorderThickness 2
+}
+
+title A1 - GET /api/scan/history - ScanController.getScanHistory()\nRated: FAST - 2026-04-01
+
+rectangle " HTTP Client " as client #EBF5FB
+
+rectangle " HTTP Request\n GET /api/scan/history\n Auth: NO AUTH\n @Valid: NO " as req #EBF5FB
+
+rectangle " ScanController\n getScanHistory() line 80\n Framework: SPRING_MVC\n Issues: NONE " as ctrl #D6EAF8
+
+rectangle " ScanRunRepository\n findAllByOrderByStartedAtDesc() line 82\n Est: ~5ms " as svc1 #D5F5E3
+
+rectangle " ResponseEntity\n ok() line 83\n Est: ~5ms " as svc2 #D5F5E3
+
+database " Database " as db #D6EAF8
+
+rectangle " Response\n 200 OK " as resp #E8F8E8
+
+rectangle " Timing - GET /api/scan/history\n p50 ESTIMATED: ~28ms\n p95 ESTIMATED: ~70ms\n Rating: FAST " as timing #D5F5E3
+
+client -[#2196F3,thickness=2]-> req
+req -[#2196F3,thickness=2]-> ctrl : GET /api/scan/history
+ctrl -[#27AE60,thickness=2]-> svc1 : findAllByOrderByStartedAtDesc()
+ctrl -[#27AE60,thickness=2]-> svc2 : ok()
+ctrl -[#27AE60,thickness=2]-> resp
+resp -[#2196F3,thickness=2]-> client
+timing --> resp
+@enduml

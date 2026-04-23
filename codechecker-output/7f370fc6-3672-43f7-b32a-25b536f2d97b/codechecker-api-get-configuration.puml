@@ -1,0 +1,76 @@
+@startuml codechecker_api_get_configuration
+left to right direction
+skinparam defaultFontSize 11
+skinparam defaultFontName Arial
+skinparam titleFontSize 14
+skinparam titleFontStyle bold
+skinparam rectangle {
+  RoundCorner 8
+  BorderThickness 2
+}
+skinparam database {
+  BorderColor #2C3E50
+  BorderThickness 2
+}
+skinparam cloud {
+  BorderColor #8E44AD
+  BorderThickness 2
+}
+
+title A1 - GET /configuration - ConfigurationResource.getConfiguration()\nRated: MODERATE - 2026-04-08
+
+rectangle " HTTP Client " as client #EBF5FB
+
+rectangle " HTTP Request\n GET /configuration\n Auth: NO AUTH\n @Valid: NO " as req #EBF5FB
+
+rectangle " ConfigurationResource\n getConfiguration() line 75\n Framework: SEEDSTACK_JAXRS\n Issues: 1 " as ctrl #D6EAF8
+
+rectangle " MDC\n put() line 86\n Est: ~5ms " as svc1 #D5F5E3
+
+rectangle " logger\n info() line 87\n Est: ~5ms " as svc2 #D5F5E3
+
+rectangle " request\n getHeader() line 91\n Est: ~5ms " as svc3 #D5F5E3
+
+rectangle " ConfigurationServiceImpl\n getAllConfiguration() line 92\n Est: ~20ms " as svc4 #D5F5E3
+
+rectangle " Response.ok()\n entity() line 93\n Est: ~5ms " as svc5 #D5F5E3
+
+rectangle " Response\n ok() line 93\n Est: ~5ms " as svc6 #D5F5E3
+
+rectangle " new Gson()\n toJson() line 93\n Est: ~5ms " as svc7 #D5F5E3
+
+rectangle " e\n getError() line 96\n Est: ~5ms " as svc8 #D5F5E3
+
+rectangle " logger\n error() line 97\n Est: ~5ms " as svc9 #D5F5E3
+
+rectangle " responseBuilder\n build() line 100\n Est: ~5ms " as svc10 #D5F5E3
+
+rectangle " ConfigurationRepository\n getAllConfigurations()\n Query: UNKNOWN\n Est: ~15ms " as repo1 #FFF8E1
+
+database " Database " as db #D6EAF8
+
+rectangle " Response\n 200 OK " as resp #E8F8E8
+
+rectangle " Issues on GET /configuration\n A3-004 MEDIUM: Potential missing index — ConfigurationRepository....\n " as issues #FEF9E7
+
+rectangle " Timing - GET /configuration\n p50 ESTIMATED: ~83ms\n p95 ESTIMATED: ~207ms\n Rating: MODERATE " as timing #FDEBD0
+
+client -[#2196F3,thickness=2]-> req
+req -[#2196F3,thickness=2]-> ctrl : GET /configuration
+ctrl -[#27AE60,thickness=2]-> svc1 : put()
+ctrl -[#27AE60,thickness=2]-> svc2 : info()
+ctrl -[#27AE60,thickness=2]-> svc3 : getHeader()
+ctrl -[#27AE60,thickness=2]-> svc4 : getAllConfiguration()
+ctrl -[#27AE60,thickness=2]-> svc5 : entity()
+ctrl -[#27AE60,thickness=2]-> svc6 : ok()
+ctrl -[#27AE60,thickness=2]-> svc7 : toJson()
+ctrl -[#27AE60,thickness=2]-> svc8 : getError()
+ctrl -[#27AE60,thickness=2]-> svc9 : error()
+ctrl -[#27AE60,thickness=2]-> svc10 : build()
+svc4 -[#8B4513,thickness=2]-> repo1
+repo1 -[#8B4513,thickness=2]-> db
+ctrl -[#27AE60,thickness=2]-> resp
+resp -[#2196F3,thickness=2]-> client
+timing --> resp
+issues --> ctrl
+@enduml
