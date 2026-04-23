@@ -9,11 +9,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
+import org.springframework.transaction.annotation.Transactional;
+
 /**
  * REST controller for retrieving scan results.
  */
 @RestController
 @RequestMapping("/api/results")
+@Transactional(readOnly = true)
 public class ResultController {
 
     @Autowired
@@ -79,7 +82,10 @@ public class ResultController {
     @GetMapping("/{scanId}/endpoints")
     public ResponseEntity<?> getEndpoints(@PathVariable String scanId) {
         return scanRunRepository.findById(scanId)
-                .map(scan -> ResponseEntity.ok(scan.getEndpoints()))
+                .map(scan -> {
+                    scan.getEndpoints().size(); // Force hibernate proxy initialization
+                    return ResponseEntity.ok(scan.getEndpoints());
+                })
                 .orElse(ResponseEntity.notFound().build());
     }
 

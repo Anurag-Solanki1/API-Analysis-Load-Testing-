@@ -1,5 +1,6 @@
 package com.codechecker.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,6 +18,9 @@ public class ApiTestRunEntity {
     private String endpointPath;
     private String environmentUrl;
 
+    // Auth tokens are sensitive credentials — never expose them in API responses.
+    // Kept in the schema for backward compatibility with existing rows.
+    @JsonIgnore
     @Column(length = 2000)
     private String authToken;
 
@@ -54,6 +58,8 @@ public class ApiTestRunEntity {
     public String getEnvironmentUrl() { return environmentUrl; }
     public void setEnvironmentUrl(String environmentUrl) { this.environmentUrl = environmentUrl; }
 
+    /** @deprecated Auth tokens are not exposed via API — use {@link #setAuthToken} only for legacy reads. */
+    @JsonIgnore
     public String getAuthToken() { return authToken; }
     public void setAuthToken(String authToken) { this.authToken = authToken; }
 

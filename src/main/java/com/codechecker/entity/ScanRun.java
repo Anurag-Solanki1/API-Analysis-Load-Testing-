@@ -32,6 +32,11 @@ public class ScanRun {
     private Integer scanMode;
     private String frameworkSummary; // JSON string e.g. {"SPRING_MVC":5,"STRUTS2":3,"JAX_WS":2}
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    private UserEntity user;
+
     @OneToMany(mappedBy = "scanRun", cascade = CascadeType.ALL, orphanRemoval = true)
     @com.fasterxml.jackson.annotation.JsonIgnore
     private List<EndpointResultEntity> endpoints = new ArrayList<>();
@@ -194,5 +199,13 @@ public class ScanRun {
 
     public void setFrameworkSummary(String frameworkSummary) {
         this.frameworkSummary = frameworkSummary;
+    }
+
+    public UserEntity getUser() {
+        return user;
+    }
+
+    public void setUser(UserEntity user) {
+        this.user = user;
     }
 }

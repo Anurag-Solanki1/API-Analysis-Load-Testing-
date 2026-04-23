@@ -5,10 +5,12 @@ import { cn } from "@/lib/utils";
 /**
  * GlowCard — Aceternity UI inspired card with animated border glow on hover.
  */
-interface GlowCardProps extends React.HTMLAttributes<HTMLDivElement> {
+interface GlowCardProps {
   children: React.ReactNode;
   glowColor?: string;
   className?: string;
+  style?: React.CSSProperties;
+  onClick?: React.MouseEventHandler<HTMLDivElement>;
 }
 
 const GlowCard = React.forwardRef<HTMLDivElement, GlowCardProps>(

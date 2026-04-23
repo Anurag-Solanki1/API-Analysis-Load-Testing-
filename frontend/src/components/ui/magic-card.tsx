@@ -1,13 +1,13 @@
-import React from "react";
+import React, { useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { BorderBeam } from "./border-beam";
 
 /**
- * MagicCard — A card component with optional animated border beam,
- * hover glow, and dot-pattern background. Combines Magic UI + Aceternity patterns.
+ * MagicCard — A card component with mouse-tracking glow, optional animated
+ * border beam, and dot-pattern background. Combines Magic UI + Aceternity patterns.
  */
-interface MagicCardProps extends React.HTMLAttributes<HTMLDivElement> {
+interface MagicCardProps {
   children: React.ReactNode;
   className?: string;
   /** Show the animated border beam. Default: false. */
@@ -17,6 +17,10 @@ interface MagicCardProps extends React.HTMLAttributes<HTMLDivElement> {
   accentColor?: string | false;
   /** Enable hover lift animation. Default: true. */
   hover?: boolean;
+  /** Enable glassmorphism variant. Default: false. */
+  glass?: boolean;
+  style?: React.CSSProperties;
+  onClick?: React.MouseEventHandler<HTMLDivElement>;
 }
 
 const MagicCard = React.forwardRef<HTMLDivElement, MagicCardProps>(
@@ -28,22 +32,39 @@ const MagicCard = React.forwardRef<HTMLDivElement, MagicCardProps>(
       beamColor,
       accentColor,
       hover = true,
+      glass = false,
       ...props
     },
     ref,
   ) => {
+    const innerRef = useRef<HTMLDivElement>(null);
+    const cardRef = (ref as React.RefObject<HTMLDivElement>) || innerRef;
+
+    const handleMouseMove = useCallback(
+      (e: React.MouseEvent<HTMLDivElement>) => {
+        const el = cardRef.current ?? (e.currentTarget as HTMLDivElement);
+        const rect = el.getBoundingClientRect();
+        el.style.setProperty("--mouse-x", `${e.clientX - rect.left}px`);
+        el.style.setProperty("--mouse-y", `${e.clientY - rect.top}px`);
+      },
+      [cardRef],
+    );
+
     const Wrapper = hover ? motion.div : "div";
     const hoverProps = hover
-      ? { whileHover: { y: -2, transition: { duration: 0.2 } } }
+      ? { whileHover: { y: -3, transition: { duration: 0.2 } } }
       : {};
 
     return (
       <Wrapper
-        ref={ref as any}
+        ref={cardRef as any}
         className={cn(
-          "group relative overflow-hidden rounded-2xl border border-white/[0.06] bg-surface-card transition-colors duration-200 hover:border-white/[0.12]",
+          "group relative overflow-hidden rounded-2xl border border-white/[0.06] bg-surface-card transition-all duration-200 hover:border-white/[0.12]",
+          glass &&
+            "bg-white/[0.03] backdrop-blur-xl border-white/[0.08]",
           className,
         )}
+        onMouseMove={handleMouseMove}
         {...hoverProps}
         {...props}
       >
@@ -60,11 +81,11 @@ const MagicCard = React.forwardRef<HTMLDivElement, MagicCardProps>(
           />
         )}
 
-        {/* Hover glow */}
+        {/* Mouse-tracking hover glow */}
         <div
-          className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+          className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 transition-opacity duration-500 group-hover:opacity-100"
           style={{
-            background: `radial-gradient(600px circle at var(--mouse-x,50%) var(--mouse-y,50%), rgba(99,102,241,0.08), transparent 40%)`,
+            background: `radial-gradient(600px circle at var(--mouse-x,50%) var(--mouse-y,50%), ${accentColor && typeof accentColor === "string" ? accentColor + "18" : "rgba(99,102,241,0.1)"}, transparent 40%)`,
           }}
         />
 

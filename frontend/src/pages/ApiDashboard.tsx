@@ -36,6 +36,9 @@ import {
   getRecentMonitorHits,
   clearMonitorHits,
   getGatewayUrl,
+  getValidJwt,
+  getMonitorHistory,
+  getMonitorHitCount,
 } from "../api";
 import type {
   EndpointResult,
@@ -81,6 +84,23 @@ const ApiDashboard: React.FC = () => {
   const [monitorSaving, setMonitorSaving] = useState(false);
   const [monitorSaved, setMonitorSaved] = useState(false);
   const [monitorCopied, setMonitorCopied] = useState(false);
+  const [monitorShowAll, setMonitorShowAll] = useState(false);
+  // Monitor / Local APIs table — pagination & date filter
+  const [monitorPageSize, setMonitorPageSize] = useState<10 | 50 | 100>(50);
+  const [monitorPage, setMonitorPage] = useState(0);
+  const [monitorDateFilter, setMonitorDateFilter] = useState(""); // YYYY-MM-DD or ""
+  
+  // Monitor History DB State
+  const [monitorTab, setMonitorTab] = useState<"live" | "history">("live");
+  const [historyHits, setHistoryHits] = useState<GatewayHit[]>([]);
+  const [historyPage, setHistoryPage] = useState(0);
+  const [historyPageSize, setHistoryPageSize] = useState<10 | 50 | 100>(50);
+  const [historyTotalElements, setHistoryTotalElements] = useState(0);
+  const [historyTotalPages, setHistoryTotalPages] = useState(0);
+  const [historyDate, setHistoryDate] = useState("");
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [totalPersistedHits, setTotalPersistedHits] = useState(0);
+
   const [slaThresholdMs, setSlaThresholdMs] = useState(500);
   const [toast, setToast] = useState<{
     message: string;
@@ -135,6 +155,10 @@ const ApiDashboard: React.FC = () => {
   const [ltHistoryOpen, setLtHistoryOpen] = useState(true);
   // null = cumulative average of all runs; a run id = show that run's stats
   const [ltSelectedRunId, setLtSelectedRunId] = useState<string | null>(null);
+  // Load Test History table — pagination & date filter
+  const [ltHistoryPageSize, setLtHistoryPageSize] = useState<10 | 50 | 100>(10);
+  const [ltHistoryPage, setLtHistoryPage] = useState(0); // 0-indexed
+  const [ltHistoryDateFilter, setLtHistoryDateFilter] = useState(""); // YYYY-MM-DD or ""
 
   const [threads, setThreads] = useState(5);
   const [totalRequests, setTotalRequests] = useState(50);
@@ -158,6 +182,11 @@ const ApiDashboard: React.FC = () => {
   const [authType, setAuthType] = useState<
     "bearer" | "basic" | "apikey" | "none"
   >("bearer");
+  // Tracks whether the current token was injected from CodeChecker's own
+  // session via the '⚡ Use session token' button. When true, the token is
+  // silently refreshed before a test starts. When false (user typed their
+  // own token for an external API), we never touch it.
+  const [isSessionToken, setIsSessionToken] = useState(false);
   const [apiKeyHeader, setApiKeyHeader] = useState("X-Api-Key");
   const [contentType, setContentType] = useState("application/json");
   const [queryParamRows, setQueryParamRows] = useState<KVRow[]>([
@@ -201,6 +230,7 @@ const ApiDashboard: React.FC = () => {
       environmentUrl,
       authToken,
       authType,
+      isSessionToken, // persisted so we know to auto-refresh on next load
       apiKeyHeader,
       contentType,
       requestPayload,
@@ -217,6 +247,7 @@ const ApiDashboard: React.FC = () => {
     selectedEndpoint,
     environmentUrl,
     authToken,
+    isSessionToken,
     authType,
     apiKeyHeader,
     contentType,
@@ -241,7 +272,6 @@ const ApiDashboard: React.FC = () => {
     try {
       const cfg = JSON.parse(raw);
       if (cfg.environmentUrl) setEnvironmentUrl(cfg.environmentUrl);
-      if (cfg.authToken !== undefined) setAuthToken(cfg.authToken);
       if (cfg.authType) setAuthType(cfg.authType);
       if (cfg.apiKeyHeader) setApiKeyHeader(cfg.apiKeyHeader);
       if (cfg.contentType) setContentType(cfg.contentType);
@@ -258,6 +288,20 @@ const ApiDashboard: React.FC = () => {
       if (cfg.rampUpInterval !== undefined)
         setRampUpInterval(cfg.rampUpInterval);
       if (cfg.thinkTime !== undefined) setThinkTime(cfg.thinkTime);
+
+      // Restore token — if it was a session token, silently refresh it so
+      // the user never has to click 'Use session token' again.
+      if (cfg.isSessionToken && cfg.authType === "bearer") {
+        setIsSessionToken(true);
+        // Fire-and-forget refresh; result updates authToken state
+        getValidJwt().then((fresh) => {
+          if (fresh) setAuthToken(fresh);
+          else if (cfg.authToken) setAuthToken(cfg.authToken); // fallback to saved
+        });
+      } else if (cfg.authToken !== undefined) {
+        setAuthToken(cfg.authToken);
+        setIsSessionToken(false);
+      }
     } catch {
       /* ignore corrupt data */
     }
@@ -352,6 +396,7 @@ const ApiDashboard: React.FC = () => {
       if (cfg) setMonitorTargetUrl(cfg.targetBaseUrl);
     });
     getRecentMonitorHits(projectName).then(setMonitorHits);
+    getMonitorHitCount(projectName).then(setTotalPersistedHits);
 
     const client = new Client({
       brokerURL: getWebSocketUrl(),
@@ -361,8 +406,8 @@ const ApiDashboard: React.FC = () => {
         client.subscribe(`/topic/monitor/${projectName}`, (msg) => {
           const hit: GatewayHit = JSON.parse(msg.body);
           setMonitorHits((prev) => [hit, ...prev].slice(0, 200));
-          // Collect per-request logs when a load test is actively running
-          if (liveRunningRef.current && hit.source === "load-test") {
+          // Collect per-request logs for load tests
+          if (hit.source === "load-test") {
             setLtRequestLogs((prev) => {
               const updated = [hit, ...prev];
               ltRequestLogsRef.current = updated;
@@ -381,6 +426,20 @@ const ApiDashboard: React.FC = () => {
       setMonitorConnected(false);
     };
   }, [projectName]);
+
+  // Fetch monitor history when tab is 'history' or pagination/filter changes
+  useEffect(() => {
+    if (!projectName || monitorTab !== "history") return;
+    setHistoryLoading(true);
+    getMonitorHistory(projectName, historyPage, historyPageSize, historyDate)
+      .then((res) => {
+        setHistoryHits(res.content);
+        setHistoryTotalElements(res.totalElements);
+        setHistoryTotalPages(res.totalPages);
+      })
+      .catch((err) => console.error("Failed to load history:", err))
+      .finally(() => setHistoryLoading(false));
+  }, [projectName, monitorTab, historyPage, historyPageSize, historyDate]);
 
   // In APM mode, auto-populate the load test base URL with the local gateway proxy URL
   // so the user doesn't have to type it in manually.
@@ -507,6 +566,14 @@ const ApiDashboard: React.FC = () => {
     });
   };
 
+  // Set the load test Base URL to the gateway base for this project
+  const handleUseGatewayAsBaseUrl = () => {
+    const baseUrl = getGatewayUrl(projectName!, "");
+    setEnvironmentUrl(baseUrl);
+    setMonitorCopied(true);
+    setTimeout(() => setMonitorCopied(false), 2000);
+  };
+
   const handleStartLiveTest = async () => {
     if (!selectedEndpoint || !projectName) return;
     const runId = crypto.randomUUID();
@@ -522,6 +589,20 @@ const ApiDashboard: React.FC = () => {
       Object.fromEntries(
         rows.filter((r) => r.enabled && r.key).map((r) => [r.key, r.val]),
       );
+
+    // ── Session token auto-refresh (only when user explicitly used '⚡ Use session token') ──
+    // If the user typed their own token for an external API, we leave it
+    // completely untouched. Auto-refresh only applies to CodeChecker's own
+    // session JWT, which was explicitly injected via the button.
+    let resolvedToken = authToken;
+    if (authType === "bearer" && isSessionToken && resolvedToken.trim()) {
+      const fresh = await getValidJwt();
+      if (fresh) {
+        resolvedToken = fresh;
+        setAuthToken(fresh); // keep UI in sync with refreshed token
+      }
+    }
+    // ─────────────────────────────────────────────────────────────────────
 
     const client = new Client({
       brokerURL: getWebSocketUrl(),
@@ -564,7 +645,7 @@ const ApiDashboard: React.FC = () => {
           httpMethod: selectedEndpoint.httpMethod,
           endpointPath: selectedEndpoint.path,
           environmentUrl,
-          authToken,
+          authToken: resolvedToken,
           authType,
           apiKeyHeader: authType === "apikey" ? apiKeyHeader : undefined,
           requestPayload,
@@ -609,6 +690,28 @@ const ApiDashboard: React.FC = () => {
     if (!parsed.search && parsed.pathname === "/") return;
     e.preventDefault();
 
+    // ── Gateway URL detection ─────────────────────────────────────────────
+    // If the pasted URL is a full gateway proxy URL like:
+    //   http://localhost:8081/api/gateway/API-Analysis/api/some/endpoint
+    // strip the endpoint path so only the base remains:
+    //   http://localhost:8081/api/gateway/API-Analysis
+    const gatewayPattern = /^\/api\/gateway\/([^\/]+)(\/.*)$/;
+    const gatewayMatch = parsed.pathname.match(gatewayPattern);
+    if (gatewayMatch && selectedEndpoint) {
+      // gatewayMatch[1] = projectName, gatewayMatch[2] = downstream path
+      const downstreamPath = gatewayMatch[2];
+      // Check if the downstream path ends with (or is) the current endpoint path
+      const epPath = selectedEndpoint.path.replace(/\{[^}]+\}/g, "[^/]+");
+      const endsWithEndpoint = new RegExp(epPath.replace(/[.+?^$|[\]\\]/g, "\\$&") + "$").test(downstreamPath);
+      if (endsWithEndpoint) {
+        // Strip endpoint suffix — keep only up to the project-level gateway base
+        const gatewayBase = parsed.origin + "/api/gateway/" + gatewayMatch[1];
+        setEnvironmentUrl(gatewayBase);
+        return;
+      }
+    }
+    // ─────────────────────────────────────────────────────────────────────
+
     // Extract query params
     const newQP: KVRow[] = [];
     parsed.searchParams.forEach((v, k) =>
@@ -642,7 +745,7 @@ const ApiDashboard: React.FC = () => {
         .replace(/[.+?^$|[\]\\]/g, "\\$&")
         .replace(/\{[^}]+\}/g, "[^/]+");
       const m = parsed.pathname.match(
-        new RegExp("^(.*?)" + epAnchor + "(\\/.*)?$"),
+        new RegExp("^(.*?)" + epAnchor + "(\/.*)?$"),
       );
       if (m) {
         base = parsed.origin + (m[1] ?? "");
@@ -1310,6 +1413,24 @@ ${entriesHtml}
     return environmentUrl.replace(/\/$/, "") + resolvedPath + qs;
   }, [selectedEndpoint, environmentUrl, pathParamValues, queryParamRows]);
 
+  // Decode the current Bearer token's expiry so the UI can warn the user
+  // BEFORE they start a load test with an already-expired token.
+  const tokenExpiryInfo = React.useMemo(() => {
+    if (authType !== "bearer" || !authToken.trim()) return null;
+    try {
+      const payload = JSON.parse(atob(authToken.trim().split(".")[1]));
+      if (!payload.exp) return null;
+      const msLeft = payload.exp * 1000 - Date.now();
+      if (msLeft <= 0) return { status: "expired" as const, msLeft: 0, label: "EXPIRED" };
+      const minLeft = Math.ceil(msLeft / 60_000);
+      if (msLeft < 60_000) return { status: "critical" as const, msLeft, label: `< 1 min left` };
+      if (msLeft < 5 * 60_000) return { status: "warning" as const, msLeft, label: `${minLeft} min left` };
+      return { status: "ok" as const, msLeft, label: `${minLeft} min left` };
+    } catch {
+      return null; // not a JWT (opaque token) — no expiry info
+    }
+  }, [authToken, authType]);
+
   // Framework detection helpers for conditional UI
   const isSoap =
     selectedEndpoint?.httpMethod === "SOAP" ||
@@ -1319,9 +1440,47 @@ ${entriesHtml}
     selectedEndpoint?.framework === "STRUTS1" ||
     selectedEndpoint?.framework === "STRUTS2";
 
-  const filteredHits = selectedEndpoint
-    ? monitorHits.filter((h) => h.path === selectedEndpoint.path)
-    : monitorHits;
+  // Monitor hits: path filter + date filter
+  const filteredHits = React.useMemo(() => {
+    if (monitorTab === "history") return historyHits;
+    
+    let hits = selectedEndpoint && !monitorShowAll
+      ? monitorHits.filter((h) => h.path === selectedEndpoint.path)
+      : monitorHits;
+    if (monitorDateFilter) {
+      // h.time is now an ISO datetime like "2026-04-24T01:02:45.123"
+      // so startsWith("2026-04-24") correctly filters by date
+      hits = hits.filter((h) => h.time?.startsWith(monitorDateFilter) ?? false);
+    }
+    return hits;
+  }, [monitorHits, historyHits, monitorTab, selectedEndpoint, monitorShowAll, monitorDateFilter]);
+
+  // Monitor hits: current page slice
+  const monitorPageCount = monitorTab === "history"
+    ? Math.max(1, historyTotalPages)
+    : Math.max(1, Math.ceil(filteredHits.length / monitorPageSize));
+    
+  const monitorHitsPage = monitorTab === "history"
+    ? historyHits
+    : filteredHits.slice(
+        monitorPage * monitorPageSize,
+        (monitorPage + 1) * monitorPageSize,
+      );
+      
+  const totalDisplayHits = monitorTab === "history" ? historyTotalElements : filteredHits.length;
+
+  // Load Test History: date filter
+  const ltHistoryFiltered = React.useMemo(() => {
+    if (!ltHistoryDateFilter) return liveTestHistory;
+    return liveTestHistory.filter((e) => e.runAt?.startsWith(ltHistoryDateFilter) || e.runAt?.includes(ltHistoryDateFilter.split("-").reverse().join("/")));
+  }, [liveTestHistory, ltHistoryDateFilter]);
+
+  // Load Test History: current page slice
+  const ltHistoryPageCount = Math.max(1, Math.ceil(ltHistoryFiltered.length / ltHistoryPageSize));
+  const ltHistoryPage_ = ltHistoryFiltered.slice(
+    ltHistoryPage * ltHistoryPageSize,
+    (ltHistoryPage + 1) * ltHistoryPageSize,
+  );
   const apmAverage =
     apmLogs.length > 0
       ? Math.round(
@@ -2757,7 +2916,46 @@ ${entriesHtml}
                               display: "block",
                             }}
                           >
-                            Token
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                              <span>
+                                Token{" "}
+                                {isSessionToken && (
+                                  <span style={{ fontSize: "0.6rem", color: "var(--accent-light)", fontWeight: 500 }}>
+                                    (session — auto-refreshes)
+                                  </span>
+                                )}
+                              </span>
+                              <button
+                                type="button"
+                                disabled={liveRunning}
+                                onClick={async () => {
+                                  const tok = await getValidJwt();
+                                  if (tok) {
+                                    setAuthToken(tok);
+                                    setIsSessionToken(true); // mark as session token so it auto-refreshes on test start
+                                  } else {
+                                    alert("No active session found. Please log in first.");
+                                  }
+                                }}
+                                style={{
+                                  fontSize: "0.65rem",
+                                  fontWeight: 600,
+                                  padding: "0.15rem 0.5rem",
+                                  background: isSessionToken
+                                    ? "rgba(34,197,94,0.15)"
+                                    : "rgba(99,102,241,0.15)",
+                                  color: isSessionToken
+                                    ? "var(--success)"
+                                    : "var(--accent-light)",
+                                  border: `1px solid ${isSessionToken ? "rgba(34,197,94,0.35)" : "rgba(99,102,241,0.35)"}`,
+                                  borderRadius: 4,
+                                  cursor: "pointer",
+                                  letterSpacing: "0.04em",
+                                }}
+                              >
+                                {isSessionToken ? "✓ Session active" : "⚡ Use session token"}
+                              </button>
+                            </div>
                           </label>
                           <input
                             className="form-input"
@@ -2765,9 +2963,12 @@ ${entriesHtml}
                               fontSize: "0.8rem",
                               fontFamily: "var(--font-mono)",
                             }}
-                            placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                            placeholder="Paste your Bearer token here (for external APIs)…"
                             value={authToken}
-                            onChange={(e) => setAuthToken(e.target.value)}
+                            onChange={(e) => {
+                              setAuthToken(e.target.value);
+                              setIsSessionToken(false); // user is typing their own token, disable auto-refresh
+                            }}
                             disabled={liveRunning}
                           />
                           <div
@@ -2784,7 +2985,59 @@ ${entriesHtml}
                             <code style={{ color: "var(--accent-light)" }}>
                               Authorization: Bearer &lt;token&gt;
                             </code>
+                            {isSessionToken
+                              ? " — using CodeChecker session token, auto-refreshes on test start."
+                              : " — paste any Bearer token here (your own app, external API, etc.)."}
                           </div>
+                          {/* Token expiry status badge — always shown when a token is present */}
+                          {tokenExpiryInfo && (
+                            <div
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "0.5rem",
+                                fontSize: "0.7rem",
+                                padding: "0.3rem 0.5rem",
+                                borderRadius: 5,
+                                background:
+                                  tokenExpiryInfo.status === "expired"
+                                    ? "rgba(239,68,68,0.1)"
+                                    : tokenExpiryInfo.status === "critical"
+                                      ? "rgba(239,68,68,0.07)"
+                                      : tokenExpiryInfo.status === "warning"
+                                        ? "rgba(245,158,11,0.08)"
+                                        : "rgba(34,197,94,0.07)",
+                                border: `1px solid ${
+                                  tokenExpiryInfo.status === "expired" || tokenExpiryInfo.status === "critical"
+                                    ? "rgba(239,68,68,0.25)"
+                                    : tokenExpiryInfo.status === "warning"
+                                      ? "rgba(245,158,11,0.25)"
+                                      : "rgba(34,197,94,0.2)"
+                                }`,
+                                color:
+                                  tokenExpiryInfo.status === "expired" || tokenExpiryInfo.status === "critical"
+                                    ? "var(--danger)"
+                                    : tokenExpiryInfo.status === "warning"
+                                      ? "var(--warning)"
+                                      : "var(--success)",
+                              }}
+                            >
+                              <span style={{ fontWeight: 700 }}>
+                                {tokenExpiryInfo.status === "expired" ? "⛔" :
+                                 tokenExpiryInfo.status === "critical" ? "⚠" :
+                                 tokenExpiryInfo.status === "warning" ? "⏱" : "✓"}{" "}
+                                Token{" "}
+                                {tokenExpiryInfo.status === "expired"
+                                  ? "is EXPIRED"
+                                  : `expires in ${tokenExpiryInfo.label}`}
+                              </span>
+                              {tokenExpiryInfo.status !== "ok" && !isSessionToken && (
+                                <span style={{ color: "var(--text-muted)", fontStyle: "italic" }}>
+                                  — get a new token from your external API before starting the test
+                                </span>
+                              )}
+                            </div>
+                          )}
                         </div>
                       )}
 
@@ -4075,7 +4328,7 @@ ${entriesHtml}
                           fontSize: "0.95rem",
                         }}
                       >
-                        {liveStats.percentiles![p]}ms
+                        {liveStats.percentiles![p] ?? 0}ms
                       </div>
                     </div>
                   ))}
@@ -4750,9 +5003,7 @@ ${entriesHtml}
                 : "none",
             }}
           >
-            <div
-              style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}
-            >
+            <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
               <span style={{ fontWeight: 700, fontSize: "0.88rem" }}>
                 Load Test History
               </span>
@@ -4778,8 +5029,123 @@ ${entriesHtml}
 
           {ltHistoryOpen && (
             <div style={{ overflowX: "auto" }}>
+              {/* ── Pagination toolbar ── */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.6rem",
+                  flexWrap: "wrap",
+                  padding: "0.55rem 1.25rem",
+                  borderBottom: "1px solid rgba(255,255,255,0.05)",
+                  background: "rgba(99,102,241,0.03)",
+                }}
+              >
+                {/* Date picker */}
+                <div style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
+                  <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", whiteSpace: "nowrap" }}>📅 Filter date</span>
+                  <input
+                    type="date"
+                    value={ltHistoryDateFilter}
+                    onChange={(e) => { setLtHistoryDateFilter(e.target.value); setLtHistoryPage(0); }}
+                    style={{
+                      background: "var(--bg-elevated)",
+                      border: "1px solid var(--border)",
+                      borderRadius: 6,
+                      color: "var(--text-primary)",
+                      padding: "0.18rem 0.4rem",
+                      fontSize: "0.71rem",
+                      outline: "none",
+                    }}
+                  />
+                  {ltHistoryDateFilter && (
+                    <button
+                      onClick={() => { setLtHistoryDateFilter(""); setLtHistoryPage(0); }}
+                      title="Clear filter"
+                      style={{ background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 4, color: "var(--danger)", cursor: "pointer", fontSize: "0.7rem", padding: "0.1rem 0.35rem", lineHeight: 1.2 }}
+                    >✕ Clear</button>
+                  )}
+                  {ltHistoryDateFilter && (
+                    <span style={{ fontSize: "0.68rem", color: "var(--text-muted)" }}>
+                      {ltHistoryFiltered.length} result{ltHistoryFiltered.length !== 1 ? "s" : ""}
+                    </span>
+                  )}
+                </div>
+
+                <div style={{ flex: 1 }} />
+
+                {/* Rows per page */}
+                <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
+                  <span style={{ fontSize: "0.7rem", color: "var(--text-muted)" }}>Rows</span>
+                  {([10, 50, 100] as const).map((n) => (
+                    <button
+                      key={n}
+                      onClick={() => { setLtHistoryPageSize(n); setLtHistoryPage(0); }}
+                      style={{
+                        minWidth: 32,
+                        padding: "0.15rem 0.4rem",
+                        borderRadius: 5,
+                        border: `1px solid ${ltHistoryPageSize === n ? "rgba(99,102,241,0.6)" : "var(--border)"}`,
+                        background: ltHistoryPageSize === n ? "rgba(99,102,241,0.18)" : "transparent",
+                        color: ltHistoryPageSize === n ? "var(--accent-light)" : "var(--text-muted)",
+                        fontWeight: ltHistoryPageSize === n ? 700 : 400,
+                        cursor: "pointer",
+                        fontSize: "0.71rem",
+                        transition: "all 0.15s",
+                      }}
+                    >{n}</button>
+                  ))}
+                </div>
+
+                {/* Page navigation */}
+                <div style={{ display: "flex", alignItems: "center", gap: "0.3rem" }}>
+                  <button
+                    disabled={ltHistoryPage === 0}
+                    onClick={() => setLtHistoryPage(0)}
+                    title="First page"
+                    style={{ background: "none", border: "1px solid var(--border)", borderRadius: 5, color: "var(--text-muted)", cursor: ltHistoryPage === 0 ? "not-allowed" : "pointer", opacity: ltHistoryPage === 0 ? 0.3 : 1, fontSize: "0.72rem", padding: "0.15rem 0.4rem" }}
+                  >«</button>
+                  <button
+                    disabled={ltHistoryPage === 0}
+                    onClick={() => setLtHistoryPage((p) => p - 1)}
+                    title="Previous page"
+                    style={{ background: "none", border: "1px solid var(--border)", borderRadius: 5, color: "var(--text-muted)", cursor: ltHistoryPage === 0 ? "not-allowed" : "pointer", opacity: ltHistoryPage === 0 ? 0.3 : 1, fontSize: "0.85rem", padding: "0.1rem 0.45rem" }}
+                  >‹</button>
+                  <span
+                    style={{
+                      fontSize: "0.71rem",
+                      color: "var(--text-primary)",
+                      background: "rgba(99,102,241,0.1)",
+                      border: "1px solid rgba(99,102,241,0.25)",
+                      borderRadius: 5,
+                      padding: "0.15rem 0.55rem",
+                      whiteSpace: "nowrap",
+                      fontVariantNumeric: "tabular-nums",
+                    }}
+                  >
+                    {ltHistoryPage + 1} <span style={{ color: "var(--text-muted)" }}>/ {ltHistoryPageCount}</span>
+                  </span>
+                  <button
+                    disabled={ltHistoryPage >= ltHistoryPageCount - 1}
+                    onClick={() => setLtHistoryPage((p) => p + 1)}
+                    title="Next page"
+                    style={{ background: "none", border: "1px solid var(--border)", borderRadius: 5, color: "var(--text-muted)", cursor: ltHistoryPage >= ltHistoryPageCount - 1 ? "not-allowed" : "pointer", opacity: ltHistoryPage >= ltHistoryPageCount - 1 ? 0.3 : 1, fontSize: "0.85rem", padding: "0.1rem 0.45rem" }}
+                  >›</button>
+                  <button
+                    disabled={ltHistoryPage >= ltHistoryPageCount - 1}
+                    onClick={() => setLtHistoryPage(ltHistoryPageCount - 1)}
+                    title="Last page"
+                    style={{ background: "none", border: "1px solid var(--border)", borderRadius: 5, color: "var(--text-muted)", cursor: ltHistoryPage >= ltHistoryPageCount - 1 ? "not-allowed" : "pointer", opacity: ltHistoryPage >= ltHistoryPageCount - 1 ? 0.3 : 1, fontSize: "0.72rem", padding: "0.15rem 0.4rem" }}
+                  >»</button>
+                  <span style={{ fontSize: "0.68rem", color: "var(--text-muted)", marginLeft: "0.15rem" }}>
+                    {ltHistoryFiltered.length} total
+                  </span>
+                </div>
+              </div>
+
               {/* Mini trend chart */}
               {liveTestHistory.length > 1 &&
+
                 (() => {
                   const chartData = [...liveTestHistory]
                     .reverse()
@@ -4927,7 +5293,7 @@ ${entriesHtml}
                   </tr>
                 </thead>
                 <tbody>
-                  {liveTestHistory.map((entry, idx) => {
+                {ltHistoryPage_.map((entry, idx) => {
                     const errPct =
                       entry.totalRequests > 0
                         ? (
@@ -4935,8 +5301,9 @@ ${entriesHtml}
                             100
                           ).toFixed(1)
                         : "0.0";
-                    // liveTestHistory[0]=newest → run # = total - idx gives oldest=Run#1
-                    const runNumber = liveTestHistory.length - idx;
+                    // Global run number: oldest = Run #1, newest = Run #(total)
+                    const globalIdx = ltHistoryPage * ltHistoryPageSize + idx;
+                    const runNumber = ltHistoryFiltered.length - globalIdx;
                     return (
                       <tr key={entry.id}>
                         <td
@@ -5032,7 +5399,7 @@ ${entriesHtml}
                             fontFamily: "var(--font-mono)",
                           }}
                         >
-                          {entry.percentiles ? entry.percentiles.p50 : "—"}
+                          {entry.percentiles ? entry.percentiles.p50 ?? "—" : "—"}
                         </td>
                         <td
                           style={{
@@ -5040,7 +5407,7 @@ ${entriesHtml}
                             fontFamily: "var(--font-mono)",
                           }}
                         >
-                          {entry.percentiles ? entry.percentiles.p90 : "—"}
+                          {entry.percentiles ? entry.percentiles.p90 ?? "—" : "—"}
                         </td>
                         <td
                           style={{
@@ -5230,58 +5597,151 @@ ${entriesHtml}
               {selectedEndpoint && monitorTargetUrl && (
                 <div
                   style={{
-                    minWidth: 260,
+                    minWidth: 280,
                     background: "rgba(99,102,241,0.06)",
                     border: "1px solid rgba(99,102,241,0.15)",
                     borderRadius: "var(--radius)",
                     padding: "0.85rem 1rem",
                     display: "flex",
                     flexDirection: "column",
-                    gap: "0.5rem",
+                    gap: "0.75rem",
                   }}
                 >
-                  <div
-                    style={{
-                      fontSize: "0.7rem",
-                      fontWeight: 700,
-                      color: "var(--text-muted)",
-                    }}
-                  >
-                    Proxy URL for this endpoint
+                  {/* Load Test Base URL — paste this into Base URL field */}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.3rem" }}>
+                    <div
+                      style={{
+                        fontSize: "0.68rem",
+                        fontWeight: 700,
+                        color: "#22c55e",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.05em",
+                      }}
+                    >
+                      ⚡ Load Test Base URL
+                    </div>
+                    <div
+                      style={{
+                        fontSize: "0.62rem",
+                        color: "var(--text-muted)",
+                        marginBottom: "0.15rem",
+                      }}
+                    >
+                      Paste this into the "Base URL" field in Load Test ↑
+                    </div>
+                    <code
+                      style={{
+                        fontSize: "0.72rem",
+                        color: "#22c55e",
+                        wordBreak: "break-all",
+                        lineHeight: 1.5,
+                        background: "rgba(34,197,94,0.06)",
+                        border: "1px solid rgba(34,197,94,0.15)",
+                        borderRadius: 6,
+                        padding: "0.25rem 0.5rem",
+                        display: "block",
+                      }}
+                    >
+                      {getGatewayUrl(projectName!, "")}
+                    </code>
+                    <button
+                      className="btn btn-outline btn-sm"
+                      style={{
+                        fontSize: "0.7rem",
+                        alignSelf: "flex-start",
+                        borderColor: "rgba(34,197,94,0.3)",
+                        color: "#22c55e",
+                      }}
+                      onClick={() => {
+                        const url = getGatewayUrl(projectName!, "");
+                        navigator.clipboard.writeText(url).then(() => {
+                          setMonitorCopied(true);
+                          setTimeout(() => setMonitorCopied(false), 2000);
+                        });
+                      }}
+                    >
+                      {monitorCopied ? (
+                        <>
+                          <CheckCircle style={{ width: 12, height: 12, marginRight: 4 }} />
+                          Copied!
+                        </>
+                      ) : (
+                        <>
+                          <Copy style={{ width: 12, height: 12, marginRight: 4 }} />
+                          Copy Base URL
+                        </>
+                      )}
+                    </button>
                   </div>
-                  <code
-                    style={{
-                      fontSize: "0.75rem",
-                      color: "var(--accent-light)",
-                      wordBreak: "break-all",
-                      lineHeight: 1.5,
-                    }}
-                  >
-                    {getGatewayUrl(projectName!, selectedEndpoint.path)}
-                  </code>
-                  <button
-                    className="btn btn-outline btn-sm"
-                    style={{ fontSize: "0.72rem", alignSelf: "flex-start" }}
-                    onClick={() => handleCopyGatewayUrl(selectedEndpoint.path)}
-                  >
-                    {monitorCopied ? (
-                      <>
-                        <CheckCircle
-                          style={{ width: 12, height: 12, marginRight: 4 }}
-                        />
-                        Copied!
-                      </>
-                    ) : (
-                      <>
-                        <Copy
-                          style={{ width: 12, height: 12, marginRight: 4 }}
-                        />
-                        Copy URL
-                      </>
-                    )}
-                  </button>
+
+                  {/* Divider */}
+                  <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }} />
+
+                  {/* Full proxy URL — for browser testing */}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.3rem" }}>
+                    <div
+                      style={{
+                        fontSize: "0.68rem",
+                        fontWeight: 700,
+                        color: "var(--text-muted)",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.05em",
+                      }}
+                    >
+                      Full Endpoint Proxy URL
+                    </div>
+                    <div
+                      style={{
+                        fontSize: "0.62rem",
+                        color: "var(--text-muted)",
+                        marginBottom: "0.15rem",
+                      }}
+                    >
+                      Open in browser or Postman to test this endpoint
+                    </div>
+                    <code
+                      style={{
+                        fontSize: "0.7rem",
+                        color: "var(--accent-light)",
+                        wordBreak: "break-all",
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      {getGatewayUrl(projectName!, selectedEndpoint.path)}
+                    </code>
+                    <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap" }}>
+                      <button
+                        className="btn btn-outline btn-sm"
+                        style={{ fontSize: "0.7rem" }}
+                        onClick={() => handleCopyGatewayUrl(selectedEndpoint.path)}
+                      >
+                        <Copy style={{ width: 12, height: 12, marginRight: 4 }} />
+                        Copy Full URL
+                      </button>
+                      <button
+                        className="btn btn-sm"
+                        style={{
+                          fontSize: "0.7rem",
+                          background: "rgba(99,102,241,0.15)",
+                          border: "1px solid rgba(99,102,241,0.3)",
+                          color: "#818cf8",
+                          borderRadius: 6,
+                          padding: "0.25rem 0.6rem",
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                        onClick={handleUseGatewayAsBaseUrl}
+                        title="Sets the Load Test Base URL to the gateway base (without endpoint path)"
+                      >
+                        ⚡ Use as Load Test Base URL
+                      </button>
+                    </div>
+                  </div>
+
                 </div>
               )}
+
             </div>
           </div>
 
@@ -5716,19 +6176,60 @@ ${entriesHtml}
                   fontWeight: 700,
                   display: "flex",
                   alignItems: "center",
-                  gap: "0.5rem",
+                  gap: "1.5rem",
                 }}
               >
-                <Radio
-                  style={{
-                    width: 16,
-                    height: 16,
-                    color: monitorConnected
-                      ? "var(--success)"
-                      : "var(--text-muted)",
-                  }}
-                />
-                Real-Time Hit Stream
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                  <Radio
+                    style={{
+                      width: 16,
+                      height: 16,
+                      color: monitorConnected
+                        ? "var(--success)"
+                        : "var(--text-muted)",
+                    }}
+                  />
+                  Monitor & Logs
+                </div>
+
+                <div style={{ display: "flex", background: "rgba(255,255,255,0.03)", padding: "0.2rem", borderRadius: "8px" }}>
+                  <button
+                    onClick={() => setMonitorTab("live")}
+                    style={{
+                      padding: "0.3rem 0.8rem",
+                      fontSize: "0.75rem",
+                      fontWeight: monitorTab === "live" ? 700 : 500,
+                      color: monitorTab === "live" ? "var(--text-primary)" : "var(--text-muted)",
+                      background: monitorTab === "live" ? "rgba(255,255,255,0.1)" : "transparent",
+                      borderRadius: "6px",
+                      border: "none",
+                      cursor: "pointer",
+                      transition: "all 0.2s"
+                    }}
+                  >
+                    🔴 Live Stream
+                  </button>
+                  <button
+                    onClick={() => setMonitorTab("history")}
+                    style={{
+                      padding: "0.3rem 0.8rem",
+                      fontSize: "0.75rem",
+                      fontWeight: monitorTab === "history" ? 700 : 500,
+                      color: monitorTab === "history" ? "var(--text-primary)" : "var(--text-muted)",
+                      background: monitorTab === "history" ? "rgba(255,255,255,0.1)" : "transparent",
+                      borderRadius: "6px",
+                      border: "none",
+                      cursor: "pointer",
+                      transition: "all 0.2s",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.3rem"
+                    }}
+                  >
+                    ⏳ DB History ({totalPersistedHits.toLocaleString()})
+                    {historyLoading && <div className="spinner" style={{ width: 12, height: 12, borderWidth: 2 }} />}
+                  </button>
+                </div>
                 {selectedEndpoint && (
                   <span
                     style={{
@@ -5743,6 +6244,29 @@ ${entriesHtml}
                       {selectedEndpoint.path}
                     </code>
                   </span>
+                )}
+                {/* Show all paths toggle */}
+                {selectedEndpoint && monitorHits.length > 0 && (
+                  <button
+                    onClick={() => setMonitorShowAll((v) => !v)}
+                    style={{
+                      fontSize: "0.65rem",
+                      fontWeight: 600,
+                      padding: "0.15rem 0.5rem",
+                      background: monitorShowAll
+                        ? "rgba(99,102,241,0.2)"
+                        : "rgba(255,255,255,0.05)",
+                      color: monitorShowAll
+                        ? "var(--accent-light)"
+                        : "var(--text-muted)",
+                      border: `1px solid ${monitorShowAll ? "rgba(99,102,241,0.4)" : "var(--border)"}`,
+                      borderRadius: 4,
+                      cursor: "pointer",
+                      marginLeft: "0.5rem",
+                    }}
+                  >
+                    {monitorShowAll ? "All paths" : "This path only"}
+                  </button>
                 )}
                 {(() => {
                   const slaBreaches = filteredHits.filter(
@@ -5781,21 +6305,166 @@ ${entriesHtml}
                   ) : null;
                 })()}
               </div>
-              {filteredHits.length > 0 && (
-                <button
-                  className="btn btn-outline btn-sm"
-                  style={{ fontSize: "0.75rem" }}
-                  onClick={() => {
-                    setMonitorHits([]);
-                    if (projectName) clearMonitorHits(projectName);
-                  }}
-                >
-                  Clear
-                </button>
-              )}
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                {filteredHits.length > 0 && (
+                  <button
+                    className="btn btn-outline btn-sm"
+                    style={{ fontSize: "0.75rem" }}
+                    onClick={() => {
+                      setMonitorHits([]);
+                      if (projectName) clearMonitorHits(projectName);
+                    }}
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
             </div>
 
-            {filteredHits.length === 0 ? (
+            {/* ── Pagination toolbar for monitor hits ── */}
+            {(monitorTab === "history" ? totalPersistedHits > 0 : monitorHits.length > 0) && (
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.6rem",
+                  flexWrap: "wrap",
+                  padding: "0.55rem 1.5rem",
+                  borderBottom: "1px solid rgba(255,255,255,0.05)",
+                  background: "rgba(99,102,241,0.03)",
+                }}
+              >
+                {/* Date picker */}
+                <div style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
+                  <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", whiteSpace: "nowrap" }}>📅 Filter date</span>
+                  <input
+                    type="date"
+                    value={monitorTab === "history" ? historyDate : monitorDateFilter}
+                    onChange={(e) => {
+                      if (monitorTab === "history") {
+                        setHistoryDate(e.target.value);
+                        setHistoryPage(0);
+                      } else {
+                        setMonitorDateFilter(e.target.value);
+                        setMonitorPage(0);
+                      }
+                    }}
+                    style={{
+                      background: "var(--bg-elevated)",
+                      border: "1px solid var(--border)",
+                      borderRadius: 6,
+                      color: "var(--text-primary)",
+                      padding: "0.18rem 0.4rem",
+                      fontSize: "0.71rem",
+                      outline: "none",
+                    }}
+                  />
+                  {(monitorTab === "history" ? historyDate : monitorDateFilter) && (
+                    <button
+                      onClick={() => {
+                        if (monitorTab === "history") {
+                          setHistoryDate("");
+                          setHistoryPage(0);
+                        } else {
+                          setMonitorDateFilter("");
+                          setMonitorPage(0);
+                        }
+                      }}
+                      title="Clear filter"
+                      style={{ background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 4, color: "var(--danger)", cursor: "pointer", fontSize: "0.7rem", padding: "0.1rem 0.35rem", lineHeight: 1.2 }}
+                    >✕ Clear</button>
+                  )}
+                  {(monitorTab === "history" ? historyDate : monitorDateFilter) && (
+                    <span style={{ fontSize: "0.68rem", color: "var(--text-muted)" }}>
+                      {totalDisplayHits} hit{totalDisplayHits !== 1 ? "s" : ""}
+                    </span>
+                  )}
+                </div>
+
+                <div style={{ flex: 1 }} />
+
+                {/* Rows per page */}
+                <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
+                  <span style={{ fontSize: "0.7rem", color: "var(--text-muted)" }}>Rows</span>
+                  {([10, 50, 100] as const).map((n) => {
+                    const isActive = (monitorTab === "history" ? historyPageSize : monitorPageSize) === n;
+                    return (
+                      <button
+                        key={n}
+                        onClick={() => {
+                          if (monitorTab === "history") {
+                            setHistoryPageSize(n);
+                            setHistoryPage(0);
+                          } else {
+                            setMonitorPageSize(n);
+                            setMonitorPage(0);
+                          }
+                        }}
+                        style={{
+                          minWidth: 32,
+                          padding: "0.15rem 0.4rem",
+                          borderRadius: 5,
+                          border: `1px solid ${isActive ? "rgba(99,102,241,0.6)" : "var(--border)"}`,
+                          background: isActive ? "rgba(99,102,241,0.18)" : "transparent",
+                          color: isActive ? "var(--accent-light)" : "var(--text-muted)",
+                          fontWeight: isActive ? 700 : 400,
+                          cursor: "pointer",
+                          fontSize: "0.71rem",
+                          transition: "all 0.15s",
+                        }}
+                      >{n}</button>
+                    );
+                  })}
+                </div>
+
+                {/* Page navigation */}
+                <div style={{ display: "flex", alignItems: "center", gap: "0.3rem" }}>
+                  <button
+                    disabled={(monitorTab === "history" ? historyPage : monitorPage) === 0}
+                    onClick={() => monitorTab === "history" ? setHistoryPage(0) : setMonitorPage(0)}
+                    title="First page"
+                    style={{ background: "none", border: "1px solid var(--border)", borderRadius: 5, color: "var(--text-muted)", cursor: (monitorTab === "history" ? historyPage : monitorPage) === 0 ? "not-allowed" : "pointer", opacity: (monitorTab === "history" ? historyPage : monitorPage) === 0 ? 0.3 : 1, fontSize: "0.72rem", padding: "0.15rem 0.4rem" }}
+                  >«</button>
+                  <button
+                    disabled={(monitorTab === "history" ? historyPage : monitorPage) === 0}
+                    onClick={() => monitorTab === "history" ? setHistoryPage((p) => p - 1) : setMonitorPage((p) => p - 1)}
+                    title="Previous page"
+                    style={{ background: "none", border: "1px solid var(--border)", borderRadius: 5, color: "var(--text-muted)", cursor: (monitorTab === "history" ? historyPage : monitorPage) === 0 ? "not-allowed" : "pointer", opacity: (monitorTab === "history" ? historyPage : monitorPage) === 0 ? 0.3 : 1, fontSize: "0.85rem", padding: "0.1rem 0.45rem" }}
+                  >‹</button>
+                  <span
+                    style={{
+                      fontSize: "0.71rem",
+                      color: "var(--text-primary)",
+                      background: "rgba(99,102,241,0.1)",
+                      border: "1px solid rgba(99,102,241,0.25)",
+                      borderRadius: 5,
+                      padding: "0.15rem 0.55rem",
+                      whiteSpace: "nowrap",
+                      fontVariantNumeric: "tabular-nums",
+                    }}
+                  >
+                    {(monitorTab === "history" ? historyPage : monitorPage) + 1} <span style={{ color: "var(--text-muted)" }}>/ {monitorPageCount}</span>
+                  </span>
+                  <button
+                    disabled={(monitorTab === "history" ? historyPage : monitorPage) >= monitorPageCount - 1}
+                    onClick={() => monitorTab === "history" ? setHistoryPage((p) => p + 1) : setMonitorPage((p) => p + 1)}
+                    title="Next page"
+                    style={{ background: "none", border: "1px solid var(--border)", borderRadius: 5, color: "var(--text-muted)", cursor: (monitorTab === "history" ? historyPage : monitorPage) >= monitorPageCount - 1 ? "not-allowed" : "pointer", opacity: (monitorTab === "history" ? historyPage : monitorPage) >= monitorPageCount - 1 ? 0.3 : 1, fontSize: "0.85rem", padding: "0.1rem 0.45rem" }}
+                  >›</button>
+                  <button
+                    disabled={(monitorTab === "history" ? historyPage : monitorPage) >= monitorPageCount - 1}
+                    onClick={() => monitorTab === "history" ? setHistoryPage(monitorPageCount - 1) : setMonitorPage(monitorPageCount - 1)}
+                    title="Last page"
+                    style={{ background: "none", border: "1px solid var(--border)", borderRadius: 5, color: "var(--text-muted)", cursor: (monitorTab === "history" ? historyPage : monitorPage) >= monitorPageCount - 1 ? "not-allowed" : "pointer", opacity: (monitorTab === "history" ? historyPage : monitorPage) >= monitorPageCount - 1 ? 0.3 : 1, fontSize: "0.72rem", padding: "0.15rem 0.4rem" }}
+                  >»</button>
+                  <span style={{ fontSize: "0.68rem", color: "var(--text-muted)", marginLeft: "0.15rem" }}>
+                    {totalDisplayHits} total
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {totalDisplayHits === 0 ? (
               <div
                 style={{
                   textAlign: "center",
@@ -5812,10 +6481,11 @@ ${entriesHtml}
                     marginBottom: "1rem",
                   }}
                 />
-                <p>No hits recorded yet.</p>
+                <p>{monitorTab === "history" ? "No history records found." : "No hits recorded yet."}</p>
                 <p style={{ fontSize: "0.8rem" }}>
-                  Route real traffic through the Gateway URL — or start a Load
-                  Test from the APM tab to see hits appear here instantly.
+                  {monitorTab === "history" 
+                    ? "Adjust your date filter or start generating traffic."
+                    : "Route real traffic through the Gateway URL — or start a Load Test from the APM tab to see hits appear here instantly."}
                 </p>
               </div>
             ) : (
@@ -5839,7 +6509,7 @@ ${entriesHtml}
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredHits.map((hit, idx) => {
+                    {monitorHitsPage.map((hit, idx) => {
                       const isSuccess =
                         hit.statusCode >= 200 && hit.statusCode < 300;
                       const isWarn =

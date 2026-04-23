@@ -63,9 +63,7 @@ logs/
 # =====================
 # Scan output (large/generated artifacts)
 # =====================
-codechecker-output/**/*.html
-codechecker-output/**/*.png
-
+codechecker-output/
 # =====================
 # Secrets & local config
 # =====================

@@ -18,7 +18,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -131,6 +131,9 @@ public class GatewayController {
 
         log.debug("Gateway → {} {} → {}", request.getMethod(), downstreamPath, fullUrl);
 
+        // Determine if this is a load test up-front so error hits can be tagged correctly
+        boolean isLoadTest = LOAD_TEST_VALUE.equalsIgnoreCase(request.getHeader(LOAD_TEST_HEADER));
+
         try {
             HttpRequest.Builder builder = HttpRequest.newBuilder()
                     .uri(URI.create(fullUrl))
@@ -170,9 +173,7 @@ public class GatewayController {
             // Broadcast hit to dashboard
             // If the request was injected by ApiTesterService (load-test), tag it
             // so it appears as a "load-test" hit, not a real "gateway" hit.
-            boolean isLoadTest = LOAD_TEST_VALUE.equalsIgnoreCase(
-                    request.getHeader(LOAD_TEST_HEADER));
-            String timeStr = LocalTime.now().toString().substring(0, 12);
+            String timeStr = LocalDateTime.now().toString().substring(0, 23); // e.g. 2026-04-24T01:02:45.123
             GatewayHit hit = new GatewayHit(
                     request.getMethod(), downstreamPath,
                     response.statusCode(), durationMs,
@@ -253,12 +254,15 @@ public class GatewayController {
             long durationMs = 0;
             GatewayHit errHit = new GatewayHit(request.getMethod(), downstreamPath,
                     -1, durationMs,
-                    LocalTime.now().toString().substring(0, 12), projectName);
+                    LocalDateTime.now().toString().substring(0, 23), projectName,
+                    isLoadTest ? "load-test" : null);
             errHit.setRequestUrl(fullUrl);
-            errHit.setErrorMessage("Connection failed: " + e.getMessage());
+            String errMsg = e.getMessage();
+            if (errMsg == null) errMsg = e.toString();
+            errHit.setErrorMessage("Connection failed: " + errMsg);
             monitorService.record(projectName, errHit);
             return ResponseEntity.status(502)
-                    .body(("Gateway error: " + e.getMessage()).getBytes());
+                    .body(("Gateway error: " + errMsg).getBytes());
         }
     }
 

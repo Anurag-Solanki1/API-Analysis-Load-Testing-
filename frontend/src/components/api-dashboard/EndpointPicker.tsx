@@ -36,7 +36,7 @@ const container = {
 
 const item = {
   hidden: { opacity: 0, y: 12 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.25, ease: "easeOut" } },
+  show: { opacity: 1, y: 0, transition: { duration: 0.25, ease: "easeOut" as const } },
 };
 
 const EndpointPicker: React.FC<EndpointPickerProps> = ({
@@ -47,7 +47,7 @@ const EndpointPicker: React.FC<EndpointPickerProps> = ({
   onBack,
   getMethodBadge,
 }) => {
-  const filtered = endpoints.filter(
+  const filtered = (Array.isArray(endpoints) ? endpoints : []).filter(
     (ep) => ep.diagramPath && ep.diagramPath.trim() !== "",
   );
 

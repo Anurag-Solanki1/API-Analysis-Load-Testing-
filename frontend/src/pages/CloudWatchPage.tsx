@@ -66,12 +66,7 @@ const CloudWatchPage: React.FC = () => {
       .catch(() => setBatches([]));
   }, [projectName]);
 
-  const refreshBatches = () => {
-    if (!projectName) return;
-    getProjectBatches(projectName)
-      .then(setBatches)
-      .catch(() => {});
-  };
+
 
   const handleSelectBatch = async (id: string | "all") => {
     setActiveBatchId(id);
@@ -165,7 +160,7 @@ const CloudWatchPage: React.FC = () => {
   };
 
   // ── Derived analytics ─────────────────────────────────────────────────
-  const uniqueEndpoints = new Set(logs.map((l) => l.endpointPath)).size;
+
   const slowCount = logs.filter((l) => l.durationMs > 1000).length;
 
   // Only include entries where we actually measured a duration (>0ms).

@@ -5,10 +5,13 @@ import { cn } from "@/lib/utils";
 /**
  * ShimmerButton — Magic UI button with animated shimmer/glow effect.
  */
-interface ShimmerButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface ShimmerButtonProps {
   children: React.ReactNode;
   shimmerColor?: string;
   className?: string;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
+  disabled?: boolean;
+  type?: "button" | "submit" | "reset";
 }
 
 const ShimmerButton = React.forwardRef<HTMLButtonElement, ShimmerButtonProps>(

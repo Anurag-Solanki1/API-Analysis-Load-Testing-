@@ -14,8 +14,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.transaction.annotation.Transactional;
+
 @RestController
 @RequestMapping("/api/test")
+@Transactional(readOnly = true)
 public class ApiTestController {
 
     private final ApiTesterService testerService;
@@ -56,7 +59,9 @@ public class ApiTestController {
         List<ScanRun> runs = scanRunRepository.findByProjectNameOrderByStartedAtDesc(projectName);
         if (runs.isEmpty())
             return List.of();
-        return runs.get(0).getEndpoints();
+        List<EndpointResultEntity> endpoints = runs.get(0).getEndpoints();
+        endpoints.size(); // Force hibernate proxy initialization
+        return endpoints;
     }
 
     /**

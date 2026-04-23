@@ -9,15 +9,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
@@ -25,12 +32,15 @@ import java.util.concurrent.ConcurrentLinkedDeque;
  * Holds the in-memory ring buffer of the last 200 gateway hits per project,
  * broadcasts each hit to WebSocket subscribers, and persists hits to the DB
  * so they survive backend restarts.
+ *
+ * A scheduled job runs daily at 03:00 to delete records older than 7 days.
  */
 @Service
 public class GatewayMonitorService {
 
     private static final Logger log = LoggerFactory.getLogger(GatewayMonitorService.class);
     private static final int MAX_HITS_PER_PROJECT = 200;
+    private static final int TTL_DAYS = 7;
 
     private final ConcurrentHashMap<String, Deque<GatewayHit>> recentHits = new ConcurrentHashMap<>();
 
@@ -77,15 +87,12 @@ public class GatewayMonitorService {
      * Return up to 200 most recent hits for a project, newest first.
      * Falls back to in-memory ring buffer if DB is unavailable.
      */
+    @Transactional(readOnly = true)
     public List<GatewayHit> getRecent(String projectName) {
         try {
             List<GatewayHitEntity> entities = hitRepository.findTop200ByProjectNameOrderByRecordedAtDesc(projectName);
             if (!entities.isEmpty()) {
-                List<GatewayHit> hits = new ArrayList<>();
-                for (GatewayHitEntity e : entities) {
-                    hits.add(fromEntity(e));
-                }
-                return hits;
+                return entities.stream().map(this::fromEntity).collect(Collectors.toList());
             }
         } catch (Exception e) {
             log.warn("Failed to query gateway hits from DB for {}: {}", projectName, e.getMessage());
@@ -93,6 +100,50 @@ public class GatewayMonitorService {
         // Fallback: in-memory buffer (e.g. first request after app start)
         Deque<GatewayHit> deque = recentHits.get(projectName);
         return deque != null ? new ArrayList<>(deque) : new ArrayList<>();
+    }
+
+    /**
+     * Paginated history query. Optionally filter to a specific calendar day.
+     *
+     * @param projectName the project
+     * @param page        0-based page index
+     * @param size        rows per page (max 200)
+     * @param date        optional – if provided, only hits from that day are returned
+     */
+    @Transactional(readOnly = true)
+    public Page<GatewayHit> getHistory(String projectName, int page, int size, LocalDate date) {
+        int safeSize = Math.min(size, 200);
+        PageRequest pageRequest = PageRequest.of(page, safeSize);
+        try {
+            Page<GatewayHitEntity> entityPage;
+            if (date != null) {
+                LocalDateTime from = date.atStartOfDay();
+                LocalDateTime to   = date.atTime(LocalTime.MAX);
+                entityPage = hitRepository.findByProjectNameAndRecordedAtBetweenOrderByRecordedAtDesc(
+                        projectName, from, to, pageRequest);
+            } else {
+                entityPage = hitRepository.findByProjectNameOrderByRecordedAtDesc(projectName, pageRequest);
+            }
+            List<GatewayHit> hits = entityPage.getContent().stream()
+                    .map(this::fromEntity)
+                    .collect(Collectors.toList());
+            return new PageImpl<>(hits, pageRequest, entityPage.getTotalElements());
+        } catch (Exception e) {
+            log.warn("Failed to fetch history for {}: {}", projectName, e.getMessage());
+            return Page.empty(pageRequest);
+        }
+    }
+
+    /**
+     * Return the total count of stored hits for a project.
+     */
+    @Transactional(readOnly = true)
+    public long countHits(String projectName) {
+        try {
+            return hitRepository.countByProjectName(projectName);
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     /**
@@ -107,6 +158,24 @@ public class GatewayMonitorService {
             log.warn("Failed to clear gateway hits from DB for {}: {}", projectName, e.getMessage());
         }
     }
+
+    /**
+     * Daily cleanup at 03:00: deletes gateway_hits records older than 7 days
+     * to keep the table from growing unbounded.
+     */
+    @Scheduled(cron = "0 0 3 * * *")
+    @Transactional
+    public void cleanupOldHits() {
+        LocalDateTime cutoff = LocalDateTime.now().minusDays(TTL_DAYS);
+        try {
+            hitRepository.deleteByRecordedAtBefore(cutoff);
+            log.info("Gateway hit TTL cleanup: deleted records older than {}", cutoff);
+        } catch (Exception e) {
+            log.warn("Gateway hit TTL cleanup failed: {}", e.getMessage());
+        }
+    }
+
+    // ─── Mapping helpers ───────────────────────────────────────────────────────
 
     private GatewayHitEntity toEntity(GatewayHit hit, String projectName) {
         GatewayHitEntity e = new GatewayHitEntity();

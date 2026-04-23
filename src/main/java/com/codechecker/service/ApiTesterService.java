@@ -104,7 +104,8 @@ public class ApiTesterService {
         run.setHttpMethod(request.getHttpMethod());
         run.setEndpointPath(request.getEndpointPath());
         run.setEnvironmentUrl(request.getEnvironmentUrl());
-        run.setAuthToken(request.getAuthToken());
+        // NOTE: authToken is intentionally NOT persisted — tokens are secrets
+        //       and must never be stored in the database.
         run.setRequestPayload(request.getRequestPayload());
         run.setTotalHits(request.getTotalHits());
         run.setStartedAt(LocalDateTime.now());
@@ -365,13 +366,13 @@ public class ApiTesterService {
                     long lat = (gwMs != null) ? gwMs : wallMs;
 
                     total.incrementAndGet();
-                    if (latencies.size() < 100_000)
-                        latencies.add(lat);
-                    minMs.accumulateAndGet(lat, Math::min);
-                    maxMs.accumulateAndGet(lat, Math::max);
                     statusDist.computeIfAbsent(code, k -> new AtomicLong()).incrementAndGet();
 
                     if (code >= 200 && code < 400) {
+                        minMs.accumulateAndGet(lat, Math::min);
+                        maxMs.accumulateAndGet(lat, Math::max);
+                        if (latencies.size() < 100_000)
+                            latencies.add(lat);
                         success.incrementAndGet();
                         successSum.addAndGet(lat);
                     } else {
@@ -458,7 +459,7 @@ public class ApiTesterService {
             return;
         long t = total.get(), s = success.get(), f = failed.get();
         long elapsed = Math.max(1, System.currentTimeMillis() - startTime);
-        double throughput = t * 1000.0 / elapsed;
+        double throughput = s * 1000.0 / elapsed;
         long avgAll = t > 0 ? (successSum.get() + failedSum.get()) / t : 0;
         long avgSucc = s > 0 ? successSum.get() / s : 0;
         long avgFail = f > 0 ? failedSum.get() / f : 0;

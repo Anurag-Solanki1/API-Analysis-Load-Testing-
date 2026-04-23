@@ -151,7 +151,7 @@ export default function Results() {
     pName?: string,
   ) => {
     const projName = pName || summary?.projectName || "";
-    if (!projName) return;
+    if (!projName || !Array.isArray(eps)) return;
     const avgMap: Record<string, number> = {};
     const pctMap: Record<string, { p50: number; p95: number }> = {};
     for (const ep of eps) {
@@ -944,7 +944,7 @@ ${
                   </tr>
                 </thead>
                 <tbody>
-                  {endpoints.map((ep, i) => {
+                  {(Array.isArray(endpoints) ? endpoints : []).map((ep, i) => {
                     const key = `${ep.httpMethod}:${ep.path}`;
                     const avgMs = measuredAvg[key] ?? null;
                     const liveRating =

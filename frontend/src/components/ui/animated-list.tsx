@@ -1,6 +1,5 @@
 import React from "react";
 import { motion, type Variants } from "framer-motion";
-import { cn } from "@/lib/utils";
 
 /**
  * AnimatedList — Magic UI staggered list/grid container.
@@ -33,7 +32,7 @@ const itemVariants: Variants = {
 
 const AnimatedList: React.FC<AnimatedListProps> & {
   Item: typeof AnimatedListItem;
-} = ({ children, className, stagger, as: Tag = "div" }) => {
+} = ({ children, className, stagger }) => {
   const variants = stagger
     ? {
         ...containerVariants,

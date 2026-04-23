@@ -59,15 +59,6 @@ export default function Dashboard() {
     (sum, s) => sum + (s.totalEndpoints || 0),
     0,
   );
-  const avgScore =
-    history.length > 0
-      ? Math.round(
-          history
-            .filter((s) => s.healthScore)
-            .reduce((sum, s) => sum + s.healthScore, 0) /
-            history.filter((s) => s.healthScore).length,
-        )
-      : 0;
 
   // AI-derived values for the previous scan (for trend comparison)
   const prevAiTotal = prevAiIssues.length;

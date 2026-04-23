@@ -5,7 +5,6 @@ import type { ScanHistoryItem, IssueResult } from "../api";
 import { Copy, CheckCircle } from "lucide-react";
 import PageHeader from "@/components/ui/page-header";
 import MagicCard from "@/components/ui/magic-card";
-import { AnimatedList } from "@/components/ui/animated-list";
 import ShimmerButton from "@/components/ui/shimmer-button";
 
 export default function History() {

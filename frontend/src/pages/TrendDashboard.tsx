@@ -77,6 +77,7 @@ export default function TrendDashboard() {
   const [trendData, setTrendData] = useState<TrendPoint[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedProject, setSelectedProject] = useState<string>("ALL");
+  const [hasAiData, setHasAiData] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -89,6 +90,7 @@ export default function TrendDashboard() {
         setScans(sorted);
 
         // Fetch AI issues for each scan to compute real scores
+        let anyAi = false;
         const points: TrendPoint[] = await Promise.all(
           sorted.map(async (s, idx) => {
             try {
@@ -96,6 +98,7 @@ export default function TrendDashboard() {
               const ai = computeAiScore(issues, s.projectName);
               // Use AI score if AI issues exist, otherwise fallback to stored
               const hasAi = ai.total > 0;
+              if (hasAi) anyAi = true;
               return {
                 label: `#${idx + 1}`,
                 date: new Date(s.startedAt).toLocaleDateString(undefined, {
@@ -136,6 +139,7 @@ export default function TrendDashboard() {
             }
           }),
         );
+        setHasAiData(anyAi);
         setTrendData(points);
       } catch {
         setScans([]);
@@ -233,28 +237,71 @@ export default function TrendDashboard() {
   return (
     <div>
       {/* Header */}
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-6 flex items-center justify-between">
         <PageHeader
           title="Cross-Scan Trends"
           subtitle="Health scores, issue counts & severity breakdown over time"
           gradient="from-indigo-400 via-purple-400 to-fuchsia-400"
           className="mb-0"
         />
-        {projects.length > 1 && (
-          <select
-            value={selectedProject}
-            onChange={(e) => setSelectedProject(e.target.value)}
-            className="min-w-[180px] cursor-pointer rounded-[10px] border border-indigo-500/20 bg-surface-card px-4 py-2 text-[0.82rem] font-medium text-txt-primary outline-none transition-colors hover:border-indigo-500/40"
+        <div className="flex items-center gap-3">
+          {/* Data source badge */}
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.4rem",
+              padding: "0.3rem 0.75rem",
+              borderRadius: 8,
+              fontSize: "0.72rem",
+              fontWeight: 600,
+              background: hasAiData ? "rgba(99,102,241,0.12)" : "rgba(234,179,8,0.12)",
+              color: hasAiData ? "#818cf8" : "#eab308",
+              border: `1px solid ${hasAiData ? "rgba(99,102,241,0.25)" : "rgba(234,179,8,0.25)"}`,
+            }}
           >
-            <option value="ALL">All Projects ({scans.length})</option>
-            {projects.map((p) => (
-              <option key={p} value={p}>
-                {p}
-              </option>
-            ))}
-          </select>
-        )}
+            <span style={{ fontSize: "0.65rem" }}>{hasAiData ? "🤖" : "🔍"}</span>
+            {hasAiData ? "AI Analysis" : "Static Scan Data"}
+          </div>
+          {projects.length > 1 && (
+            <select
+              value={selectedProject}
+              onChange={(e) => setSelectedProject(e.target.value)}
+              className="min-w-[180px] cursor-pointer rounded-[10px] border border-indigo-500/20 bg-surface-card px-4 py-2 text-[0.82rem] font-medium text-txt-primary outline-none transition-colors hover:border-indigo-500/40"
+            >
+              <option value="ALL">All Projects ({scans.length})</option>
+              {projects.map((p) => (
+                <option key={p} value={p}>
+                  {p}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
       </div>
+
+      {/* Info banner when no AI data */}
+      {!hasAiData && (
+        <div
+          style={{
+            marginBottom: "1.5rem",
+            padding: "0.75rem 1rem",
+            borderRadius: 10,
+            background: "rgba(234,179,8,0.07)",
+            border: "1px solid rgba(234,179,8,0.2)",
+            display: "flex",
+            alignItems: "center",
+            gap: "0.6rem",
+            fontSize: "0.8rem",
+            color: "#eab308",
+          }}
+        >
+          <span>⚠️</span>
+          <span>
+            <strong>No AI Analysis imported yet.</strong> Showing static scan data (Java AST analysis). To enable AI-powered trends, go to <strong>Issues → AI Agent</strong> and import GitHub Copilot AI issues for each scan.
+          </span>
+        </div>
+      )}
 
       {/* KPI Cards */}
       <AnimatedList className="mb-6 grid grid-cols-4 gap-4" stagger={0.08}>
@@ -339,7 +386,7 @@ export default function TrendDashboard() {
                 Issues Over Time
               </h4>
               <p style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>
-                AI-detected issues per scan
+                {hasAiData ? "AI-detected issues per scan" : "Issues detected by static analysis"}
               </p>
             </div>
           </div>
@@ -432,7 +479,7 @@ export default function TrendDashboard() {
                 Health Score
               </h4>
               <p style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>
-                AI-computed code quality score (0–100)
+                {hasAiData ? "AI-computed code quality score (0–100)" : "Static analysis health score (0–100)"}
               </p>
             </div>
           </div>
@@ -473,7 +520,7 @@ export default function TrendDashboard() {
                   fontWeight: 600,
                   marginBottom: 4,
                 }}
-                formatter={(value: number) => [`${value} / 100`, "Score"]}
+                formatter={(value: any) => [`${value} / 100`, "Score"]}
               />
               <Line
                 type="monotone"

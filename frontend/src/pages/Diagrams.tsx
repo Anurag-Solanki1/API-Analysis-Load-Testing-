@@ -2,6 +2,12 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getDiagrams, getDiagramUrl } from '../api';
 import type { DiagramFile } from '../api';
+import { motion } from 'framer-motion';
+import { Image, FileCode, Layers, Search, Map as MapIcon } from 'lucide-react';
+import PageHeader from '@/components/ui/page-header';
+import MagicCard from '@/components/ui/magic-card';
+import { AnimatedList } from '@/components/ui/animated-list';
+import ShimmerButton from '@/components/ui/shimmer-button';
 
 export default function Diagrams() {
   const { scanId: paramScanId } = useParams<{ scanId: string }>();
@@ -33,104 +39,147 @@ export default function Diagrams() {
 
   return (
     <div>
-      <div className="page-header">
-        <h2>Diagrams</h2>
-        <p>Generated PlantUML architecture and call-chain diagrams</p>
-      </div>
+      <PageHeader
+        title="Diagrams"
+        subtitle="Generated PlantUML architecture and call-chain diagrams"
+        gradient="from-cyan-400 to-blue-400"
+      />
 
       {!paramScanId && (
-        <div className="card animate-in" style={{ marginBottom: '1.5rem', maxWidth: 500 }}>
+        <MagicCard accentColor="#06b6d4" className="mb-6 max-w-[500px] p-6">
           <div className="form-group">
             <label>Scan ID</label>
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
-              <input className="form-input" placeholder="Enter scan ID..." value={scanId}
-                     onChange={e => setScanId(e.target.value)} />
-              <button className="btn btn-primary btn-sm" onClick={() => loadDiagrams(scanId)}>Load</button>
+            <div className="flex gap-2">
+              <input
+                className="form-input"
+                placeholder="Enter scan ID..."
+                value={scanId}
+                onChange={e => setScanId(e.target.value)}
+              />
+              <ShimmerButton onClick={() => loadDiagrams(scanId)}>
+                Load
+              </ShimmerButton>
             </div>
           </div>
-        </div>
+        </MagicCard>
       )}
 
       {diagrams.length > 0 && (
         <>
-          <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', alignItems: 'center' }}>
-            <div className="tabs" style={{ marginBottom: 0, borderBottom: 'none' }}>
-              <button className={`tab ${filter === 'png' ? 'active' : ''}`} onClick={() => setFilter('png')}>
-                🖼️ PNG ({pngCount})
+          <div className="mb-6 flex items-center gap-1">
+            {[
+              { key: 'png', label: 'PNG', icon: Image, count: pngCount },
+              { key: 'puml', label: 'PUML', icon: FileCode, count: pumlCount },
+              { key: 'all', label: 'All', icon: Layers, count: diagrams.length },
+            ].map(({ key, label, icon: Icon, count }) => (
+              <button
+                key={key}
+                onClick={() => setFilter(key as any)}
+                className={`flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-[0.8rem] font-medium transition-all ${
+                  filter === key
+                    ? 'bg-indigo-500/15 text-indigo-400 border border-indigo-500/25'
+                    : 'text-txt-muted hover:text-txt-primary hover:bg-white/[0.04] border border-transparent'
+                }`}
+              >
+                <Icon size={15} />
+                {label} ({count})
               </button>
-              <button className={`tab ${filter === 'puml' ? 'active' : ''}`} onClick={() => setFilter('puml')}>
-                📝 PUML ({pumlCount})
-              </button>
-              <button className={`tab ${filter === 'all' ? 'active' : ''}`} onClick={() => setFilter('all')}>
-                All ({diagrams.length})
-              </button>
-            </div>
+            ))}
           </div>
 
           {filter !== 'puml' && (
-            <div className="diagram-grid">
+            <AnimatedList className="diagram-grid" stagger={0.06}>
               {filtered.filter(d => d.type === 'png').map((d, i) => {
                 const filename = d.name;
                 const baseName = filename.replace(/\.[^.]+$/, '');
                 return (
-                  <div key={i} className="card diagram-card animate-in">
-                    <img
-                      src={getDiagramUrl(d.path)}
-                      alt={d.name}
-                      loading="lazy"
-                      style={{ cursor: 'pointer' }}
+                  <AnimatedList.Item key={i}>
+                    <MagicCard
+                      accentColor="#06b6d4"
+                      className="cursor-pointer p-4"
                       onClick={() => navigate(`/diagrams/${paramScanId || scanId}/view/${encodeURIComponent(filename)}`)}
-                    />
-                    <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.5rem', textAlign: 'center' }}>
-                      {baseName}
-                    </p>
-                    <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem', justifyContent: 'center' }}>
-                      <button
-                        className="btn btn-primary btn-sm"
-                        onClick={() => navigate(`/diagrams/${paramScanId || scanId}/view/${encodeURIComponent(filename)}`)}
-                      >
-                        🔍 View &amp; Download
-                      </button>
-                    </div>
-                  </div>
+                    >
+                      <motion.img
+                        whileHover={{ scale: 1.02 }}
+                        src={getDiagramUrl(d.path)}
+                        alt={d.name}
+                        loading="lazy"
+                        className="w-full aspect-[4/3] object-contain rounded-lg border border-white/[0.06] bg-surface-primary transition-all hover:border-indigo-500/20 hover:shadow-[0_0_20px_rgba(99,102,241,0.1)]"
+                      />
+                      <p className="mt-3 text-center text-[0.8rem] font-medium text-txt-secondary">
+                        {baseName}
+                      </p>
+                      <div className="mt-2 flex justify-center">
+                        <ShimmerButton
+                          className="text-xs"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/diagrams/${paramScanId || scanId}/view/${encodeURIComponent(filename)}`);
+                          }}
+                        >
+                          <Search size={13} /> View & Download
+                        </ShimmerButton>
+                      </div>
+                    </MagicCard>
+                  </AnimatedList.Item>
                 );
               })}
-            </div>
+            </AnimatedList>
           )}
 
           {filter !== 'png' && (
-            <div style={{ marginTop: '1rem' }}>
+            <AnimatedList className="mt-4 flex flex-col gap-3" stagger={0.06}>
               {filtered.filter(d => d.type === 'puml').map((d, i) => (
-                <div key={i} className="card animate-in" style={{ marginBottom: '0.75rem' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                      <span style={{ fontSize: '1.25rem' }}>📄</span>
-                      <div>
-                        <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>{d.name}</div>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>PlantUML source</div>
+                <AnimatedList.Item key={i}>
+                  <MagicCard accentColor="#8b5cf6" hover={false} className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-500/10 border border-violet-500/15">
+                          <FileCode size={20} className="text-violet-400" />
+                        </div>
+                        <div>
+                          <div className="text-[0.9rem] font-semibold">{d.name}</div>
+                          <div className="text-[0.72rem] text-txt-muted">PlantUML source</div>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <a
+                          href={getDiagramUrl(d.path)}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="btn btn-outline btn-sm"
+                        >
+                          Open ↗
+                        </a>
+                        <a
+                          href={getDiagramUrl(d.path)}
+                          download={d.name}
+                          className="btn btn-primary btn-sm"
+                        >
+                          Download
+                        </a>
                       </div>
                     </div>
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                      <a href={getDiagramUrl(d.path)} target="_blank" rel="noreferrer" className="btn btn-outline btn-sm">
-                        🔗 Open
-                      </a>
-                      <a href={getDiagramUrl(d.path)} download={d.name} className="btn btn-primary btn-sm">
-                        📥 Download
-                      </a>
-                    </div>
-                  </div>
-                </div>
+                  </MagicCard>
+                </AnimatedList.Item>
               ))}
-            </div>
+            </AnimatedList>
           )}
         </>
       )}
 
-      {loading && <div className="empty-state"><div className="empty-state-icon animate-pulse">⏳</div><h3>Loading diagrams...</h3></div>}
+      {loading && (
+        <div className="empty-state">
+          <div className="empty-state-icon animate-pulse">⏳</div>
+          <h3>Loading diagrams...</h3>
+        </div>
+      )}
 
       {!loading && diagrams.length === 0 && paramScanId && (
         <div className="empty-state">
-          <div className="empty-state-icon">🗺️</div>
+          <div className="empty-state-icon">
+            <MapIcon size={48} className="text-txt-muted" />
+          </div>
           <h3>No diagrams found</h3>
           <p>Diagrams are generated during the scan. Make sure the scan completed successfully.</p>
         </div>
@@ -138,3 +187,5 @@ export default function Diagrams() {
     </div>
   );
 }
+
+

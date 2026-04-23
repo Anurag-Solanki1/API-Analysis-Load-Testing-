@@ -136,8 +136,8 @@ const MetricCardsGrid: React.FC<MetricCardsGridProps> = ({
       ls.totalRequests > 0
         ? ((ls.failedRequests / ls.totalRequests) * 100).toFixed(1)
         : "0";
-    dispP90 = ls.percentiles ? `${ls.percentiles.p90}ms` : "—";
-    dispP99 = ls.percentiles ? `${ls.percentiles.p99}ms` : "—";
+    dispP90 = ls.percentiles ? `${ls.percentiles.p90 ?? 0}ms` : "—";
+    dispP99 = ls.percentiles ? `${ls.percentiles.p99 ?? 0}ms` : "—";
     dispMin = `${ls.minResponseTimeMs}ms`;
     dispMax = `${ls.maxResponseTimeMs}ms`;
     dispThroughput = `${ls.throughput} req/s`;
@@ -153,10 +153,10 @@ const MetricCardsGrid: React.FC<MetricCardsGridProps> = ({
           ).toFixed(1)
         : "0";
     dispP90 = selectedEntry.percentiles
-      ? `${selectedEntry.percentiles.p90}ms`
+      ? `${selectedEntry.percentiles.p90 ?? 0}ms`
       : "—";
     dispP99 = selectedEntry.percentiles
-      ? `${selectedEntry.percentiles.p99}ms`
+      ? `${selectedEntry.percentiles.p99 ?? 0}ms`
       : "—";
     dispMin = `${selectedEntry.minResponseTimeMs}ms`;
     dispMax = `${selectedEntry.maxResponseTimeMs}ms`;
