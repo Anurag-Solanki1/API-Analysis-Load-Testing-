@@ -49,11 +49,7 @@ async function apiFetch(url: string, init?: RequestInit): Promise<Response> {
   return res;
 }
 
-/**
- * Returns a valid JWT for use in outbound requests (e.g. load tester).
- * If the stored token expires within 60 seconds it is silently refreshed first.
- * Returns null if the user is not logged in or the refresh fails.
- */
+
 export async function getValidJwt(): Promise<string | null> {
   const jwt = localStorage.getItem("jwt");
   if (!jwt) return null;
