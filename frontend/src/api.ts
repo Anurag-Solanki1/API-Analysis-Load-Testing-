@@ -753,7 +753,7 @@ export function getGatewayUrl(
     .map((c) =>
       /[A-Za-z0-9\-._~!$&'()*+,;=:@]/.test(c) ? c : encodeURIComponent(c),
     )
-    .join("");
+    .join(""); 
   const userEmail = getUserEmail() || "unknown";
   const encodedEmail = encodeURIComponent(userEmail);
   return `${API_BASE}/api/gateway/${encodedEmail}/${encodedProject}${endpointPath}`;
