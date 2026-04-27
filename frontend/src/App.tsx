@@ -31,6 +31,7 @@ import DiagramViewer from "./pages/DiagramViewer";
 import TrendDashboard from "./pages/TrendDashboard";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import { CommunityFeed } from "./pages/CommunityFeed";
 import GridPattern from "@/components/ui/grid-pattern";
 import "./index.css";
 
@@ -39,6 +40,7 @@ const navSections = [
     label: "Overview",
     items: [
       { to: "/", icon: LayoutDashboard, label: "Dashboard", end: true },
+      { to: "/community", icon: Cloud, label: "Community Feed" },
       { to: "/trends", icon: TrendingUp, label: "Trends" },
     ],
   },
@@ -104,6 +106,10 @@ function AnimatedRoutes() {
           <Route path="/diagrams" element={<ProtectedRoute><Diagrams /></ProtectedRoute>} />
           <Route path="/diagrams/:scanId" element={<ProtectedRoute><Diagrams /></ProtectedRoute>} />
           <Route path="/diagrams/:scanId/view/:filename" element={<ProtectedRoute><DiagramViewer /></ProtectedRoute>} />
+          
+          {/* Community & Dashboards */}
+          <Route path="/community" element={<ProtectedRoute><CommunityFeed /></ProtectedRoute>} />
+          
           <Route path="/apis" element={<ProtectedRoute><ApiList /></ProtectedRoute>} />
           <Route path="/apis/:projectName" element={<ProtectedRoute><ApiDashboard /></ProtectedRoute>} />
           <Route path="/apm" element={<ProtectedRoute><ApiList basePath="/apm" /></ProtectedRoute>} />

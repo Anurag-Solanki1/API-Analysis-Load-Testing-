@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.codechecker.entity.ScanRun;
+import com.codechecker.repository.ScanRunRepository;
+
 /**
  * Management endpoints for the gateway monitor.
  *
@@ -30,17 +33,36 @@ public class MonitorController {
 
     private final GatewayConfigRepository configRepo;
     private final GatewayMonitorService monitorService;
+    private final com.codechecker.security.SecurityUtils securityUtils;
+    private final ScanRunRepository scanRunRepository;
 
     public MonitorController(GatewayConfigRepository configRepo,
-            GatewayMonitorService monitorService) {
+            GatewayMonitorService monitorService,
+            com.codechecker.security.SecurityUtils securityUtils,
+            ScanRunRepository scanRunRepository) {
         this.configRepo = configRepo;
         this.monitorService = monitorService;
+        this.securityUtils = securityUtils;
+        this.scanRunRepository = scanRunRepository;
+    }
+
+    private com.codechecker.entity.UserEntity resolveTargetUser(String scanId) {
+        if (scanId != null && !scanId.isBlank()) {
+            Optional<ScanRun> optScan = scanRunRepository.findById(scanId);
+            if (optScan.isEmpty() || !securityUtils.canAccessScan(optScan.get())) {
+                throw new org.springframework.security.access.AccessDeniedException("Cannot access scan");
+            }
+            return optScan.get().getUser();
+        }
+        return securityUtils.getCurrentUser();
     }
 
     /** Return the gateway config for a project (404 if not set yet). */
     @GetMapping("/config/{projectName}")
-    public ResponseEntity<GatewayConfigEntity> getConfig(@PathVariable String projectName) {
-        return configRepo.findByProjectName(projectName)
+    public ResponseEntity<GatewayConfigEntity> getConfig(@PathVariable String projectName,
+            @RequestParam(required = false) String scanId) {
+        com.codechecker.entity.UserEntity user = resolveTargetUser(scanId);
+        return configRepo.findByUserAndProjectName(user, projectName)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -54,9 +76,11 @@ public class MonitorController {
                 || targetBaseUrl == null || targetBaseUrl.isBlank()) {
             throw new IllegalArgumentException("projectName and targetBaseUrl are required");
         }
-        Optional<GatewayConfigEntity> existing = configRepo.findByProjectName(projectName);
+        com.codechecker.entity.UserEntity user = securityUtils.getCurrentUser();
+        Optional<GatewayConfigEntity> existing = configRepo.findByUserAndProjectName(user, projectName);
         GatewayConfigEntity cfg = existing.orElseGet(() -> {
             GatewayConfigEntity e = new GatewayConfigEntity();
+            e.setUser(user);
             e.setProjectName(projectName);
             e.setCreatedAt(LocalDateTime.now());
             return e;
@@ -68,8 +92,10 @@ public class MonitorController {
 
     /** Return the last 200 gateway hits for a project (newest first). */
     @GetMapping("/{projectName}/recent")
-    public List<GatewayHit> getRecentHits(@PathVariable String projectName) {
-        return monitorService.getRecent(projectName);
+    public List<GatewayHit> getRecentHits(@PathVariable String projectName,
+            @RequestParam(required = false) String scanId) {
+        com.codechecker.entity.UserEntity user = resolveTargetUser(scanId);
+        return monitorService.getRecent(user, projectName);
     }
 
     /**
@@ -85,26 +111,31 @@ public class MonitorController {
             @PathVariable String projectName,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size,
-            @RequestParam(required = false) String date) {
+            @RequestParam(required = false) String date,
+            @RequestParam(required = false) String scanId) {
         LocalDate localDate = null;
         if (date != null && !date.isBlank()) {
             try {
                 localDate = LocalDate.parse(date);
             } catch (Exception ignored) { /* bad format — ignore date filter */ }
         }
-        return monitorService.getHistory(projectName, page, size, localDate);
+        com.codechecker.entity.UserEntity user = resolveTargetUser(scanId);
+        return monitorService.getHistory(user, projectName, page, size, localDate);
     }
 
     /** Total number of persisted hits for a project. */
     @GetMapping("/{projectName}/history/count")
-    public Map<String, Long> getHitCount(@PathVariable String projectName) {
-        return Map.of("count", monitorService.countHits(projectName));
+    public Map<String, Long> getHitCount(@PathVariable String projectName,
+            @RequestParam(required = false) String scanId) {
+        com.codechecker.entity.UserEntity user = resolveTargetUser(scanId);
+        return Map.of("count", monitorService.countHits(user, projectName));
     }
 
     /** Clear the in-memory hit buffer and DB records for a project. */
     @DeleteMapping("/{projectName}/hits")
     public ResponseEntity<Void> clearHits(@PathVariable String projectName) {
-        monitorService.clear(projectName);
+        com.codechecker.entity.UserEntity user = securityUtils.getCurrentUser();
+        monitorService.clear(user, projectName);
         return ResponseEntity.noContent().build();
     }
 }

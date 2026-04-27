@@ -1,5 +1,8 @@
 package com.codechecker.web;
 
+import com.codechecker.entity.ScanRun;
+import com.codechecker.repository.ScanRunRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
@@ -18,6 +21,12 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/diagrams")
 public class DiagramController {
 
+    @Autowired
+    private ScanRunRepository scanRunRepository;
+
+    @Autowired
+    private com.codechecker.security.SecurityUtils securityUtils;
+
     /** Validate that a path variable contains only safe characters (UUID-like segments, no traversal). */
     private boolean isSafePathSegment(String segment) {
         return segment != null && segment.matches("[a-zA-Z0-9._-]+");
@@ -31,6 +40,11 @@ public class DiagramController {
         if (!isSafePathSegment(scanId)) {
             return ResponseEntity.badRequest().body("Invalid scan ID");
         }
+        Optional<ScanRun> optScan = scanRunRepository.findById(scanId);
+        if (optScan.isEmpty() || !securityUtils.canAccessScan(optScan.get())) {
+            return ResponseEntity.status(403).body("Not authorized to view this scan's diagrams");
+        }
+        
         Path outputDir = Paths.get("codechecker-output", scanId);
         if (!Files.exists(outputDir)) {
             return ResponseEntity.notFound().build();
@@ -62,6 +76,11 @@ public class DiagramController {
         if (!isSafePathSegment(scanId) || !isSafePathSegment(filename)) {
             return ResponseEntity.badRequest().build();
         }
+        Optional<ScanRun> optScan = scanRunRepository.findById(scanId);
+        if (optScan.isEmpty() || !securityUtils.canAccessScan(optScan.get())) {
+            return ResponseEntity.status(403).build();
+        }
+        
         Path pngFile = Paths.get("codechecker-output", scanId, filename + ".png");
         if (!Files.exists(pngFile)) {
             return ResponseEntity.notFound().build();
@@ -77,6 +96,11 @@ public class DiagramController {
         if (!isSafePathSegment(scanId) || !isSafePathSegment(filename)) {
             return ResponseEntity.badRequest().body("Invalid path");
         }
+        Optional<ScanRun> optScan = scanRunRepository.findById(scanId);
+        if (optScan.isEmpty() || !securityUtils.canAccessScan(optScan.get())) {
+            return ResponseEntity.status(403).body("Not authorized to view this scan's diagrams");
+        }
+        
         Path pumlFile = Paths.get("codechecker-output", scanId, filename + ".puml");
         if (!Files.exists(pumlFile)) {
             return ResponseEntity.notFound().build();

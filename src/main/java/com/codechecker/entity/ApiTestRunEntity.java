@@ -12,6 +12,10 @@ public class ApiTestRunEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    private UserEntity user;
 
     private String projectName;
     private String httpMethod;
@@ -86,4 +90,7 @@ public class ApiTestRunEntity {
 
     public List<Integer> getHitLatencies() { return hitLatencies; }
     public void setHitLatencies(List<Integer> hitLatencies) { this.hitLatencies = hitLatencies; }
+
+    public UserEntity getUser() { return user; }
+    public void setUser(UserEntity user) { this.user = user; }
 }

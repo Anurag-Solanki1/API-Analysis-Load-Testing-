@@ -39,6 +39,7 @@ import {
   getValidJwt,
   getMonitorHistory,
   getMonitorHitCount,
+  getUserEmail,
 } from "../api";
 import type {
   EndpointResult,
@@ -56,6 +57,8 @@ const ApiDashboard: React.FC = () => {
   const { projectName } = useParams<{ projectName: string }>();
   const navigate = useNavigate();
   const location = useLocation();
+  const scanIdParam = new URLSearchParams(location.search).get("scanId") || undefined;
+  const isReadOnly = !!scanIdParam;
   const isApmMode = location.pathname.startsWith("/apm");
   const [endpoints, setEndpoints] = useState<EndpointResult[]>([]);
   const [selectedEndpoint, setSelectedEndpoint] =
@@ -392,18 +395,19 @@ const ApiDashboard: React.FC = () => {
   // load-test hits are streamed into the monitor ring buffer immediately.
   useEffect(() => {
     if (!projectName) return;
-    getMonitorConfig(projectName).then((cfg) => {
+    getMonitorConfig(projectName, scanIdParam).then((cfg) => {
       if (cfg) setMonitorTargetUrl(cfg.targetBaseUrl);
     });
-    getRecentMonitorHits(projectName).then(setMonitorHits);
-    getMonitorHitCount(projectName).then(setTotalPersistedHits);
+    getRecentMonitorHits(projectName, scanIdParam).then(setMonitorHits);
+    getMonitorHitCount(projectName, scanIdParam).then(setTotalPersistedHits);
 
     const client = new Client({
       brokerURL: getWebSocketUrl(),
       reconnectDelay: 3000,
       onConnect: () => {
         setMonitorConnected(true);
-        client.subscribe(`/topic/monitor/${projectName}`, (msg) => {
+        const encodedEmail = encodeURIComponent(getUserEmail() || "unknown");
+        client.subscribe(`/topic/monitor/${encodedEmail}/${projectName}`, (msg) => {
           const hit: GatewayHit = JSON.parse(msg.body);
           setMonitorHits((prev) => [hit, ...prev].slice(0, 200));
           // Collect per-request logs for load tests
@@ -431,7 +435,7 @@ const ApiDashboard: React.FC = () => {
   useEffect(() => {
     if (!projectName || monitorTab !== "history") return;
     setHistoryLoading(true);
-    getMonitorHistory(projectName, historyPage, historyPageSize, historyDate)
+    getMonitorHistory(projectName, historyPage, historyPageSize, historyDate, scanIdParam)
       .then((res) => {
         setHistoryHits(res.content);
         setHistoryTotalElements(res.totalElements);
@@ -439,7 +443,7 @@ const ApiDashboard: React.FC = () => {
       })
       .catch((err) => console.error("Failed to load history:", err))
       .finally(() => setHistoryLoading(false));
-  }, [projectName, monitorTab, historyPage, historyPageSize, historyDate]);
+  }, [projectName, monitorTab, historyPage, historyPageSize, historyDate, scanIdParam]);
 
   // In APM mode, auto-populate the load test base URL with the local gateway proxy URL
   // so the user doesn't have to type it in manually.
@@ -460,6 +464,7 @@ const ApiDashboard: React.FC = () => {
       projectName,
       selectedEndpoint.path,
       selectedEndpoint.httpMethod,
+      scanIdParam
     );
     setHistory(records);
     // Pre-fill environment URL from most recent test run, but only if the user
@@ -608,7 +613,8 @@ const ApiDashboard: React.FC = () => {
       brokerURL: getWebSocketUrl(),
       reconnectDelay: 0,
       onConnect: () => {
-        client.subscribe(`/topic/live-test/${runId}`, (msg) => {
+        const encodedEmail = encodeURIComponent(getUserEmail() || "unknown");
+        client.subscribe(`/topic/live-test/${encodedEmail}/${runId}`, (msg) => {
           const data = JSON.parse(msg.body);
           setLiveStats(data);
           if (data.type === "COMPLETE") {
@@ -2193,11 +2199,12 @@ ${entriesHtml}
                   {!liveRunning ? (
                     <button
                       className="btn btn-danger"
-                      style={{ width: "100%", justifyContent: "center" }}
+                      style={{ width: "100%", justifyContent: "center", opacity: isReadOnly ? 0.5 : 1 }}
                       onClick={handleStartLiveTest}
+                      disabled={isReadOnly}
                     >
                       <Zap style={{ width: 15, height: 15, marginRight: 6 }} />
-                      Start Load Test
+                      {isReadOnly ? "Read Only" : "Start Load Test"}
                     </button>
                   ) : (
                     <button

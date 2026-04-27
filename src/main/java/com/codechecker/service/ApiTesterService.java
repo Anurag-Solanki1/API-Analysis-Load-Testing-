@@ -98,8 +98,9 @@ public class ApiTesterService {
         this.httpClient = client;
     }
 
-    public ApiTestRunEntity runTest(ApiTestRequest request) {
+    public ApiTestRunEntity runTest(ApiTestRequest request, com.codechecker.entity.UserEntity user) {
         ApiTestRunEntity run = new ApiTestRunEntity();
+        run.setUser(user);
         run.setProjectName(request.getProjectName());
         run.setHttpMethod(request.getHttpMethod());
         run.setEndpointPath(request.getEndpointPath());
@@ -296,7 +297,7 @@ public class ApiTesterService {
      * Progress snapshots are pushed via WebSocket every 1 second.
      */
     @Async("scanExecutor")
-    public CompletableFuture<Void> runLiveTest(ApiTestRequest request) {
+    public CompletableFuture<Void> runLiveTest(ApiTestRequest request, com.codechecker.entity.UserEntity user) {
         String runId = request.getLiveRunId();
         liveCancels.put(runId, true);
 
@@ -335,7 +336,7 @@ public class ApiTesterService {
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
         scheduler.scheduleAtFixedRate(() -> {
             if (!isCancelled(runId))
-                publishProgress(runId, total, success, failed, successSum, failedSum,
+                publishProgress(user, runId, total, success, failed, successSum, failedSum,
                         minMs, maxMs, statusDist, startTime, false, null, threads, requestsPerThread);
         }, 1, 1, TimeUnit.SECONDS);
 
@@ -416,12 +417,13 @@ public class ApiTesterService {
             pct.put("p99", sorted.get(pctIndex(sorted.size(), 99)));
         }
 
-        publishProgress(runId, total, success, failed, successSum, failedSum,
+        publishProgress(user, runId, total, success, failed, successSum, failedSum,
                 minMs, maxMs, statusDist, startTime, true, pct, threads, requestsPerThread);
 
         // Persist result
         try {
             ApiTestRunEntity run = new ApiTestRunEntity();
+            run.setUser(user);
             run.setProjectName(request.getProjectName());
             run.setHttpMethod(request.getHttpMethod());
             run.setEndpointPath(request.getEndpointPath());
@@ -448,7 +450,7 @@ public class ApiTesterService {
         return CompletableFuture.completedFuture(null);
     }
 
-    private void publishProgress(String runId,
+    private void publishProgress(com.codechecker.entity.UserEntity user, String runId,
             AtomicLong total, AtomicLong success, AtomicLong failed,
             AtomicLong successSum, AtomicLong failedSum,
             AtomicLong minMs, AtomicLong maxMs,
@@ -486,7 +488,7 @@ public class ApiTesterService {
         if (percentiles != null)
             msg.put("percentiles", percentiles);
         try {
-            messagingTemplate.convertAndSend("/topic/live-test/" + runId, msg);
+            messagingTemplate.convertAndSend("/topic/live-test/" + user.getEmail() + "/" + runId, msg);
         } catch (Exception e) {
             log.warn("Progress publish failed for {}: {}", runId, e.getMessage());
         }
@@ -662,7 +664,7 @@ public class ApiTesterService {
     }
 
     /** Cancel a running live test. */
-    public void cancelLiveTest(String runId) {
+    public void cancelLiveTest(String runId, com.codechecker.entity.UserEntity user) {
         liveCancels.put(runId, false);
     }
 }

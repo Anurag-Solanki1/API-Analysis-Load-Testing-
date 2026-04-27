@@ -96,24 +96,25 @@ public class GatewayController {
 
     /**
      * Catch-all proxy for every HTTP method applied to every sub-path under
-     * /api/gateway/{projectName}/**
+     * /api/gateway/{userEmail}/{projectName}/**
      */
-    @RequestMapping(value = "/{projectName}/**", method = { RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT,
+    @RequestMapping(value = "/{userEmail}/{projectName}/**", method = { RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT,
             RequestMethod.DELETE, RequestMethod.PATCH,
             RequestMethod.HEAD, RequestMethod.OPTIONS })
     public ResponseEntity<byte[]> proxy(
+            @PathVariable String userEmail,
             @PathVariable String projectName,
             HttpServletRequest request) {
 
-        Optional<GatewayConfigEntity> cfg = configRepo.findByProjectName(projectName);
+        Optional<GatewayConfigEntity> cfg = configRepo.findByUser_EmailAndProjectName(userEmail, projectName);
         if (cfg.isEmpty()) {
             return ResponseEntity.status(503)
-                    .body(("Gateway not configured for project '" + projectName +
+                    .body(("Gateway not configured for project '" + projectName + "' and user '" + userEmail +
                             "'. Set the target URL via the Monitor tab first.").getBytes());
         }
 
         String targetBase = cfg.get().getTargetBaseUrl().replaceAll("/+$", "");
-        String prefix = "/api/gateway/" + projectName;
+        String prefix = "/api/gateway/" + userEmail + "/" + projectName;
 
         // Extract downstream path (strip context path + gateway prefix).
         // URL-decode rawUri first so project names with spaces (%20) don't
@@ -230,7 +231,11 @@ public class GatewayController {
             }
             // ─────────────────────────────────────────────────────────────────────
 
-            monitorService.record(projectName, hit);
+            // Only record hit if it is NOT a load test hit.
+            if (!isLoadTest) {
+                com.codechecker.entity.UserEntity user = cfg.get().getUser();
+                monitorService.record(user, projectName, hit);
+            }
 
             // Build response, forwarding headers from target
             HttpHeaders responseHeaders = new HttpHeaders();
@@ -260,7 +265,10 @@ public class GatewayController {
             String errMsg = e.getMessage();
             if (errMsg == null) errMsg = e.toString();
             errHit.setErrorMessage("Connection failed: " + errMsg);
-            monitorService.record(projectName, errHit);
+            if (!isLoadTest) {
+                com.codechecker.entity.UserEntity user = cfg.get().getUser();
+                monitorService.record(user, projectName, errHit);
+            }
             return ResponseEntity.status(502)
                     .body(("Gateway error: " + errMsg).getBytes());
         }

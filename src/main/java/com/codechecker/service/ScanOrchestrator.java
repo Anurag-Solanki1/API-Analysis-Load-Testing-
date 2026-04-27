@@ -101,7 +101,7 @@ public class ScanOrchestrator {
      * Returns immediately with the scanId; frontend watches WebSocket for progress.
      */
     @Async("scanExecutor")
-    public CompletableFuture<ScanResult> runScan(ScanRequest request, String scanId) {
+    public CompletableFuture<ScanResult> runScan(ScanRequest request, String scanId, UserEntity currentUser) {
         log.info("Starting scan {} for project: {}", scanId, request.getProjectPath());
         runningScanFlags.put(scanId, true);
 
@@ -114,6 +114,7 @@ public class ScanOrchestrator {
         scanRun.setStatus(ScanStatus.RUNNING);
         scanRun.setStartedAt(Instant.now());
         scanRun.setScanMode(request.getScanMode());
+        scanRun.setUser(currentUser);
         scanRunRepository.save(scanRun);
 
         try {

@@ -9,7 +9,8 @@ import java.util.List;
 
 @Repository
 public interface ScanRunRepository extends JpaRepository<ScanRun, String> {
-    List<ScanRun> findAllByOrderByStartedAtDesc();
+    List<ScanRun> findByUserOrderByStartedAtDesc(com.codechecker.entity.UserEntity user);
     List<ScanRun> findByStatus(ScanStatus status);
-    List<ScanRun> findByProjectNameOrderByStartedAtDesc(String projectName);
+    List<ScanRun> findByUserAndProjectNameOrderByStartedAtDesc(com.codechecker.entity.UserEntity user, String projectName);
+    List<ScanRun> findByIsPublicTrueOrderByStartedAtDesc();
 }

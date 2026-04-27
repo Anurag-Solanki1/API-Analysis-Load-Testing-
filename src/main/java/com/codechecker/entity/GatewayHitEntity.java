@@ -11,6 +11,11 @@ public class GatewayHitEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    private UserEntity user;
+
     @Column(nullable = false)
     private String projectName;
 
@@ -165,5 +170,13 @@ public class GatewayHitEntity {
 
     public void setRecordedAt(LocalDateTime recordedAt) {
         this.recordedAt = recordedAt;
+    }
+
+    public UserEntity getUser() {
+        return user;
+    }
+
+    public void setUser(UserEntity user) {
+        this.user = user;
     }
 }

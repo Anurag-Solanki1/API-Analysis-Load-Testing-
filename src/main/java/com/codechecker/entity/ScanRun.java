@@ -31,6 +31,9 @@ public class ScanRun {
     private Integer diagramsGenerated;
     private Integer scanMode;
     private String frameworkSummary; // JSON string e.g. {"SPRING_MVC":5,"STRUTS2":3,"JAX_WS":2}
+    
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean isPublic = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -207,5 +210,13 @@ public class ScanRun {
 
     public void setUser(UserEntity user) {
         this.user = user;
+    }
+
+    public boolean isPublic() {
+        return isPublic;
+    }
+
+    public void setPublic(boolean isPublic) {
+        this.isPublic = isPublic;
     }
 }

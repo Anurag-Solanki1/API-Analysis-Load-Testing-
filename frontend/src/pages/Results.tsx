@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getScanSummary, getEndpoints, getIssues } from "../api";
+import { getScanSummary, getEndpoints, getIssues, toggleScanVisibility } from "../api";
 import type { ScanSummary, EndpointResult, IssueResult } from "../api";
 import PageHeader from "@/components/ui/page-header";
 import MagicCard from "@/components/ui/magic-card";
@@ -113,6 +113,8 @@ export default function Results() {
   const [endpoints, setEndpoints] = useState<EndpointResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isPublic, setIsPublic] = useState(false);
+  const [togglingVisibility, setTogglingVisibility] = useState(false);
   const [aiIssues, setAiIssues] = useState<IssueResult[]>([]);
   /** measured avg ms per "METHOD:path" key */
   const [measuredAvg, setMeasuredAvg] = useState<Record<string, number>>({});
@@ -201,6 +203,7 @@ export default function Results() {
       setSummary(sum);
       setEndpoints(eps);
       setScanId(id);
+      setIsPublic(sum.isPublic || false);
       // Fetch AI issues separately — non-fatal if not yet imported
       getIssues(id)
         .then((issues) => {
@@ -219,6 +222,19 @@ export default function Results() {
   };
 
   const hasMeasured = Object.keys(measuredAvg).length > 0;
+
+  const handleToggleVisibility = async () => {
+    if (!scanId || togglingVisibility) return;
+    setTogglingVisibility(true);
+    try {
+      const res = await toggleScanVisibility(scanId, !isPublic);
+      setIsPublic(res.isPublic);
+    } catch (err) {
+      console.error("Failed to toggle visibility", err);
+    } finally {
+      setTogglingVisibility(false);
+    }
+  };
 
   const exportPdf = () => {
     if (!summary) return;
@@ -397,9 +413,32 @@ ${
         gradient="from-emerald-400 to-indigo-400"
       >
         {summary && (
-          <ShimmerButton onClick={exportPdf} className="mt-2">
-            📄 Export PDF
-          </ShimmerButton>
+          <div className="flex items-center gap-4 mt-2">
+            <button
+              onClick={handleToggleVisibility}
+              disabled={togglingVisibility}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full font-medium transition-all ${
+                isPublic
+                  ? "bg-indigo-500/20 text-indigo-300 border border-indigo-500/50 hover:bg-indigo-500/30"
+                  : "bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10"
+              }`}
+            >
+              <span className="relative flex h-3 w-3">
+                {isPublic && (
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                )}
+                <span
+                  className={`relative inline-flex rounded-full h-3 w-3 ${
+                    isPublic ? "bg-indigo-500" : "bg-gray-500"
+                  }`}
+                ></span>
+              </span>
+              {togglingVisibility ? "Saving..." : isPublic ? "Public on Community" : "Private Scan"}
+            </button>
+            <ShimmerButton onClick={exportPdf}>
+              📄 Export PDF
+            </ShimmerButton>
+          </div>
         )}
       </PageHeader>
 

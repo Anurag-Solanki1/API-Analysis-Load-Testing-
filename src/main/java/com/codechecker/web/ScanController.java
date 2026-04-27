@@ -20,6 +20,7 @@ public class ScanController {
 
     @Autowired private ScanOrchestrator scanOrchestrator;
     @Autowired private ScanRunRepository scanRunRepository;
+    @Autowired private com.codechecker.security.SecurityUtils securityUtils;
 
     /**
      * POST /api/scan — Start a new scan.
@@ -31,10 +32,11 @@ public class ScanController {
             return ResponseEntity.badRequest().body(Map.of("error", "projectPath is required"));
         }
 
+        com.codechecker.entity.UserEntity currentUser = securityUtils.getCurrentUser();
         String scanId = UUID.randomUUID().toString();
 
         // Kick off async scan
-        scanOrchestrator.runScan(request, scanId);
+        scanOrchestrator.runScan(request, scanId, currentUser);
 
         Map<String, String> response = new LinkedHashMap<>();
         response.put("scanId", scanId);
@@ -83,7 +85,29 @@ public class ScanController {
      */
     @GetMapping("/history")
     public ResponseEntity<List<ScanRun>> getScanHistory() {
-        List<ScanRun> scans = scanRunRepository.findAllByOrderByStartedAtDesc();
+        com.codechecker.entity.UserEntity currentUser = securityUtils.getCurrentUser();
+        List<ScanRun> scans = scanRunRepository.findByUserOrderByStartedAtDesc(currentUser);
         return ResponseEntity.ok(scans);
+    }
+
+    /**
+     * PUT /api/scan/{id}/visibility — Toggle scan visibility.
+     */
+    @PutMapping("/{id}/visibility")
+    public ResponseEntity<?> toggleVisibility(@PathVariable String id, @RequestBody Map<String, Boolean> body) {
+        com.codechecker.entity.UserEntity currentUser = securityUtils.getCurrentUser();
+        Optional<ScanRun> optScan = scanRunRepository.findById(id);
+        if (optScan.isEmpty()) return ResponseEntity.notFound().build();
+        
+        ScanRun scan = optScan.get();
+        if (!scan.getUser().getId().equals(currentUser.getId())) {
+            return ResponseEntity.status(403).body("Not authorized to modify this scan");
+        }
+        
+        boolean isPublic = body.getOrDefault("isPublic", false);
+        scan.setPublic(isPublic);
+        scanRunRepository.save(scan);
+        
+        return ResponseEntity.ok(Map.of("scanId", id, "isPublic", isPublic));
     }
 }

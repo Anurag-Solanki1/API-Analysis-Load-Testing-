@@ -8,5 +8,6 @@ import java.util.List;
 
 @Repository
 public interface ApiTestRunRepository extends JpaRepository<ApiTestRunEntity, String> {
-    List<ApiTestRunEntity> findByProjectNameAndEndpointPathAndHttpMethodOrderByStartedAtDesc(String projectName, String endpointPath, String httpMethod);
+    List<ApiTestRunEntity> findByUserAndProjectNameAndEndpointPathAndHttpMethodOrderByStartedAtDesc(
+            com.codechecker.entity.UserEntity user, String projectName, String endpointPath, String httpMethod);
 }

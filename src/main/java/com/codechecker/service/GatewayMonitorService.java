@@ -61,23 +61,25 @@ public class GatewayMonitorService {
      * WebSocket.
      */
     @Transactional
-    public void record(String projectName, GatewayHit hit) {
+    public void record(com.codechecker.entity.UserEntity user, String projectName, GatewayHit hit) {
         // Persist to DB
         try {
             GatewayHitEntity entity = toEntity(hit, projectName);
+            entity.setUser(user);
             hitRepository.save(entity);
         } catch (Exception e) {
             log.warn("Failed to persist gateway hit for {}: {}", projectName, e.getMessage());
         }
 
         // Keep in-memory ring buffer for live WebSocket feed
-        Deque<GatewayHit> deque = recentHits.computeIfAbsent(projectName, k -> new ConcurrentLinkedDeque<>());
+        String cacheKey = user.getEmail() + ":" + projectName;
+        Deque<GatewayHit> deque = recentHits.computeIfAbsent(cacheKey, k -> new ConcurrentLinkedDeque<>());
         deque.addFirst(hit);
         while (deque.size() > MAX_HITS_PER_PROJECT) {
             deque.pollLast();
         }
         try {
-            messagingTemplate.convertAndSend("/topic/monitor/" + projectName, hit);
+            messagingTemplate.convertAndSend("/topic/monitor/" + user.getEmail() + "/" + projectName, hit);
         } catch (Exception e) {
             log.warn("Failed to broadcast gateway hit for {}: {}", projectName, e.getMessage());
         }
@@ -88,9 +90,9 @@ public class GatewayMonitorService {
      * Falls back to in-memory ring buffer if DB is unavailable.
      */
     @Transactional(readOnly = true)
-    public List<GatewayHit> getRecent(String projectName) {
+    public List<GatewayHit> getRecent(com.codechecker.entity.UserEntity user, String projectName) {
         try {
-            List<GatewayHitEntity> entities = hitRepository.findTop200ByProjectNameOrderByRecordedAtDesc(projectName);
+            List<GatewayHitEntity> entities = hitRepository.findTop200ByUserAndProjectNameOrderByRecordedAtDesc(user, projectName);
             if (!entities.isEmpty()) {
                 return entities.stream().map(this::fromEntity).collect(Collectors.toList());
             }
@@ -98,7 +100,8 @@ public class GatewayMonitorService {
             log.warn("Failed to query gateway hits from DB for {}: {}", projectName, e.getMessage());
         }
         // Fallback: in-memory buffer (e.g. first request after app start)
-        Deque<GatewayHit> deque = recentHits.get(projectName);
+        String cacheKey = user.getEmail() + ":" + projectName;
+        Deque<GatewayHit> deque = recentHits.get(cacheKey);
         return deque != null ? new ArrayList<>(deque) : new ArrayList<>();
     }
 
@@ -111,7 +114,7 @@ public class GatewayMonitorService {
      * @param date        optional – if provided, only hits from that day are returned
      */
     @Transactional(readOnly = true)
-    public Page<GatewayHit> getHistory(String projectName, int page, int size, LocalDate date) {
+    public Page<GatewayHit> getHistory(com.codechecker.entity.UserEntity user, String projectName, int page, int size, LocalDate date) {
         int safeSize = Math.min(size, 200);
         PageRequest pageRequest = PageRequest.of(page, safeSize);
         try {
@@ -119,10 +122,10 @@ public class GatewayMonitorService {
             if (date != null) {
                 LocalDateTime from = date.atStartOfDay();
                 LocalDateTime to   = date.atTime(LocalTime.MAX);
-                entityPage = hitRepository.findByProjectNameAndRecordedAtBetweenOrderByRecordedAtDesc(
-                        projectName, from, to, pageRequest);
+                entityPage = hitRepository.findByUserAndProjectNameAndRecordedAtBetweenOrderByRecordedAtDesc(
+                        user, projectName, from, to, pageRequest);
             } else {
-                entityPage = hitRepository.findByProjectNameOrderByRecordedAtDesc(projectName, pageRequest);
+                entityPage = hitRepository.findByUserAndProjectNameOrderByRecordedAtDesc(user, projectName, pageRequest);
             }
             List<GatewayHit> hits = entityPage.getContent().stream()
                     .map(this::fromEntity)
@@ -138,9 +141,9 @@ public class GatewayMonitorService {
      * Return the total count of stored hits for a project.
      */
     @Transactional(readOnly = true)
-    public long countHits(String projectName) {
+    public long countHits(com.codechecker.entity.UserEntity user, String projectName) {
         try {
-            return hitRepository.countByProjectName(projectName);
+            return hitRepository.countByUserAndProjectName(user, projectName);
         } catch (Exception e) {
             return 0;
         }
@@ -150,10 +153,11 @@ public class GatewayMonitorService {
      * Clear the in-memory ring buffer and DB records for a project.
      */
     @Transactional
-    public void clear(String projectName) {
-        recentHits.remove(projectName);
+    public void clear(com.codechecker.entity.UserEntity user, String projectName) {
+        String cacheKey = user.getEmail() + ":" + projectName;
+        recentHits.remove(cacheKey);
         try {
-            hitRepository.deleteByProjectName(projectName);
+            hitRepository.deleteByUserAndProjectName(user, projectName);
         } catch (Exception e) {
             log.warn("Failed to clear gateway hits from DB for {}: {}", projectName, e.getMessage());
         }

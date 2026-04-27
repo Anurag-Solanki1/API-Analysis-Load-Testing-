@@ -13,20 +13,20 @@ import java.util.List;
 public interface GatewayHitRepository extends JpaRepository<GatewayHitEntity, Long> {
 
     /** Live feed: most recent 200 hits for a project. */
-    List<GatewayHitEntity> findTop200ByProjectNameOrderByRecordedAtDesc(String projectName);
+    List<GatewayHitEntity> findTop200ByUserAndProjectNameOrderByRecordedAtDesc(com.codechecker.entity.UserEntity user, String projectName);
 
     /** Paginated history: all hits for a project, newest first. */
-    Page<GatewayHitEntity> findByProjectNameOrderByRecordedAtDesc(String projectName, Pageable pageable);
+    Page<GatewayHitEntity> findByUserAndProjectNameOrderByRecordedAtDesc(com.codechecker.entity.UserEntity user, String projectName, Pageable pageable);
 
     /** Paginated history filtered by a specific calendar day. */
-    Page<GatewayHitEntity> findByProjectNameAndRecordedAtBetweenOrderByRecordedAtDesc(
-            String projectName, LocalDateTime from, LocalDateTime to, Pageable pageable);
+    Page<GatewayHitEntity> findByUserAndProjectNameAndRecordedAtBetweenOrderByRecordedAtDesc(
+            com.codechecker.entity.UserEntity user, String projectName, LocalDateTime from, LocalDateTime to, Pageable pageable);
 
     /** TTL cleanup: delete all hits older than the given cutoff timestamp. */
     void deleteByRecordedAtBefore(LocalDateTime cutoff);
 
     /** Count how many hits exist for a project (for stats). */
-    long countByProjectName(String projectName);
+    long countByUserAndProjectName(com.codechecker.entity.UserEntity user, String projectName);
 
-    void deleteByProjectName(String projectName);
+    void deleteByUserAndProjectName(com.codechecker.entity.UserEntity user, String projectName);
 }

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -24,44 +25,77 @@ public class ApiTestController {
     private final ApiTesterService testerService;
     private final ApiTestRunRepository runRepository;
     private final ScanRunRepository scanRunRepository;
+    private final com.codechecker.security.SecurityUtils securityUtils;
 
     public ApiTestController(ApiTesterService testerService, ApiTestRunRepository runRepository,
-            ScanRunRepository scanRunRepository) {
+            ScanRunRepository scanRunRepository, com.codechecker.security.SecurityUtils securityUtils) {
         this.testerService = testerService;
         this.runRepository = runRepository;
         this.scanRunRepository = scanRunRepository;
+        this.securityUtils = securityUtils;
     }
 
     @PostMapping("/run")
     public ApiTestRunEntity runTest(@RequestBody ApiTestRequest request) {
-        return testerService.runTest(request);
+        com.codechecker.entity.UserEntity user = securityUtils.getCurrentUser();
+        return testerService.runTest(request, user);
     }
 
     @GetMapping("/history")
-    public List<ApiTestRunEntity> getHistory(
+    public ResponseEntity<List<ApiTestRunEntity>> getHistory(
             @RequestParam String projectName,
             @RequestParam String endpointPath,
-            @RequestParam String httpMethod) {
-        return runRepository.findByProjectNameAndEndpointPathAndHttpMethodOrderByStartedAtDesc(projectName,
-                endpointPath, httpMethod);
+            @RequestParam String httpMethod,
+            @RequestParam(required = false) String scanId) {
+
+        com.codechecker.entity.UserEntity targetUser = null;
+
+        if (scanId != null && !scanId.isBlank()) {
+            Optional<ScanRun> optScan = scanRunRepository.findById(scanId);
+            if (optScan.isEmpty() || !securityUtils.canAccessScan(optScan.get())) {
+                return ResponseEntity.status(403).build();
+            }
+            targetUser = optScan.get().getUser();
+        } else {
+            targetUser = securityUtils.getCurrentUser();
+        }
+
+        List<ApiTestRunEntity> history = runRepository.findByUserAndProjectNameAndEndpointPathAndHttpMethodOrderByStartedAtDesc(
+                targetUser, projectName, endpointPath, httpMethod);
+        return ResponseEntity.ok(history);
     }
 
     @GetMapping("/projects")
     public List<String> getProjects() {
-        return scanRunRepository.findAllByOrderByStartedAtDesc().stream()
+        com.codechecker.entity.UserEntity user = securityUtils.getCurrentUser();
+        return scanRunRepository.findByUserOrderByStartedAtDesc(user).stream()
                 .map(ScanRun::getProjectName)
                 .distinct()
                 .collect(Collectors.toList());
     }
 
     @GetMapping("/endpoints")
-    public List<EndpointResultEntity> getProjectEndpoints(@RequestParam String projectName) {
-        List<ScanRun> runs = scanRunRepository.findByProjectNameOrderByStartedAtDesc(projectName);
+    public ResponseEntity<List<EndpointResultEntity>> getProjectEndpoints(
+            @RequestParam String projectName,
+            @RequestParam(required = false) String scanId) {
+
+        List<ScanRun> runs;
+        if (scanId != null && !scanId.isBlank()) {
+            Optional<ScanRun> optScan = scanRunRepository.findById(scanId);
+            if (optScan.isEmpty() || !securityUtils.canAccessScan(optScan.get())) {
+                return ResponseEntity.status(403).build();
+            }
+            runs = List.of(optScan.get());
+        } else {
+            com.codechecker.entity.UserEntity user = securityUtils.getCurrentUser();
+            runs = scanRunRepository.findByUserAndProjectNameOrderByStartedAtDesc(user, projectName);
+        }
+
         if (runs.isEmpty())
-            return List.of();
+            return ResponseEntity.ok(List.of());
         List<EndpointResultEntity> endpoints = runs.get(0).getEndpoints();
         endpoints.size(); // Force hibernate proxy initialization
-        return endpoints;
+        return ResponseEntity.ok(endpoints);
     }
 
     /**
@@ -74,7 +108,8 @@ public class ApiTestController {
         if (request.getLiveRunId() == null || request.getLiveRunId().isBlank()) {
             return ResponseEntity.badRequest().body(Map.of("error", "liveRunId is required"));
         }
-        testerService.runLiveTest(request);
+        com.codechecker.entity.UserEntity user = securityUtils.getCurrentUser();
+        testerService.runLiveTest(request, user);
         return ResponseEntity.ok(Map.of("runId", request.getLiveRunId(), "status", "RUNNING"));
     }
 
@@ -83,7 +118,8 @@ public class ApiTestController {
      */
     @DeleteMapping("/run-live/{runId}")
     public ResponseEntity<Map<String, String>> cancelLiveTest(@PathVariable String runId) {
-        testerService.cancelLiveTest(runId);
+        com.codechecker.entity.UserEntity user = securityUtils.getCurrentUser();
+        testerService.cancelLiveTest(runId, user);
         return ResponseEntity.ok(Map.of("runId", runId, "status", "CANCELLED"));
     }
 }

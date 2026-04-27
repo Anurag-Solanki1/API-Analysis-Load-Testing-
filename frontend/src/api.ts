@@ -86,6 +86,17 @@ export async function getValidJwt(): Promise<string | null> {
   }
 }
 
+export function getUserEmail(): string | null {
+  const jwt = localStorage.getItem("jwt");
+  if (!jwt) return null;
+  try {
+    const payload = JSON.parse(atob(jwt.split(".")[1]));
+    return payload.sub || payload.email || "unknown";
+  } catch (e) {
+    return null;
+  }
+}
+
 export interface ScanRequest {
   projectName: string;
   projectPath: string;
@@ -125,6 +136,7 @@ export interface ScanSummary {
   moderateEndpoints: number;
   slowEndpoints: number;
   criticalEndpoints: number;
+  isPublic?: boolean;
 }
 
 export interface EndpointResult {
@@ -186,6 +198,19 @@ export interface ScanHistoryItem {
   totalFiles: number;
   diagramsGenerated: number;
   frameworkSummary?: string;
+  isPublic?: boolean;
+}
+
+export interface PublicScanItem {
+  id: string;
+  projectName: string;
+  startedAt: string;
+  completedAt: string;
+  healthScore: number;
+  grade: string;
+  totalEndpoints: number;
+  ownerName: string;
+  ownerPicture: string;
 }
 
 // ─── API Functions ───
@@ -212,6 +237,20 @@ export async function stopScan(scanId: string): Promise<void> {
 
 export async function getScanHistory(): Promise<ScanHistoryItem[]> {
   const res = await apiFetch(`${API_BASE}/api/scan/history`);
+  return res.json();
+}
+
+export async function toggleScanVisibility(scanId: string, isPublic: boolean): Promise<{ scanId: string, isPublic: boolean }> {
+  const res = await apiFetch(`${API_BASE}/api/scan/${scanId}/visibility`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ isPublic }),
+  });
+  return res.json();
+}
+
+export async function getPublicScans(): Promise<PublicScanItem[]> {
+  const res = await apiFetch(`${API_BASE}/api/community/scans`);
   return res.json();
 }
 
@@ -541,8 +580,10 @@ export async function getTestProjects(): Promise<string[]> {
 
 export async function getTestEndpoints(
   projectName: string,
+  scanId?: string
 ): Promise<EndpointResult[]> {
   const params = new URLSearchParams({ projectName });
+  if (scanId) params.append("scanId", scanId);
   const res = await apiFetch(`${API_BASE}/api/test/endpoints?${params}`);
   return res.json();
 }
@@ -560,8 +601,10 @@ export async function getApiTestHistory(
   projectName: string,
   endpointPath: string,
   httpMethod: string,
+  scanId?: string
 ): Promise<ApiTestRun[]> {
   const params = new URLSearchParams({ projectName, endpointPath, httpMethod });
+  if (scanId) params.append("scanId", scanId);
   const res = await apiFetch(`${API_BASE}/api/test/history?${params}`);
   return res.json();
 }
@@ -616,10 +659,11 @@ export interface GatewayHit {
 /** Get the configured target URL for a project (null if not configured). */
 export async function getMonitorConfig(
   projectName: string,
+  scanId?: string
 ): Promise<GatewayConfig | null> {
-  const res = await apiFetch(
-    `${API_BASE}/api/monitor/config/${encodeURIComponent(projectName)}`,
-  );
+  let url = `${API_BASE}/api/monitor/config/${encodeURIComponent(projectName)}`;
+  if (scanId) url += `?scanId=${scanId}`;
+  const res = await apiFetch(url);
   if (res.status === 404) return null;
   return res.json();
 }
@@ -640,10 +684,11 @@ export async function saveMonitorConfig(
 /** Return the last 200 gateway hits for a project (newest first). */
 export async function getRecentMonitorHits(
   projectName: string,
+  scanId?: string
 ): Promise<GatewayHit[]> {
-  const res = await apiFetch(
-    `${API_BASE}/api/monitor/${encodeURIComponent(projectName)}/recent`,
-  );
+  let url = `${API_BASE}/api/monitor/${encodeURIComponent(projectName)}/recent`;
+  if (scanId) url += `?scanId=${scanId}`;
+  const res = await apiFetch(url);
   if (!res.ok) return [];
   return res.json();
 }
@@ -669,13 +714,15 @@ export async function getMonitorHistory(
   projectName: string,
   page: number = 0,
   size: number = 50,
-  date?: string
+  date?: string,
+  scanId?: string
 ): Promise<PageResult<GatewayHit>> {
   const params = new URLSearchParams({
     page: page.toString(),
     size: size.toString(),
   });
   if (date) params.set("date", date);
+  if (scanId) params.set("scanId", scanId);
   const res = await apiFetch(
     `${API_BASE}/api/monitor/${encodeURIComponent(projectName)}/history?${params}`
   );
@@ -684,10 +731,10 @@ export async function getMonitorHistory(
 }
 
 /** Total number of persisted hits for a project. */
-export async function getMonitorHitCount(projectName: string): Promise<number> {
-  const res = await apiFetch(
-    `${API_BASE}/api/monitor/${encodeURIComponent(projectName)}/history/count`
-  );
+export async function getMonitorHitCount(projectName: string, scanId?: string): Promise<number> {
+  let url = `${API_BASE}/api/monitor/${encodeURIComponent(projectName)}/history/count`;
+  if (scanId) url += `?scanId=${scanId}`;
+  const res = await apiFetch(url);
   if (!res.ok) return 0;
   const data = await res.json();
   return data.count || 0;
@@ -707,5 +754,7 @@ export function getGatewayUrl(
       /[A-Za-z0-9\-._~!$&'()*+,;=:@]/.test(c) ? c : encodeURIComponent(c),
     )
     .join("");
-  return `${API_BASE}/api/gateway/${encodedProject}${endpointPath}`;
+  const userEmail = getUserEmail() || "unknown";
+  const encodedEmail = encodeURIComponent(userEmail);
+  return `${API_BASE}/api/gateway/${encodedEmail}/${encodedProject}${endpointPath}`;
 }

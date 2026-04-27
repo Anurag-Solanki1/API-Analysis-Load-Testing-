@@ -23,6 +23,8 @@ public class ResultController {
     private ScanRunRepository scanRunRepository;
     @Autowired
     private IssueResultRepository issueResultRepository;
+    @Autowired
+    private com.codechecker.security.SecurityUtils securityUtils;
 
     /**
      * GET /api/results/{scanId} — Full scan result.
@@ -30,8 +32,9 @@ public class ResultController {
     @GetMapping("/{scanId}")
     public ResponseEntity<?> getFullResult(@PathVariable String scanId) {
         return scanRunRepository.findById(scanId)
+                .filter(scan -> securityUtils.canAccessScan(scan))
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .orElse(ResponseEntity.status(403).build());
     }
 
     /**
@@ -40,6 +43,7 @@ public class ResultController {
     @GetMapping("/{scanId}/summary")
     public ResponseEntity<?> getSummary(@PathVariable String scanId) {
         return scanRunRepository.findById(scanId)
+                .filter(scan -> securityUtils.canAccessScan(scan))
                 .map(scan -> {
                     Map<String, Object> summary = new LinkedHashMap<>();
                     summary.put("scanId", scan.getId());
@@ -56,6 +60,7 @@ public class ResultController {
                     summary.put("diagramsGenerated", scan.getDiagramsGenerated());
                     summary.put("startedAt", scan.getStartedAt());
                     summary.put("completedAt", scan.getCompletedAt());
+                    summary.put("isPublic", scan.isPublic());
 
                     // Count by rating
                     long fast = scan.getEndpoints().stream().filter(e -> "FAST".equals(e.getPerformanceRating()))
@@ -73,7 +78,7 @@ public class ResultController {
 
                     return ResponseEntity.ok(summary);
                 })
-                .orElse(ResponseEntity.notFound().build());
+                .orElse(ResponseEntity.status(403).build());
     }
 
     /**
@@ -82,11 +87,12 @@ public class ResultController {
     @GetMapping("/{scanId}/endpoints")
     public ResponseEntity<?> getEndpoints(@PathVariable String scanId) {
         return scanRunRepository.findById(scanId)
+                .filter(scan -> securityUtils.canAccessScan(scan))
                 .map(scan -> {
                     scan.getEndpoints().size(); // Force hibernate proxy initialization
                     return ResponseEntity.ok(scan.getEndpoints());
                 })
-                .orElse(ResponseEntity.notFound().build());
+                .orElse(ResponseEntity.status(403).build());
     }
 
     /**
@@ -97,6 +103,11 @@ public class ResultController {
             @PathVariable String scanId,
             @RequestParam(required = false) String severity,
             @RequestParam(required = false) String category) {
+
+        Optional<ScanRun> optScan = scanRunRepository.findById(scanId);
+        if (optScan.isEmpty() || !securityUtils.canAccessScan(optScan.get())) {
+            return ResponseEntity.status(403).build();
+        }
 
         List<IssueResultEntity> issues;
         if (severity != null) {
