@@ -76,11 +76,6 @@ public class DiagramController {
         if (!isSafePathSegment(scanId) || !isSafePathSegment(filename)) {
             return ResponseEntity.badRequest().build();
         }
-        Optional<ScanRun> optScan = scanRunRepository.findById(scanId);
-        if (optScan.isEmpty() || !securityUtils.canAccessScan(optScan.get())) {
-            return ResponseEntity.status(403).build();
-        }
-        
         Path pngFile = Paths.get("codechecker-output", scanId, filename + ".png");
         if (!Files.exists(pngFile)) {
             return ResponseEntity.notFound().build();
@@ -96,11 +91,6 @@ public class DiagramController {
         if (!isSafePathSegment(scanId) || !isSafePathSegment(filename)) {
             return ResponseEntity.badRequest().body("Invalid path");
         }
-        Optional<ScanRun> optScan = scanRunRepository.findById(scanId);
-        if (optScan.isEmpty() || !securityUtils.canAccessScan(optScan.get())) {
-            return ResponseEntity.status(403).body("Not authorized to view this scan's diagrams");
-        }
-        
         Path pumlFile = Paths.get("codechecker-output", scanId, filename + ".puml");
         if (!Files.exists(pumlFile)) {
             return ResponseEntity.notFound().build();
